@@ -2,35 +2,35 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Test on Ock</title>
-    <link>https://github.com/jun7680/categories/test/</link>
+    <link>https://jun7680.github.io/categories/test/</link>
     <description>Recent content in Test on Ock</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 09 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://github.com/jun7680/categories/test/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 09 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/categories/test/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Chinese Test</title>
-      <link>https://github.com/jun7680/p/test-chinese/</link>
+      <link>https://jun7680.github.io/p/test-chinese/</link>
       <pubDate>Wed, 09 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://github.com/jun7680/p/test-chinese/</guid>
+      <guid>https://jun7680.github.io/p/test-chinese/</guid>
       <description>正文测试 而这些并不是完全重要，更加重要的问题是， 带着这些问题，我们来审视一下学生会退会。 既然如何， 对我个人而言，学生会退会不仅仅是一个重大的</description>
     </item>
     
     <item>
       <title>Placeholder Text</title>
-      <link>https://github.com/jun7680/p/placeholder-text/</link>
+      <link>https://jun7680.github.io/p/placeholder-text/</link>
       <pubDate>Sat, 09 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://github.com/jun7680/p/placeholder-text/</guid>
+      <guid>https://jun7680.github.io/p/placeholder-text/</guid>
       <description>&lt;p&gt;Lorem est tota propiore conpellat pectoribus de pectora summo.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Emoji Support</title>
-      <link>https://github.com/jun7680/p/emoji-support/</link>
+      <link>https://jun7680.github.io/p/emoji-support/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://github.com/jun7680/p/emoji-support/</guid>
+      <guid>https://jun7680.github.io/p/emoji-support/</guid>
       <description>&lt;p&gt;Emoji can be enabled in a Hugo project in a number of ways.&lt;/p&gt;</description>
     </item>
     
