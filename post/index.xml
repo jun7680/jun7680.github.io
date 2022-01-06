@@ -6,14 +6,14 @@
     <description>Recent content in Posts on Ock</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 09 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Chinese Test</title>
-      <link>https://jun7680.github.io/p/test-chinese/</link>
-      <pubDate>Wed, 09 Sep 2020 00:00:00 +0000</pubDate>
+      <title>Notion으로 Posting</title>
+      <link>https://jun7680.github.io/p/notion/</link>
+      <pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://jun7680.github.io/p/test-chinese/</guid>
-      <description>正文测试 而这些并不是完全重要，更加重要的问题是， 带着这些问题，我们来审视一下学生会退会。 既然如何， 对我个人而言，学生会退会不仅仅是一个重大的</description>
+      <guid>https://jun7680.github.io/p/notion/</guid>
+      <description>글 작성 --- layout: post title: 제목 subtitle: 부제목 date: 글 작성 시간 categories: 카테고리 tags: 테그 or [테그, 테그....] comments: true &amp;lt;- 댓글 사용 여부 --- 처음에 마크다운 문법 에러가 계속 났었는데 알고보</description>
     </item>
     
     <item>

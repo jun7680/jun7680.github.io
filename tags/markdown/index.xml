@@ -6,7 +6,16 @@
     <description>Recent content in markdown on Ock</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Mar 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/markdown/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/markdown/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Notion으로 Posting</title>
+      <link>https://jun7680.github.io/p/notion/</link>
+      <pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jun7680.github.io/p/notion/</guid>
+      <description>글 작성 --- layout: post title: 제목 subtitle: 부제목 date: 글 작성 시간 categories: 카테고리 tags: 테그 or [테그, 테그....] comments: true &amp;lt;- 댓글 사용 여부 --- 처음에 마크다운 문법 에러가 계속 났었는데 알고보</description>
+    </item>
+    
     <item>
       <title>Markdown Syntax Guide</title>
       <link>https://jun7680.github.io/p/markdown-syntax-guide/</link>
