@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en-us">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Notion으로 jekyll에 포스팅하기'><title>Notion으로 Posting</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Observable에 대해 알아보자!'><title>Hot Observable, Cold Observable</title>
 
-<link rel='canonical' href='https://jun7680.github.io/p/notion/'>
+<link rel='canonical' href='https://jun7680.github.io/p/hot-observable-cold-observable/'>
 
-<link rel="stylesheet" href="/scss/style.min.775dbd4fd34fda61c5273b4bc3415f7c9666414fb6c40aab164a7ded4397da98.css"><meta property='og:title' content='Notion으로 Posting'>
-<meta property='og:description' content='Notion으로 jekyll에 포스팅하기'>
-<meta property='og:url' content='https://jun7680.github.io/p/notion/'>
+<link rel="stylesheet" href="/scss/style.min.775dbd4fd34fda61c5273b4bc3415f7c9666414fb6c40aab164a7ded4397da98.css"><meta property='og:title' content='Hot Observable, Cold Observable'>
+<meta property='og:description' content='Observable에 대해 알아보자!'>
+<meta property='og:url' content='https://jun7680.github.io/p/hot-observable-cold-observable/'>
 <meta property='og:site_name' content='Ock'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Markdown' /><meta property='article:tag' content='jekyll' /><meta property='article:tag' content='Notion' /><meta property='article:published_time' content='2020-12-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2020-12-23T00:00:00&#43;00:00'/><meta property='og:image' content='https://jun7680.github.io/p/notion/notion_logo.png' />
-<meta name="twitter:title" content="Notion으로 Posting">
-<meta name="twitter:description" content="Notion으로 jekyll에 포스팅하기"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://jun7680.github.io/p/notion/notion_logo.png' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='RxSwift' /><meta property='article:published_time' content='2022-01-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2022-01-07T00:00:00&#43;00:00'/><meta property='og:image' content='https://jun7680.github.io/p/hot-observable-cold-observable/Observable.png' />
+<meta name="twitter:title" content="Hot Observable, Cold Observable">
+<meta name="twitter:description" content="Observable에 대해 알아보자!"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://jun7680.github.io/p/hot-observable-cold-observable/Observable.png' />
     </head>
     <body class="
     article-page has-toc
@@ -62,13 +62,13 @@
     <article class="has-image main-article">
     <header class="article-header">
         <div class="article-image">
-            <a href="/p/notion/">
-                <img src="/p/notion/notion_logo_hue0fc8e6fbcd2e111e165f01729436d21_5002_800x0_resize_box_3.png"
-                        srcset="/p/notion/notion_logo_hue0fc8e6fbcd2e111e165f01729436d21_5002_800x0_resize_box_3.png 800w, /p/notion/notion_logo_hue0fc8e6fbcd2e111e165f01729436d21_5002_1600x0_resize_box_3.png 1600w"
+            <a href="/p/hot-observable-cold-observable/">
+                <img src="/p/hot-observable-cold-observable/Observable_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_800x0_resize_box_3.png"
+                        srcset="/p/hot-observable-cold-observable/Observable_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_800x0_resize_box_3.png 800w, /p/hot-observable-cold-observable/Observable_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_1600x0_resize_box_3.png 1600w"
                         width="800" 
-                        height="444" 
+                        height="396" 
                         loading="lazy"
-                        alt="Featured image of post Notion으로 Posting" />
+                        alt="Featured image of post Hot Observable, Cold Observable" />
                 
             </a>
         </div>
@@ -78,24 +78,20 @@
     
     <header class="article-category">
         
-            <a href="/categories/notion/" >
-                Notion
-            </a>
-        
-            <a href="/categories/jekyll/" >
-                jekyll
+            <a href="/categories/swift/" >
+                Swift
             </a>
         
     </header>
     
 
     <h2 class="article-title">
-        <a href="/p/notion/">Notion으로 Posting</a>
+        <a href="/p/hot-observable-cold-observable/">Hot Observable, Cold Observable</a>
     </h2>
 
     
     <h3 class="article-subtitle">
-        Notion으로 jekyll에 포스팅하기
+        Observable에 대해 알아보자!
     </h3>
     
 
@@ -112,7 +108,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Dec 23, 2020</time>
+                <time class="article-time--published">Jan 07, 2022</time>
             </div>
         
 
@@ -123,29 +119,23 @@
 </header>
 
     <section class="article-content">
-    <h3 id="글-작성">글 작성</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown">---
-layout: post
-title: 제목
-subtitle: 부제목
-date: 글 작성 시간
-categories: 카테고리
-tags: 테그 or [테그, 테그....]
-comments: true <span class="p">&lt;</span><span class="nt">-</span> <span class="na">댓글</span> <span class="na">사용</span> <span class="na">여부</span>
-<span class="na">---</span>
-</code></pre></div><hr>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<p><del>처음에 마크다운 문법 에러가 계속 났었는데 알고보니 따옴표&hellip;</del><br>
-<del>노션이나 다른 곳에서 복사해서 사용할 경우 따옴표에 주의해야 한다.</del></p>
-<ul>
-<li>
-<p>글 작성후 _post라는 폴더 안에 md파일을 넣어준다.</p>
-</li>
-<li>
-<p>md파일을 넣을때 <strong>yyyy-mm-dd-제목</strong> 의 형식을 맞춰서 넣어줘야 포스팅 된다.</p>
-</li>
-</ul>
+    <p><strong>습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!</strong></p>
+<h4 id="개념">개념</h4>
+<p>먼저 공식문서에 따르면 (<a class="link" href="https://reactivex.io/documentation/observable.html"  target="_blank" rel="noopener"
+    >https://reactivex.io/documentation/observable.html</a>)</p>
+<blockquote>
+<blockquote>
+<p>“Hot” and “Cold” Observables
+When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.
+In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.</p>
+</blockquote>
+</blockquote>
+<p>라고 설명 되어있는데 <del>(영어라 모르겠다..)</del></p>
+<p>아는 단어 총 동원해서 보면 hot, cold의 차이점은 구독 시점에 따른 아이템 방출 방법 이라고 되어 있다.</p>
+<p>Hot🔥 은 구독하는 순간부터 즉 이전 이벤트들은 무시하고 구도된 순간부터 다음 아이템들이 방출되고(ex: 라이브 방송)<br>
+Cold❄️ 는 구독하는 순간 이전 이벤트들을 처음 부터 끝까지 전부 전달해 준다(ex: VOD).</p>
+<p>다시말해 Hot은 구독 이후 발생한 아이템들에 대한 방출이 이루어 지고, Cold는 구독 시점 이전에 발생한 아이템들도 방출해준다고 되어있다.<br>
+<del>(잘못된 점 있으면 댓글 부탁드립니다)</del></p>
 
 </section>
 
@@ -154,11 +144,7 @@ comments: true <span class="p">&lt;</span><span class="nt">-</span> <span class=
     
     <section class="article-tags">
         
-            <a href="/tags/markdown/">Markdown</a>
-        
-            <a href="/tags/jekyll/">jekyll</a>
-        
-            <a href="/tags/notion/">Notion</a>
+            <a href="/tags/rxswift/">RxSwift</a>
         
     </section>
 
@@ -338,7 +324,11 @@ comments: true <span class="p">&lt;</span><span class="nt">-</span> <span class=
   <ol>
     <li>
       <ol>
-        <li><a href="#글-작성">글 작성</a></li>
+        <li>
+          <ol>
+            <li><a href="#개념">개념</a></li>
+          </ol>
+        </li>
       </ol>
     </li>
   </ol>

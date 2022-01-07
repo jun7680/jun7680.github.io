@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RxSwift on Ock</title>
+    <link>https://jun7680.github.io/tags/rxswift/</link>
+    <description>Recent content in RxSwift on Ock</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 07 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/rxswift/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hot Observable, Cold Observable</title>
+      <link>https://jun7680.github.io/p/hot-observable-cold-observable/</link>
+      <pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid>
+      <description>습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다! 개념 먼저 공식문서에 따르면 (https://reactivex.io/documentation/observable.html) “Hot” and “Cold” Observables When does an Observable</description>
+    </item>
+    
+  </channel>
+</rss>
