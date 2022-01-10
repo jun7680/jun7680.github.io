@@ -1,12 +1,107 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>Ock</title>
+        <title>오깅중</title>
         <link>https://jun7680.github.io/</link>
-        <description>Recent content on Ock</description>
+        <description>Recent content on 오깅중</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Fri, 07 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Mon, 10 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>iOS에서 FCM 사용하기!</title>
+        <link>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link>
+        <pubDate>Mon, 10 Jan 2022 00:00:00 +0000</pubDate>
+        
+        <guid>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid>
+        <description>&lt;img src="https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/FCM.png" alt="Featured image of post iOS에서 FCM 사용하기!" /&gt;&lt;h2 id=&#34;fcm&#34;&gt;FCM&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;fcm-설정&#34;&gt;FCM 설정&lt;/h3&gt;
+&lt;p&gt;준비 사항&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.&lt;/li&gt;
+&lt;li&gt;XCode의 APP &amp;gt; Capabilities에서 푸시 알림 사용 설정을 한다.&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.firebase.google.com/u/0/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Firebase Console&lt;/a&gt;에서 프로젝트를 추가한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;firebase-앱-등록&#34;&gt;Firebase 앱 등록&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;프로젝트를 추가하고 나오면 중앙에 &lt;figure 
+	&gt;
+	&lt;a href=&#34;https://jun7680.github.io/FCM_iOS&amp;#43;.png&#34; &gt;
+		&lt;img src=&#34;https://jun7680.github.io/FCM_iOS&amp;#43;.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;
+iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 &lt;strong&gt;GoogleService-Info.plist&lt;/strong&gt;를 다운받을수 있다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Xcode 프로젝트로 돌아가 SPM에 &lt;code&gt;https://github.com/firebase/firebase-ios-sdk&lt;/code&gt;를 추가 해준다.&lt;br&gt;
+(최신 버전을 사용해 주는 것이 좋지만 필요하다면 이전 버전을 사용해도 무방하다)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;추가를 해주고 프로젝트에서 초기화 코드를 추가 해 주면 된다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;firebase-초기화-코드&#34;&gt;Firebase 초기화 코드&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;AppDelegate.swift에 가서 Firebase를 import 해준다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Swift&#34; data-lang=&#34;Swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Firebase&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;didFinishLaunchingWithOptions 메서드에서 FirebaseApp.configure()를 날려준다&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didFinishLaunchingWithOptions&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchOptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchOptionsKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Bool&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;FirebaseApp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;이제 시작될때 원격 알림에 앱을 등록을 해줘야 하는데 친절하게 이미 구현이 되어있다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didFinishLaunchingWithOptions&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchOptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchOptionsKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Bool&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;FirebaseApp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registerForRemoteNotifications&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다 된거 같지만 중요한 토큰 등록이 남아있다.&lt;/p&gt;
+&lt;h4 id=&#34;firebase-토큰-등록&#34;&gt;Firebase 토큰 등록&lt;/h4&gt;
+&lt;p&gt;토큰은 messaging:didReceiveRegistrationToken 메서드를 통해 전달 되는데 해당 메서드는 MessagingDelegate에 구현 되어있는 함수를 이용하거나 token(completion)을 사용하여 직접 토큰을 가져올 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;o&#34;&gt;------&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Delegate&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;이용&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;extension&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;AppDelegate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MessagingDelegate&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didReceiveRegistrationToken&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fcmToken&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;fcmToken&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;이게&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;넘어오는&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;토큰이다&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt; 
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didFinishLaunchingWithOptions&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchOptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchOptionsKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Bool&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;FirebaseApp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registerForRemoteNotifications&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;Messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;delegate&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;self&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;- 이거 안해줘서 한참을 얼탔던 기억이..&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+ 
+
+&lt;span class=&#34;o&#34;&gt;------&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:)&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;이용&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;Messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;token&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;error&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; 
+
+&lt;span class=&#34;c1&#34;&gt;// 실행 코드&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;알림 서버가 구축되어있으면 자신이 사용하는 서버에 fcm 토큰 값을 보내서 사용하면 된다!!&lt;/p&gt;
+&lt;p&gt;구글의 정석적인 설명을 보고 싶으면 &lt;a class=&#34;link&#34; href=&#34;https://firebase.google.com/docs/cloud-messaging/ios/client&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;여기&lt;/a&gt;로 가서 보면 구글의 친절한 설명을 볼 수 있다.!&lt;/p&gt;
+&lt;h2 id=&#34;알림-테스트를-할-경우-꼭-실제-기기에서-해보세요-시뮬에서-백번-돌려도-백번-다-안나왔던-기억이-있습니다&#34;&gt;&lt;del&gt;알림 테스트를 할 경우 꼭 실제 기기에서 해보세요!! 시뮬에서 백번 돌려도 백번 다 안나왔던 기억이 있습니다.&lt;/del&gt;&lt;/h2&gt;
+</description>
+        </item>
+        <item>
         <title>Hot Observable, Cold Observable</title>
         <link>https://jun7680.github.io/p/hot-observable-cold-observable/</link>
         <pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate>

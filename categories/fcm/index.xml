@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>FCM on 오깅중</title>
+    <link>https://jun7680.github.io/categories/fcm/</link>
+    <description>Recent content in FCM on 오깅중</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 10 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/categories/fcm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>iOS에서 FCM 사용하기!</title>
+      <link>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link>
+      <pubDate>Mon, 10 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid>
+      <description>FCM Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션! FCM 설정 준비 사항 Apple 개발자 계정의 푸시 알림 인증 키를</description>
+    </item>
+    
+  </channel>
+</rss>

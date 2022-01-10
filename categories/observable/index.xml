@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>RxSwift on 오깅중</title>
-    <link>https://jun7680.github.io/tags/rxswift/</link>
-    <description>Recent content in RxSwift on 오깅중</description>
+    <title>Observable on 오깅중</title>
+    <link>https://jun7680.github.io/categories/observable/</link>
+    <description>Recent content in Observable on 오깅중</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 07 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/rxswift/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/categories/observable/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Hot Observable, Cold Observable</title>
       <link>https://jun7680.github.io/p/hot-observable-cold-observable/</link>
