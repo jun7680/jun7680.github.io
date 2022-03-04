@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-us">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Observable에 대해 알아보자!'><title>Hot Observable, Cold Observable</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='GCD, Concurrency를 알아보자!'><title>GCD(Grand Central Dispatch), Concurrency</title>
 
-<link rel='canonical' href='https://jun7680.github.io/p/hot-observable-cold-observable/'>
+<link rel='canonical' href='https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/'>
 
-<link rel="stylesheet" href="/scss/style.min.775dbd4fd34fda61c5273b4bc3415f7c9666414fb6c40aab164a7ded4397da98.css"><meta property='og:title' content='Hot Observable, Cold Observable'>
-<meta property='og:description' content='Observable에 대해 알아보자!'>
-<meta property='og:url' content='https://jun7680.github.io/p/hot-observable-cold-observable/'>
+<link rel="stylesheet" href="/scss/style.min.775dbd4fd34fda61c5273b4bc3415f7c9666414fb6c40aab164a7ded4397da98.css"><meta property='og:title' content='GCD(Grand Central Dispatch), Concurrency'>
+<meta property='og:description' content='GCD, Concurrency를 알아보자!'>
+<meta property='og:url' content='https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/'>
 <meta property='og:site_name' content='오깅중'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='RxSwift' /><meta property='article:tag' content='Observable' /><meta property='article:published_time' content='2022-01-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2022-01-07T00:00:00&#43;00:00'/><meta property='og:image' content='https://jun7680.github.io/p/hot-observable-cold-observable/Observable.png' />
-<meta name="twitter:title" content="Hot Observable, Cold Observable">
-<meta name="twitter:description" content="Observable에 대해 알아보자!"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://jun7680.github.io/p/hot-observable-cold-observable/Observable.png' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Concurrency' /><meta property='article:tag' content='GCD' /><meta property='article:published_time' content='2022-01-11T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2022-01-11T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="GCD(Grand Central Dispatch), Concurrency">
+<meta name="twitter:description" content="GCD, Concurrency를 알아보자!">
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
@@ -71,20 +70,8 @@ if (!doNotTrack) {
         </div>
     
 <main class="main full-width">
-    <article class="has-image main-article">
+    <article class="main-article">
     <header class="article-header">
-        <div class="article-image">
-            <a href="/p/hot-observable-cold-observable/">
-                <img src="/p/hot-observable-cold-observable/Observable_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_800x0_resize_box_3.png"
-                        srcset="/p/hot-observable-cold-observable/Observable_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_800x0_resize_box_3.png 800w, /p/hot-observable-cold-observable/Observable_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_1600x0_resize_box_3.png 1600w"
-                        width="800" 
-                        height="396" 
-                        loading="lazy"
-                        alt="Featured image of post Hot Observable, Cold Observable" />
-                
-            </a>
-        </div>
-    
 
     <div class="article-details">
     
@@ -98,12 +85,12 @@ if (!doNotTrack) {
     
 
     <h2 class="article-title">
-        <a href="/p/hot-observable-cold-observable/">Hot Observable, Cold Observable</a>
+        <a href="/p/gcdgrand-central-dispatch-concurrency/">GCD(Grand Central Dispatch), Concurrency</a>
     </h2>
 
     
     <h3 class="article-subtitle">
-        Observable에 대해 알아보자!
+        GCD, Concurrency를 알아보자!
     </h3>
     
 
@@ -120,7 +107,7 @@ if (!doNotTrack) {
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Jan 07, 2022</time>
+                <time class="article-time--published">Jan 11, 2022</time>
             </div>
         
 
@@ -135,7 +122,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-time--reading">
-                    1 분 정도
+                    2 분 정도
                 </time>
             </div>
         
@@ -145,32 +132,55 @@ if (!doNotTrack) {
 </header>
 
     <section class="article-content">
-    <p><strong>습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!</strong></p>
-<h4 id="개념">개념</h4>
-<p>먼저 공식문서에 따르면 (<a class="link" href="https://reactivex.io/documentation/observable.html"  target="_blank" rel="noopener"
-    >https://reactivex.io/documentation/observable.html</a>)</p>
-<blockquote>
-<blockquote>
-<p>“Hot” and “Cold” Observables
-When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.
-In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.</p>
-</blockquote>
-</blockquote>
-<p>라고 설명 되어있는데 <del>(영어라 모르겠다..)</del></p>
-<p>아는 단어 총 동원해서 보면 hot, cold의 차이점은 구독 시점에 따른 아이템 방출 방법 이라고 되어 있다.</p>
-<p>Hot🔥 은 생성됨과 동시에 아이템을 방출하고 나중에 구독한 옵저버는 이전값을 받을수 없고(ex: 라이브 방송)<br>
-Cold❄️ 는 옵저버가 구독하기 전에 발생한 아이템에 대해 받아볼 수 있다.(ex: VOD).</p>
-<p>다시말해 Hot은 구독 이후 발생한 아이템들에 대한 방출이 이루어 지고, Cold는 구독 시점 이전에 발생한 아이템들도 방출해준다고 되어있다.<br>
-<del>(잘못된 점 있으면 댓글 부탁드립니다)</del></p>
-<h4 id="hot-observable">Hot Observable</h4>
+    <h1 id="gcd">GCD</h1>
 <ul>
-<li>Timer, Subject, UIEvent 등등</li>
+<li>iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.<br>
+GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!<br>
+Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.</li>
 </ul>
-<h4 id="cold-observable">Cold Observable</h4>
+<h3 id="gcd예제">GCD예제</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testGCD</span><span class="p">(</span><span class="n">completion</span><span class="p">:</span> <span class="p">(</span><span class="kc">_</span> <span class="n">result</span><span class="p">:</span> <span class="nb">Int</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span> <span class="p">{</span> 
+  <span class="n">testGCD2</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span> 
+     <span class="n">testGCD3</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span> 
+        <span class="n">completion</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+     <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 <del>끔직하다</del></p>
+<h3 id="gcd-에러-핸들링">GCD 에러 핸들링</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testErrorHandler</span><span class="p">(</span><span class="n">completion</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span><span class="p">(</span><span class="n">Result</span><span class="p">?,</span> <span class="n">Error</span><span class="p">?)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span> <span class="p">{</span> 
+  <span class="p">...</span>
+  <span class="k">guard</span> <span class="kd">let</span> <span class="nv">result</span> <span class="p">=</span> <span class="n">result</span> <span class="k">else</span> <span class="p">{</span> 
+    <span class="n">completion</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="n">Error</span><span class="p">)</span>
+    <span class="k">return</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>GCD같은 경우에 completion에 데이터와 에러를 같이 보내주게 되는데 발생하는 결과마다 handler를 작성해야 하는 번거로움이 있다.</p>
+<h1 id="swift-concurrency">Swift Concurrency</h1>
 <ul>
-<li>Single, junt, of 등등 컴포넌트</li>
+<li>새로 소개된 동시성 프로그래밍 API이다. 무려 WWDC 2021에서 새로 나왔다. 동시성 프로그래밍을 가독성 좋게 깔끔하게 작성하고자 도입된 개념이다.<br>
+자세한 설명은 <a class="link" href="https://developer.apple.com/videos/play/wwdc2021/10132/"  target="_blank" rel="noopener"
+    >Apple Develop</a>에서 확인하면 된다.!</li>
 </ul>
-<p><del>Operator들에 대해 더 자세히 알아봐야겠다.</del></p>
+<h3 id="concurrency-예제">Concurrency 예제</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testGCD</span><span class="p">()</span> <span class="n">async</span> <span class="kr">throws</span> <span class="p">-&gt;</span> <span class="nb">Int</span> <span class="p">{</span> 
+  <span class="kd">let</span> <span class="nv">firstResult</span> <span class="p">=</span> <span class="k">try</span> <span class="n">await</span> <span class="n">testGCD2</span><span class="p">()</span>
+  <span class="kd">let</span> <span class="nv">secondResult</span> <span class="p">=</span> <span class="k">try</span> <span class="n">await</span> <span class="n">testGCD3</span><span class="p">()</span>
+  
+  <span class="k">return</span> <span class="n">secondResult</span>
+<span class="p">}</span>
+</code></pre></div><p>단순한 예제로만 봐도 가독성이 훨씬 좋아졌다. <del>나만 그런가?</del></p>
+<h3 id="concurrency-에러-핸들링">Concurrency 에러 핸들링</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testErrorHandler</span><span class="p">()</span> <span class="n">async</span> <span class="kr">throws</span> <span class="p">-&gt;</span> <span class="n">Result</span> <span class="p">{</span> 
+  <span class="p">...</span>
+  <span class="k">guard</span> <span class="kd">let</span> <span class="nv">result</span> <span class="p">=</span> <span class="n">result</span> <span class="k">else</span> <span class="p">{</span> 
+    <span class="k">throw</span> <span class="n">Error</span>
+  <span class="p">}</span>
+  
+  <span class="k">return</span> <span class="n">Result</span>
+<span class="p">}</span>
+</code></pre></div><p>Concurrency를 사용하게 되면 에러는 thorw로 데이터 전달은 return으로 분리 할 수 있다. 이렇게 되면 completion handler를 사용하지 않아 콜백이 없어지고 가독성 또한 좋아진다.</p>
+<p>기존 GCD로 짜여있던 코드를 이제 Concurrency로 변환하여 가독성 높은 코드로 만들어 놔야겠다. ~~(언제바꾸지)~~😱</p>
 
 </section>
 
@@ -179,9 +189,9 @@ Cold❄️ 는 옵저버가 구독하기 전에 발생한 아이템에 대해 �
     
     <section class="article-tags">
         
-            <a href="/tags/rxswift/">RxSwift</a>
+            <a href="/tags/concurrency/">Concurrency</a>
         
-            <a href="/tags/observable/">Observable</a>
+            <a href="/tags/gcd/">GCD</a>
         
     </section>
 
@@ -214,13 +224,24 @@ Cold❄️ 는 옵저버가 구독하기 전에 발생한 아이템에 대해 �
 </article>
                 
                     
-<article class="">
-    <a href="/p/gcdgrand-central-dispatch-concurrency/">
+<article class="has-image">
+    <a href="/p/hot-observable-cold-observable/">
         
+        
+            <div class="article-image">
+                <img src="/p/hot-observable-cold-observable/Observable.1c0edb7158cf289cb6cfa4519919a7a6_hu5f9ab17eedf2f19bd2df99110edcc5fd_121870_250x150_fill_box_smart1_3.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Hot Observable, Cold Observable"
+                        
+                        data-hash="md5-HA7bcVjPKJy2z6RRmRmnpg==">
+                
+            </div>
         
 
         <div class="article-details">
-            <h2 class="article-title">GCD(Grand Central Dispatch), Concurrency</h2>
+            <h2 class="article-title">Hot Observable, Cold Observable</h2>
         </div>
     </a>
 </article>
@@ -392,13 +413,17 @@ Cold❄️ 는 옵저버가 구독하기 전에 발생한 아이템에 대해 �
   <ol>
     <li>
       <ol>
-        <li>
-          <ol>
-            <li><a href="#개념">개념</a></li>
-            <li><a href="#hot-observable">Hot Observable</a></li>
-            <li><a href="#cold-observable">Cold Observable</a></li>
-          </ol>
-        </li>
+        <li><a href="#gcd예제">GCD예제</a></li>
+        <li><a href="#gcd-에러-핸들링">GCD 에러 핸들링</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li>
+      <ol>
+        <li><a href="#concurrency-예제">Concurrency 예제</a></li>
+        <li><a href="#concurrency-에러-핸들링">Concurrency 에러 핸들링</a></li>
       </ol>
     </li>
   </ol>
