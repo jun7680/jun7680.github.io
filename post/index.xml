@@ -6,7 +6,16 @@
     <description>Recent content in Posts on 오깅중</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 03 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>UIStackView Animation show/hide 버그</title>
+      <link>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</link>
+      <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</guid>
+      <description>문제점 먼저 UIStackView에서 hidden property를 사용하여 숨김?을 처리하게 되면 이게 이상하게 지속적으로 stack에 쌓이게 된다. 이게 무슨말</description>
+    </item>
+    
     <item>
       <title>Fastlane을 적용해보자</title>
       <link>https://jun7680.github.io/p/fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
