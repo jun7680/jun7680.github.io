@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-us">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='GCD, Concurrency를 알아보자!'><title>GCD(Grand Central Dispatch), Concurrency</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Swift 5.7 개선 사항'><title>Swift 5.7 개선 사항!!</title>
 
-<link rel='canonical' href='https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/'>
+<link rel='canonical' href='https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/'>
 
-<link rel="stylesheet" href="/scss/style.min.775dbd4fd34fda61c5273b4bc3415f7c9666414fb6c40aab164a7ded4397da98.css"><meta property='og:title' content='GCD(Grand Central Dispatch), Concurrency'>
-<meta property='og:description' content='GCD, Concurrency를 알아보자!'>
-<meta property='og:url' content='https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/'>
+<link rel="stylesheet" href="/scss/style.min.775dbd4fd34fda61c5273b4bc3415f7c9666414fb6c40aab164a7ded4397da98.css"><meta property='og:title' content='Swift 5.7 개선 사항!!'>
+<meta property='og:description' content='Swift 5.7 개선 사항'>
+<meta property='og:url' content='https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/'>
 <meta property='og:site_name' content='오깅중'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Concurrency' /><meta property='article:tag' content='GCD' /><meta property='article:published_time' content='2022-01-11T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2022-01-11T00:00:00&#43;00:00'/>
-<meta name="twitter:title" content="GCD(Grand Central Dispatch), Concurrency">
-<meta name="twitter:description" content="GCD, Concurrency를 알아보자!">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Swift, Swift 5,7' /><meta property='article:published_time' content='2022-06-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2022-06-15T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="Swift 5.7 개선 사항!!">
+<meta name="twitter:description" content="Swift 5.7 개선 사항">
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
@@ -85,12 +85,12 @@ if (!doNotTrack) {
     
 
     <h2 class="article-title">
-        <a href="/p/gcdgrand-central-dispatch-concurrency/">GCD(Grand Central Dispatch), Concurrency</a>
+        <a href="/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/">Swift 5.7 개선 사항!!</a>
     </h2>
 
     
     <h3 class="article-subtitle">
-        GCD, Concurrency를 알아보자!
+        Swift 5.7 개선 사항
     </h3>
     
 
@@ -107,7 +107,7 @@ if (!doNotTrack) {
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Jan 11, 2022</time>
+                <time class="article-time--published">Jun 15, 2022</time>
             </div>
         
 
@@ -132,55 +132,53 @@ if (!doNotTrack) {
 </header>
 
     <section class="article-content">
-    <h1 id="gcd">GCD</h1>
-<ul>
-<li>iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.<br>
-GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!<br>
-Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.</li>
-</ul>
-<h3 id="gcd예제">GCD예제</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testGCD</span><span class="p">(</span><span class="n">completion</span><span class="p">:</span> <span class="p">(</span><span class="kc">_</span> <span class="n">result</span><span class="p">:</span> <span class="nb">Int</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span> <span class="p">{</span> 
-  <span class="n">testGCD2</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span> 
-     <span class="n">testGCD3</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span> 
-        <span class="n">completion</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-     <span class="p">}</span>
-  <span class="p">}</span>
+    <h1 id="swift-57-개선-사항">Swift 5.7 개선 사항</h1>
+<p>Swift 5.7이 소개되면서 개발자들에게 많은 부분에서 편의성을 제공하려는 모습이 보이는거 같다</p>
+<p>일단 다양한 개선 사항이 있는데, SPM성능 향상, 표준 라이브러리 향상, 빌드 속도 향상 Swift의 편의성 등등 다양한 개선사항이 소개 됐다!!</p>
+<p>그중에 개발하면서 유용하게 쓰일 Swift Language 개선 사항을 중점으로 소개해 보려고 한다.</p>
+<h3 id="if-let-shorthand-for-unwrapping-optionals">if let shorthand for unwrapping optionals</h3>
+<p>많은 개발자들이 옵셔설 언래핑을 진행할때 <code>if let</code>, <code>guard let</code> 등을 통해 진행 하고 계실건데 이전에는 아래와 같은 쉐도잉 작업이 필요했더랬죠?</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">test</span><span class="p">:</span> <span class="nb">Int</span><span class="p">?</span> <span class="p">=</span> <span class="mi">0</span>
+
+<span class="k">if</span> <span class="kd">let</span> <span class="nv">test</span> <span class="p">=</span> <span class="n">test</span> <span class="p">{</span> 
+  <span class="bp">print</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
 <span class="p">}</span>
-</code></pre></div><p>위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 <del>끔직하다</del></p>
-<h3 id="gcd-에러-핸들링">GCD 에러 핸들링</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testErrorHandler</span><span class="p">(</span><span class="n">completion</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span><span class="p">(</span><span class="n">Result</span><span class="p">?,</span> <span class="n">Error</span><span class="p">?)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span> <span class="p">{</span> 
-  <span class="p">...</span>
-  <span class="k">guard</span> <span class="kd">let</span> <span class="nv">result</span> <span class="p">=</span> <span class="n">result</span> <span class="k">else</span> <span class="p">{</span> 
-    <span class="n">completion</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="n">Error</span><span class="p">)</span>
-    <span class="k">return</span>
-  <span class="p">}</span>
+</code></pre></div><p>쉐도잉이라 함은 if, guard 문에서 사용될 프로퍼티레 옵셔널 값을 추출한 겁니다!!</p>
+<p>다시 말해 위에 있는 if 블록을 말하는거죠</p>
+<p>지금은 너무나 익숙해져서 큰 불편함이 없지만 어쩔수 없이 변수명을 길게 사용할때가 되면 길어지는 코드에 어지럼을 느끼고 애매한 줄바꿈을 진행해야 할때가 분명 있으셨을거에요ㅎㅎ.. <del>전 그랬거든요</del></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">wwdcPresentationContentFromOptional</span><span class="p">:</span> <span class="nb">String</span><span class="p">?</span> <span class="p">=</span> <span class="s">&#34;GOOD&#34;</span>
+
+<span class="k">if</span> <span class="kd">let</span> <span class="nv">content</span> <span class="p">=</span> <span class="n">wwdcPresentationContentFromOptional</span> <span class="p">{</span> 
+  <span class="bp">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 <span class="p">}</span>
-</code></pre></div><p>GCD같은 경우에 completion에 데이터와 에러를 같이 보내주게 되는데 발생하는 결과마다 handler를 작성해야 하는 번거로움이 있다.</p>
-<h1 id="swift-concurrency">Swift Concurrency</h1>
-<ul>
-<li>새로 소개된 동시성 프로그래밍 API이다. 무려 WWDC 2021에서 새로 나왔다. 동시성 프로그래밍을 가독성 좋게 깔끔하게 작성하고자 도입된 개념이다.<br>
-자세한 설명은 <a class="link" href="https://developer.apple.com/videos/play/wwdc2021/10132/"  target="_blank" rel="noopener"
-    >Apple Develop</a>에서 확인하면 된다.!</li>
-</ul>
-<h3 id="concurrency-예제">Concurrency 예제</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testGCD</span><span class="p">()</span> <span class="n">async</span> <span class="kr">throws</span> <span class="p">-&gt;</span> <span class="nb">Int</span> <span class="p">{</span> 
-  <span class="kd">let</span> <span class="nv">firstResult</span> <span class="p">=</span> <span class="k">try</span> <span class="n">await</span> <span class="n">testGCD2</span><span class="p">()</span>
-  <span class="kd">let</span> <span class="nv">secondResult</span> <span class="p">=</span> <span class="k">try</span> <span class="n">await</span> <span class="n">testGCD3</span><span class="p">()</span>
-  
-  <span class="k">return</span> <span class="n">secondResult</span>
+</code></pre></div><p>이런식으로 좀 애매하게 줄이게 되더라고요.. 좀 더 정확한 변수명을 원해서 변수이름을 길게 써줬는데? 언래핑을 해줄때 다시 애매해지는 경향이 있더라고요???</p>
+<p>그런데 이제 Swift 5.7에서는 이런 부분을 줄일수 있게 해줬더라고요</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">content</span><span class="p">:</span> <span class="nb">String</span><span class="p">?</span> <span class="p">=</span> <span class="s">&#34;GOOD&#34;</span>
+
+<span class="k">if</span> <span class="kd">let</span> <span class="nv">content</span> <span class="p">{</span> 
+  <span class="bp">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 <span class="p">}</span>
-</code></pre></div><p>단순한 예제로만 봐도 가독성이 훨씬 좋아졌다. <del>나만 그런가?</del></p>
-<h3 id="concurrency-에러-핸들링">Concurrency 에러 핸들링</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">testErrorHandler</span><span class="p">()</span> <span class="n">async</span> <span class="kr">throws</span> <span class="p">-&gt;</span> <span class="n">Result</span> <span class="p">{</span> 
-  <span class="p">...</span>
-  <span class="k">guard</span> <span class="kd">let</span> <span class="nv">result</span> <span class="p">=</span> <span class="n">result</span> <span class="k">else</span> <span class="p">{</span> 
-    <span class="k">throw</span> <span class="n">Error</span>
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="n">Result</span>
+</code></pre></div><p>어때요 굉장히 맘에 들지 않나요???? 전 무척 맘에 들더라고요</p>
+<blockquote>
+<p>아주 간단하게 사용할수 있어서 굉장히 좋아 보이더라고요👏🏻</p>
+</blockquote>
+<h3 id="multi-statement-closure-type-inference">Multi-statement closure type inference</h3>
+<p>이제 클로져에서 반환타입을 가질때 자동 타입추론을 해줘서 명시적으로 반환 타입을 적어줄 필요가 없어지게 됐답니다!!</p>
+<p>이전에는 반드시 반환타입을 작성해 줬더라면 이제는</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">let</span> <span class="nv">test</span> <span class="p">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+
+<span class="kd">let</span> <span class="nv">test2</span> <span class="p">=</span> <span class="n">test</span><span class="p">.</span><span class="bp">map</span> <span class="p">{</span> <span class="n">number</span> <span class="k">in</span> 
+ 	<span class="k">return</span> <span class="s">&#34;Test number is </span><span class="si">\(</span><span class="n">number</span><span class="si">)</span><span class="s">&#34;</span>                      
 <span class="p">}</span>
-</code></pre></div><p>Concurrency를 사용하게 되면 에러는 thorw로 데이터 전달은 return으로 분리 할 수 있다. 이렇게 되면 completion handler를 사용하지 않아 콜백이 없어지고 가독성 또한 좋아진다.</p>
-<p>기존 GCD로 짜여있던 코드를 이제 Concurrency로 변환하여 가독성 높은 코드로 만들어 놔야겠다. ~~(언제바꾸지)~~😱</p>
+</code></pre></div><blockquote>
+<p>안드의 타입추론을 이제 부러워 하지 않아도 되겠네요 ㅎㅎ..</p>
+</blockquote>
+<h3 id="결론">결론</h3>
+<p>개발하기 편한 환경을 만들어 주기 위해 많은 노력을 해주는걸로 보이네요😁</p>
+<p>좀 더 많은 개선 사항이 있으니까 천천히 다시 읽어봐야겠어요✍️</p>
+<h3 id="참고자료">참고자료</h3>
+<p><a class="link" href="https://www.hackingwithswift.com/articles/249/whats-new-in-swift-5-7"  target="_blank" rel="noopener"
+    >https://www.hackingwithswift.com/articles/249/whats-new-in-swift-5-7</a></p>
 
 </section>
 
@@ -189,9 +187,7 @@ Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이�
     
     <section class="article-tags">
         
-            <a href="/tags/concurrency/">Concurrency</a>
-        
-            <a href="/tags/gcd/">GCD</a>
+            <a href="/tags/swift-swift-57/">Swift, Swift 5,7</a>
         
     </section>
 
@@ -213,18 +209,6 @@ Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이�
                 
                     
 <article class="">
-    <a href="/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Swift 5.7 개선 사항!!</h2>
-        </div>
-    </a>
-</article>
-                
-                    
-<article class="">
     <a href="/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/">
         
         
@@ -243,6 +227,18 @@ Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이�
 
         <div class="article-details">
             <h2 class="article-title">Fastlane을 적용해보자</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/p/gcdgrand-central-dispatch-concurrency/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">GCD(Grand Central Dispatch), Concurrency</h2>
         </div>
     </a>
 </article>
@@ -437,17 +433,10 @@ Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이�
   <ol>
     <li>
       <ol>
-        <li><a href="#gcd예제">GCD예제</a></li>
-        <li><a href="#gcd-에러-핸들링">GCD 에러 핸들링</a></li>
-      </ol>
-    </li>
-  </ol>
-
-  <ol>
-    <li>
-      <ol>
-        <li><a href="#concurrency-예제">Concurrency 예제</a></li>
-        <li><a href="#concurrency-에러-핸들링">Concurrency 에러 핸들링</a></li>
+        <li><a href="#if-let-shorthand-for-unwrapping-optionals">if let shorthand for unwrapping optionals</a></li>
+        <li><a href="#multi-statement-closure-type-inference">Multi-statement closure type inference</a></li>
+        <li><a href="#결론">결론</a></li>
+        <li><a href="#참고자료">참고자료</a></li>
       </ol>
     </li>
   </ol>
