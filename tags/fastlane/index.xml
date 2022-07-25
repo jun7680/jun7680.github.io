@@ -8,11 +8,11 @@
     <language>en-us</language>
     <lastBuildDate>Thu, 03 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/fastlane/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Fastlane을 적용해보자</title>
-      <link>https://jun7680.github.io/p/fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
+      <title>iOS Fastlane을 적용해보자</title>
+      <link>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
       <pubDate>Thu, 03 Mar 2022 00:00:00 +0000</pubDate>
       
-      <guid>https://jun7680.github.io/p/fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid>
+      <guid>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid>
       <description>도입이유 친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀 현 배포 절차 클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 (대략 30분&amp;hellip;?</description>
     </item>
     
