@@ -1,47 +1,36 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Swift on 오깅중</title>
-    <link>https://jun7680.github.io/categories/swift/</link>
-    <description>Recent content in Swift on 오깅중</description>
-    <generator>Hugo</generator>
-    <language>ko</language>
-    <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://jun7680.github.io/categories/swift/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Swift 5.7 개선 사항!!</title>
-      <link>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</link>
-      <pubDate>Wed, 15 Jun 2022 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</guid>
-      <description>&lt;h1 id=&#34;swift-57-개선-사항&#34;&gt;Swift 5.7 개선 사항&lt;/h1&gt;&#xA;&lt;p&gt;Swift 5.7이 소개되면서 개발자들에게 많은 부분에서 편의성을 제공하려는 모습이 보이는거 같다&lt;/p&gt;&#xA;&lt;p&gt;일단 다양한 개선 사항이 있는데, SPM성능 향상, 표준 라이브러리 향상, 빌드 속도 향상 Swift의 편의성 등등 다양한 개선사항이 소개 됐다!!&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>UIStackView Animation show/hide 버그</title>
-      <link>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</link>
-      <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</guid>
-      <description>&lt;h3 id=&#34;문제점&#34;&gt;문제점&lt;/h3&gt;&#xA;&lt;p&gt;먼저 UIStackView에서 hidden property를 사용하여 숨김?을 처리하게 되면 이게 이상하게 지속적으로 stack에 쌓이게 된다.&lt;/p&gt;&#xA;&lt;p&gt;이게 무슨말이냐면 숨김 버튼을 계속 누르게 되면 누른 만큼 stackview는 숨겨진다고 생각하면 되는데 5번 누르면 show를 5번 눌러줘야 다시 화면에 나타난다.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>iOS Fastlane을 적용해보자</title>
-      <link>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
-      <pubDate>Thu, 03 Mar 2022 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid>
-      <description>&lt;h3 id=&#34;도입이유&#34;&gt;도입이유&lt;/h3&gt;&#xA;&lt;p&gt;친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀&lt;/p&gt;&#xA;&lt;h5 id=&#34;현-배포-절차&#34;&gt;현 배포 절차&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 &lt;del&gt;(대략 30분&amp;hellip;?)&lt;/del&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h5 id=&#34;도입-후-절차&#34;&gt;도입 후 절차&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;fastlane &amp;rsquo;lane명&amp;rsquo; 끗!&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>GCD(Grand Central Dispatch), Concurrency</title>
-      <link>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</link>
-      <pubDate>Tue, 11 Jan 2022 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</guid>
-      <description>&lt;h1 id=&#34;gcd&#34;&gt;GCD&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.&lt;br&gt;&#xA;GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!&lt;br&gt;&#xA;Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;gcd예제&#34;&gt;GCD예제&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testGCD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;testGCD2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;n&#34;&gt;testGCD3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Hot Observable, Cold Observable</title>
-      <link>https://jun7680.github.io/p/hot-observable-cold-observable/</link>
-      <pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid>
-      <description>&lt;p&gt;&lt;strong&gt;습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h4 id=&#34;개념&#34;&gt;개념&lt;/h4&gt;&#xA;&lt;p&gt;먼저 공식문서에 따르면 (&lt;a href=&#34;https://reactivex.io/documentation/observable.html&#34;&gt;https://reactivex.io/documentation/observable.html&lt;/a&gt;)&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;“Hot” and “Cold” Observables&#xA;When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.&#xA;In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Swift on 오깅중</title><link>https://jun7680.github.io/categories/swift/</link><description>Recent content in Swift on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/categories/swift/index.xml" rel="self" type="application/rss+xml"/><item><title>Swift 5.7 개선 사항!!</title><link>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</link><pubDate>Wed, 15 Jun 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</guid><description>&lt;h1 id="swift-57-개선-사항"&gt;Swift 5.7 개선 사항&lt;/h1&gt;
+&lt;p&gt;Swift 5.7이 소개되면서 개발자들에게 많은 부분에서 편의성을 제공하려는 모습이 보이는거 같다&lt;/p&gt;
+&lt;p&gt;일단 다양한 개선 사항이 있는데, SPM성능 향상, 표준 라이브러리 향상, 빌드 속도 향상 Swift의 편의성 등등 다양한 개선사항이 소개 됐다!!&lt;/p&gt;</description></item><item><title>UIStackView Animation show/hide 버그</title><link>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</link><pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</guid><description>&lt;h3 id="문제점"&gt;문제점&lt;/h3&gt;
+&lt;p&gt;먼저 UIStackView에서 hidden property를 사용하여 숨김?을 처리하게 되면 이게 이상하게 지속적으로 stack에 쌓이게 된다.&lt;/p&gt;
+&lt;p&gt;이게 무슨말이냐면 숨김 버튼을 계속 누르게 되면 누른 만큼 stackview는 숨겨진다고 생각하면 되는데 5번 누르면 show를 5번 눌러줘야 다시 화면에 나타난다.&lt;/p&gt;</description></item><item><title>iOS Fastlane을 적용해보자</title><link>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link><pubDate>Thu, 03 Mar 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid><description>&lt;h3 id="도입이유"&gt;도입이유&lt;/h3&gt;
+&lt;p&gt;친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀&lt;/p&gt;
+&lt;h5 id="현-배포-절차"&gt;현 배포 절차&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 &lt;del&gt;(대략 30분&amp;hellip;?)&lt;/del&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="도입-후-절차"&gt;도입 후 절차&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;fastlane &amp;rsquo;lane명&amp;rsquo; 끗!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다&lt;/p&gt;</description></item><item><title>GCD(Grand Central Dispatch), Concurrency</title><link>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</link><pubDate>Tue, 11 Jan 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</guid><description>&lt;h1 id="gcd"&gt;GCD&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.&lt;br&gt;
+GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!&lt;br&gt;
+Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="gcd예제"&gt;GCD예제&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-swift" data-lang="swift"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;testGCD&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;_&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;Int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;Void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;testGCD2&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;testGCD3&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description></item><item><title>Hot Observable, Cold Observable</title><link>https://jun7680.github.io/p/hot-observable-cold-observable/</link><pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid><description>&lt;p&gt;&lt;strong&gt;습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id="개념"&gt;개념&lt;/h4&gt;
+&lt;p&gt;먼저 공식문서에 따르면 (&lt;a href="https://reactivex.io/documentation/observable.html"&gt;https://reactivex.io/documentation/observable.html&lt;/a&gt;)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;“Hot” and “Cold” Observables
+When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.
+In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.&lt;/p&gt;</description></item></channel></rss>

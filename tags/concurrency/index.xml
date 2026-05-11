@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Concurrency on 오깅중</title>
-    <link>https://jun7680.github.io/tags/concurrency/</link>
-    <description>Recent content in Concurrency on 오깅중</description>
-    <generator>Hugo</generator>
-    <language>ko</language>
-    <lastBuildDate>Tue, 11 Jan 2022 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://jun7680.github.io/tags/concurrency/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>GCD(Grand Central Dispatch), Concurrency</title>
-      <link>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</link>
-      <pubDate>Tue, 11 Jan 2022 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</guid>
-      <description>&lt;h1 id=&#34;gcd&#34;&gt;GCD&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.&lt;br&gt;&#xA;GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!&lt;br&gt;&#xA;Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;gcd예제&#34;&gt;GCD예제&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testGCD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;testGCD2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;n&#34;&gt;testGCD3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Concurrency on 오깅중</title><link>https://jun7680.github.io/tags/concurrency/</link><description>Recent content in Concurrency on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Tue, 11 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/concurrency/index.xml" rel="self" type="application/rss+xml"/><item><title>GCD(Grand Central Dispatch), Concurrency</title><link>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</link><pubDate>Tue, 11 Jan 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</guid><description>&lt;h1 id="gcd"&gt;GCD&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.&lt;br&gt;
+GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!&lt;br&gt;
+Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="gcd예제"&gt;GCD예제&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-swift" data-lang="swift"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;testGCD&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;_&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;Int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;Void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;testGCD2&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;testGCD3&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description></item></channel></rss>

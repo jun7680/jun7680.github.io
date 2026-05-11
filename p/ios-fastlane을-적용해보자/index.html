@@ -1,344 +1,61 @@
-<!DOCTYPE html>
-<html lang="ko" data-theme="dark">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>iOS Fastlane을 적용해보자 — 오깅중</title>
-<meta name="description" content="Fastlane 적용으로 원시인 탈출하기!">
-<meta name="author" content="오깅중">
-<meta property="og:type" content="article">
-<meta property="og:title" content="iOS Fastlane을 적용해보자">
-<meta property="og:site_name" content="오깅중">
-<meta property="og:description" content="Fastlane 적용으로 원시인 탈출하기!">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
-
-
-<link rel="stylesheet" href="/css/main.min.68c6a48303ea40fdb4be98ff93c5f05741d111bddb28b9a247a3bf31fdfd2ab0.css" integrity="sha256-aMakgwPqQP20vpj/k8XwV0HREb3bKLmiR6O/Mf39KrA=">
-
-<link rel="alternate" type="application/rss+xml" href="https://jun7680.github.io/index.xml" title="오깅중 RSS">
-
-
-
-</head>
-<body>
-<div class="scroll-progress"><div id="progress-bar"></div></div>
-<header class="site-header">
-  <div class="site-header__inner">
-    <a href="https://jun7680.github.io/" class="wordmark" aria-label="오깅중 홈">
-      <span>오깅중</span>
-      <span class="wordmark__cursor" aria-hidden="true"></span>
-      <span class="wordmark__mono">/ ogging.dev</span>
-    </a>
-    <nav class="site-nav">
-      
-      
-        <a href="/" >Home</a>
-      
-        <a href="/archives/" >Archives</a>
-      
-        <a href="/tags/" >Tags</a>
-      
-        <a href="/categories/" >Categories</a>
-      
-    </nav>
-    <div class="header-tools">
-      <button class="search-btn" id="search-btn" type="button" aria-label="검색 열기">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <span>검색</span>
-        <kbd>⌘K</kbd>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main class="page">
-  <div>
-    
-
-
-<article class="article reveal-in">
-  <header class="article__header">
-    <div class="article__meta">
-      <span>SWIFT</span>
-      <span>·</span>
-      <span>JAN 03, 2022</span>
-      <span>·</span>
-      <span>4분 읽기</span>
-    </div>
-    <h1 class="article__title">iOS Fastlane을 적용해보자</h1>
-    <p class="article__desc">Fastlane 적용으로 원시인 탈출하기!</p>
-  </header>
-  <div class="article__body">
-    <h3 id="도입이유">도입이유</h3>
-<p>친구랑 얘기하다 원시인 소리를 들었다&hellip;😀</p>
-<h5 id="현-배포-절차">현 배포 절차</h5>
-<ul>
-<li>클린 -&gt; Product -&gt; Archive -&gt; 완료 콜백 올때까지 대기 -&gt; 업로드 <del>(대략 30분&hellip;?)</del></li>
-</ul>
-<h5 id="도입-후-절차">도입 후 절차</h5>
-<ul>
-<li>fastlane &rsquo;lane명&rsquo; 끗!</li>
-</ul>
-<p>자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다</p>
-<h2 id="설치--업로드">설치 &amp; 업로드</h2>
-<p>Homebrew를 이용해 Fastlane을 설치 할건데 Homebrew가 설치되어 있지 않으면 설치를 하고 오자. -&gt; <a href="https://brew.sh/index_ko">바로가기</a></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install fastlane
-</span></span></code></pre></div><p>를 터미널에 입력해 주면 알아서 설치가 진행이 된다.</p>
-<p>만약 설치가 안된다면 명령어 추천이 있을경우 따라하면 되고 안돼면&hellip;. 구글링을 통해 해결해보자. (화이팅)</p>
-<p>그 다음 이제 fastlane을 적용할 프로젝트에 가서</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">fastlane init
-</span></span></code></pre></div><p>명령어로 fastlane 초기화를 진행해줍니다.</p>
-<p><img src="fastlane.png" alt=""></p>
-<p>저는 여기서 2번으로 진행했는데 일단 테스트 플라이트에 올려보는게 목적이라 2번으로 진행했습니다.</p>
-<p>무엇을 선택해도 크게 상관없이 나중에 직접 추가할 수 있으니까 맘 편하게 선택해주세요.</p>
-<p>번호 선택후 엔터를 누르면 막 뭐라고 설명이 나오고 엔터를 몇번 치다보면 설정이 완료 된다.</p>
-<p>설정이 완료 되면 fastlane 이라는 디렉토리가 생성되고 디렉토리 들어가면 다음과 같은 파일이 생성되어있다.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Appfile
-</span></span><span class="line"><span class="cl">Fastfile
-</span></span></code></pre></div><p>이제 이 두가지 설정을 통해 우리가 사용할 명령어를 설정해 주면 된다. (거의 다 됐습니다.)</p>
-<p>이제 해당 프로젝트를 협업하며 작업할 경우를 대비 작업도 따로 해주었다</p>
-<p>우선 fastlane/.env파일을 만들어</p>
-<h6 id="fastlane폴더에서-들어가서-만들경우---vi-env">fastlane폴더에서 들어가서 만들경우 -&gt; vi /.env</h6>
-<h6 id="fastlane폴더-밖에서-만들경우---vi-fastlaneenv">fastlane폴더 밖에서 만들경우 -&gt; vi fastlane/.env</h6>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">APP_IDENTIFIER</span><span class="o">=</span><span class="s2">&#34;앱 Identifier ex)com.test.test&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nv">APPLE_ID</span><span class="o">=</span><span class="s2">&#34;자신의 계정&#34;</span>
-</span></span></code></pre></div><p>를 추가해주고 저장한다.</p>
-<p>나중에 push 할때 해당 파일만 .gitignore에 추가해주고 push를 해주는게 충돌이 나지 않고 편안한다.</p>
-<p>AppFile을 열어 이제 다음과 같이 변경해주자</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">app_identifier(ENV[&#34;APP_IDENTIFIER&#34;]) # The bundle identifier of your app
-</span></span><span class="line"><span class="cl">apple_id(ENV[&#34;APPLE_ID&#34;]) # Your Apple email address
-</span></span></code></pre></div><p>이제 env파일을 통해 App identifire, Apple id를 가져오게 된다. 정말 편리하다</p>
-<p>이제 마지막으로 Fastfile에 들어가 다음과 같이 세팅을 해주면 됩니다</p>
-<p>아마 기본적으로 세팅이 되어 있으니 크게 바꾸지 않아도 되는데</p>
-<p>추가로 필요한 Action에 대한 정보는 <a href="https://docs.fastlane.tools/actions/">여기</a>에서 확인 가능!!</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">default_platform(:ios)
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">platform :ios do
-</span></span><span class="line"><span class="cl">  desc &#34;lane에 대한 설명&#34;
-</span></span><span class="line"><span class="cl">  lane : 사용할 lane명 do
-</span></span><span class="line"><span class="cl">	get_certificates 
-</span></span><span class="line"><span class="cl">	get_provisioning_profile
-</span></span><span class="line"><span class="cl">	increment_build_number(build_number: latest_testflight_build_number + 1)
-</span></span><span class="line"><span class="cl">	build_app(configuration: &#34;Debug&#34;)
-</span></span><span class="line"><span class="cl">	upload_to_testflight
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  end
-</span></span><span class="line"><span class="cl">end
-</span></span></code></pre></div><blockquote>
-<p>platform :ios do -&gt; 플랫폼</p>
-<p>desc &ldquo;lane에 대한 설명&rdquo;</p>
-<p>lane : 사용할 lane명 do -&gt; 배포시 fastlane 레인명 으로 사용된다. do는 지우지 말기!</p>
-<p>get_certificates -&gt; certificates 가져오는 action</p>
-<p>get_provisioning_profile -&gt; 프로필 가져오는 action</p>
-<p>increment_build_number(build_number: latest_testflight_build_number + 1) -&gt; 이게 이제 빌드 번호를 올려주는 action</p>
-<p><del>(분명 테플에 안올라가 있는데 배포를 하고 나니 빌드 버전이 2가 되버렸다.. 처음 올리는 빌드버전일때는 0을 넣고 진행을 해야하는건가..?)</del></p>
-<p>build_app(configuration : &ldquo;Debug&rdquo; ) -&gt; 앱 빌드 action입니다. configuration은 맞게 설정해 주시면 되요!! 테플에 올라갈꺼라 Debug로 해줬습니다.</p>
-<p>upload_to_testflight -&gt; 테플에 올리는 명령어!!!</p>
-</blockquote>
-<p>추가적으로 action들을 더 넣어줄수 있는데 사용자들이 입맛에 맞게 사용하면 될꺼 같다.</p>
-<p>설정이 끝나면 이제</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">fastlane &#34;lane명&#34;
-</span></span></code></pre></div><p>입력하면 알아서 쭉 돌아간다!!!</p>
-<p>이게 어떤 설정을 해주면 테플에 올라가는 거를 기다리지 않고 다른 작업도 할 수 있다고 하는데</p>
-<p>차분히 기다렸다.</p>
-<p>fastlane결과를 찍어둔게 사라졌는데 암튼 <strong>17분</strong>을 절약했다고 써있어서 뿌듯</p>
-<h3 id="인증-관련">인증 관련</h3>
-<p>굉장히 까다로운 인증절차를 따라야 하는데 일단 Sigh, Cert를 이용한 인증 방법을 이용하였고, 좀더 다양한 큰 규모로 넘어가면 Match를 이용한 인증을 시도해야 한다.</p>
-<p>하지만 굉장히 까다로운 세팅이 있다고 들었&hellip;</p>
-<p>일단 Cert를 이용할때</p>
-<p><img src="fastlane_error.png" alt=""></p>
-<p>처음 하면 분명 이런 에러를 마주치게 되는데 여기서 정확히 32번 정도를 애플 로그인 비밀번호를 입력했는데&hellip; 그게 아니었다..</p>
-<p>계속 오타가 나는줄 알고 한글자씩 쳐보기도 했다&hellip; <del>해킹 당한줄</del></p>
-<p>로그인 비번이 아니라 앱 비번을 입력해줘야 하는데 아마 이거 설정이 안되어 있어서 나는 에러니까</p>
-<p><a href="https://appleid.apple.com/">이쪽</a>에서 설정을 해주도록 하자</p>
-<p>로그인을 하게 되면 다음과 같은 화면을 보게 되는데 분홍색 박스의 앱 암호를 눌러 설정해 준 암호로 로그인을 하면 정상적으로 된다.!!</p>
-<p><img src="appid.png" alt=""></p>
-
-  </div>
-</article>
-
-  </div>
-  <aside class="sidebar">
-  
-<div class="card" id="about">
-  <div class="card__head">
-    <span class="card__title">ABOUT</span>
-    <span class="card__aux">v2.0</span>
-  </div>
-  <h3 class="about__name">오깅중</h3>
-  <p class="about__role">iOS Developer · Swift</p>
-  <p class="about__bio">"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.
-</p>
-  
-  <div class="about__links">
-    
-      <a class="pill-link" href="https://github.com/jun7680" target="_blank" rel="noopener">GitHub ↗</a>
-    
-      <a class="pill-link" href="https://instagram.com/ockkkk91" target="_blank" rel="noopener">Instagram ↗</a>
-    
-      <a class="pill-link" href="mailto:hi@ogging.dev" >Email ↗</a>
-    
-  </div>
-  
-</div>
-
-  
-  
-<div class="card">
-  <div class="card__head">
-    <span class="card__title">NOW</span>
-    <span class="now-aux"><span class="live-dot"></span> LIVE</span>
-  </div>
-  <div class="now-list">
-    
-      <div><span class="now-label">reading_</span> &#34;Modern Concurrency in Swift&#34;</div>
-    
-      <div><span class="now-label">building_</span> SwiftUI side project</div>
-    
-      <div><span class="now-label">listening_</span> lo-fi beats / focus</div>
-    
-  </div>
-</div>
-
-
-  
-
-<div class="card" id="tags">
-  <div class="card__head">
-    <span class="card__title">TAGS</span>
-    <span class="card__aux">11</span>
-  </div>
-  <div class="tags">
-    
-      <a class="tag" href="/tags/concurrency/">#concurrency<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fastlane/">#fastlane<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fcm/">#fcm<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/gcd/">#gcd<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/jekyll/">#jekyll<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/markdown/">#markdown<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/notion/">#notion<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/observable/">#observable<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/rxswift/">#rxswift<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/swift-swift-57/">#swift, swift 5,7<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uistackview/">#uistackview<span class="tag__count">1</span></a>
-    
-  </div>
-</div>
-
-
-  
-
-
-
-  
-  
-    
-  
-    
-  
-  
-<div class="card" id="archive">
-  <div class="card__head">
-    <span class="card__title">ARCHIVES</span>
-    <span class="card__aux">7 posts</span>
-  </div>
-  
-    
-    <div class="archive-row">
-      <span class="archive-row__year">2022</span>
-      <span class="archive-row__bar"><div style="width: 100%"></div></span>
-      <span class="archive-row__count">06</span>
-    </div>
-  
-    
-    <div class="archive-row">
-      <span class="archive-row__year">2020</span>
-      <span class="archive-row__bar"><div style="width: 17%"></div></span>
-      <span class="archive-row__count">01</span>
-    </div>
-  
-</div>
-
-
-</aside>
-
-</main>
-<footer class="site-footer">
-  <div class="site-footer__inner">
-    <div class="footer-block">
-      <pre class="footer-ascii">  ┌─────────────────┐
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>iOS Fastlane을 적용해보자 — 오깅중</title><meta name=description content="Fastlane 적용으로 원시인 탈출하기!"><meta name=author content="오깅중"><meta property="og:type" content="article"><meta property="og:title" content="iOS Fastlane을 적용해보자"><meta property="og:site_name" content="오깅중"><meta property="og:description" content="Fastlane 적용으로 원시인 탈출하기!"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.083a71654903a59dd51e4c36c2ad9984d806c2449222faec89bda397c0733b55.css integrity="sha256-CDpxZUkDpZ3VHkw2wq2ZhNgGwkSSIvrsib2jl8BzO1U="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 03, 2022</span>
+<span>·</span>
+<span>4분 읽기</span></div><h1 class=article__title>iOS Fastlane을 적용해보자</h1><p class=article__desc>Fastlane 적용으로 원시인 탈출하기!</p></header><div class=article__body><h3 id=도입이유>도입이유</h3><p>친구랑 얘기하다 원시인 소리를 들었다&mldr;😀</p><h5 id=현-배포-절차>현 배포 절차</h5><ul><li>클린 -> Product -> Archive -> 완료 콜백 올때까지 대기 -> 업로드 <del>(대략 30분&mldr;?)</del></li></ul><h5 id=도입-후-절차>도입 후 절차</h5><ul><li>fastlane &rsquo;lane명&rsquo; 끗!</li></ul><p>자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다</p><h2 id=설치--업로드>설치 & 업로드</h2><p>Homebrew를 이용해 Fastlane을 설치 할건데 Homebrew가 설치되어 있지 않으면 설치를 하고 오자. -> <a href=https://brew.sh/index_ko>바로가기</a></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>brew install fastlane
+</span></span></code></pre></div><p>를 터미널에 입력해 주면 알아서 설치가 진행이 된다.</p><p>만약 설치가 안된다면 명령어 추천이 있을경우 따라하면 되고 안돼면&mldr;. 구글링을 통해 해결해보자. (화이팅)</p><p>그 다음 이제 fastlane을 적용할 프로젝트에 가서</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>fastlane init
+</span></span></code></pre></div><p>명령어로 fastlane 초기화를 진행해줍니다.</p><p><img src=fastlane.png alt></p><p>저는 여기서 2번으로 진행했는데 일단 테스트 플라이트에 올려보는게 목적이라 2번으로 진행했습니다.</p><p>무엇을 선택해도 크게 상관없이 나중에 직접 추가할 수 있으니까 맘 편하게 선택해주세요.</p><p>번호 선택후 엔터를 누르면 막 뭐라고 설명이 나오고 엔터를 몇번 치다보면 설정이 완료 된다.</p><p>설정이 완료 되면 fastlane 이라는 디렉토리가 생성되고 디렉토리 들어가면 다음과 같은 파일이 생성되어있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>Appfile
+</span></span><span class=line><span class=cl>Fastfile
+</span></span></code></pre></div><p>이제 이 두가지 설정을 통해 우리가 사용할 명령어를 설정해 주면 된다. (거의 다 됐습니다.)</p><p>이제 해당 프로젝트를 협업하며 작업할 경우를 대비 작업도 따로 해주었다</p><p>우선 fastlane/.env파일을 만들어</p><h6 id=fastlane폴더에서-들어가서-만들경우---vi-env>fastlane폴더에서 들어가서 만들경우 -> vi /.env</h6><h6 id=fastlane폴더-밖에서-만들경우---vi-fastlaneenv>fastlane폴더 밖에서 만들경우 -> vi fastlane/.env</h6><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>APP_IDENTIFIER</span><span class=o>=</span><span class=s2>&#34;앱 Identifier ex)com.test.test&#34;</span>
+</span></span><span class=line><span class=cl><span class=nv>APPLE_ID</span><span class=o>=</span><span class=s2>&#34;자신의 계정&#34;</span>
+</span></span></code></pre></div><p>를 추가해주고 저장한다.</p><p>나중에 push 할때 해당 파일만 .gitignore에 추가해주고 push를 해주는게 충돌이 나지 않고 편안한다.</p><p>AppFile을 열어 이제 다음과 같이 변경해주자</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>app_identifier(ENV[&#34;APP_IDENTIFIER&#34;]) # The bundle identifier of your app
+</span></span><span class=line><span class=cl>apple_id(ENV[&#34;APPLE_ID&#34;]) # Your Apple email address
+</span></span></code></pre></div><p>이제 env파일을 통해 App identifire, Apple id를 가져오게 된다. 정말 편리하다</p><p>이제 마지막으로 Fastfile에 들어가 다음과 같이 세팅을 해주면 됩니다</p><p>아마 기본적으로 세팅이 되어 있으니 크게 바꾸지 않아도 되는데</p><p>추가로 필요한 Action에 대한 정보는 <a href=https://docs.fastlane.tools/actions/>여기</a>에서 확인 가능!!</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>default_platform(:ios)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>platform :ios do
+</span></span><span class=line><span class=cl>  desc &#34;lane에 대한 설명&#34;
+</span></span><span class=line><span class=cl>  lane : 사용할 lane명 do
+</span></span><span class=line><span class=cl>	get_certificates 
+</span></span><span class=line><span class=cl>	get_provisioning_profile
+</span></span><span class=line><span class=cl>	increment_build_number(build_number: latest_testflight_build_number + 1)
+</span></span><span class=line><span class=cl>	build_app(configuration: &#34;Debug&#34;)
+</span></span><span class=line><span class=cl>	upload_to_testflight
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  end
+</span></span><span class=line><span class=cl>end
+</span></span></code></pre></div><blockquote><p>platform :ios do -> 플랫폼</p><p>desc &ldquo;lane에 대한 설명&rdquo;</p><p>lane : 사용할 lane명 do -> 배포시 fastlane 레인명 으로 사용된다. do는 지우지 말기!</p><p>get_certificates -> certificates 가져오는 action</p><p>get_provisioning_profile -> 프로필 가져오는 action</p><p>increment_build_number(build_number: latest_testflight_build_number + 1) -> 이게 이제 빌드 번호를 올려주는 action</p><p><del>(분명 테플에 안올라가 있는데 배포를 하고 나니 빌드 버전이 2가 되버렸다.. 처음 올리는 빌드버전일때는 0을 넣고 진행을 해야하는건가..?)</del></p><p>build_app(configuration : &ldquo;Debug&rdquo; ) -> 앱 빌드 action입니다. configuration은 맞게 설정해 주시면 되요!! 테플에 올라갈꺼라 Debug로 해줬습니다.</p><p>upload_to_testflight -> 테플에 올리는 명령어!!!</p></blockquote><p>추가적으로 action들을 더 넣어줄수 있는데 사용자들이 입맛에 맞게 사용하면 될꺼 같다.</p><p>설정이 끝나면 이제</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>fastlane &#34;lane명&#34;
+</span></span></code></pre></div><p>입력하면 알아서 쭉 돌아간다!!!</p><p>이게 어떤 설정을 해주면 테플에 올라가는 거를 기다리지 않고 다른 작업도 할 수 있다고 하는데</p><p>차분히 기다렸다.</p><p>fastlane결과를 찍어둔게 사라졌는데 암튼 <strong>17분</strong>을 절약했다고 써있어서 뿌듯</p><h3 id=인증-관련>인증 관련</h3><p>굉장히 까다로운 인증절차를 따라야 하는데 일단 Sigh, Cert를 이용한 인증 방법을 이용하였고, 좀더 다양한 큰 규모로 넘어가면 Match를 이용한 인증을 시도해야 한다.</p><p>하지만 굉장히 까다로운 세팅이 있다고 들었&mldr;</p><p>일단 Cert를 이용할때</p><p><img src=fastlane_error.png alt></p><p>처음 하면 분명 이런 에러를 마주치게 되는데 여기서 정확히 32번 정도를 애플 로그인 비밀번호를 입력했는데&mldr; 그게 아니었다..</p><p>계속 오타가 나는줄 알고 한글자씩 쳐보기도 했다&mldr; <del>해킹 당한줄</del></p><p>로그인 비번이 아니라 앱 비번을 입력해줘야 하는데 아마 이거 설정이 안되어 있어서 나는 에러니까</p><p><a href=https://appleid.apple.com/>이쪽</a>에서 설정을 해주도록 하자</p><p>로그인을 하게 되면 다음과 같은 화면을 보게 되는데 분홍색 박스의 앱 암호를 눌러 설정해 준 암호로 로그인을 하면 정상적으로 된다.!!</p><p><img src=appid.png alt></p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:hi@ogging.dev>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>11</span></div><div class=tags><a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
+<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>7 posts</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
+<span class=archive-row__bar><div style=width:17%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │
-  └─────────────────┘</pre>
-      <p style="font-size: 13px; color: var(--ink-2); margin: 0; max-width: 40ch;">
-        iOS, Swift, 그리고 가끔 다른 것들. <br/>
-"Don't worry if it doesn't work right."
-
-      </p>
-    </div>
-    <div class="footer-block">
-      <h4>NAVIGATE</h4>
-      <ul>
-        
-          <li><a href="/">Home</a></li>
-        
-          <li><a href="/archives/">Archives</a></li>
-        
-          <li><a href="/tags/">Tags</a></li>
-        
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-    <div class="footer-block">
-      <h4>ELSEWHERE</h4>
-      <ul>
-        
-          <li><a href="https://github.com/jun7680" target="_blank" rel="noopener">GitHub ↗</a></li>
-        
-          <li><a href="https://instagram.com/ockkkk91" target="_blank" rel="noopener">Instagram ↗</a></li>
-        
-          <li><a href="mailto:hi@ogging.dev" >Email ↗</a></li>
-        
-        <li><a href="https://jun7680.github.io/index.xml">RSS ↗</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-baseline">
-    <span>© 2020–2026 오깅중</span>
-    <span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span>
-  </div>
-</footer>
-
-<div class="palette-backdrop" id="palette-backdrop" hidden data-index-url="https://jun7680.github.io/index.json">
-  <div class="palette" role="dialog" aria-modal="true" aria-label="검색">
-    <div class="palette__input">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="palette-input" type="text" placeholder="포스트 검색…" autocomplete="off" />
-      <kbd>ESC</kbd>
-    </div>
-    <div class="palette__list" id="palette-list"></div>
-    <div class="palette__empty" id="palette-empty" hidden>검색 결과가 없습니다.</div>
-  </div>
-</div>
-
-
-<script src="/js/main.min.34a28cdaccfaa37477469e8c2c59449d793c14d0e285844ea959270e0acda9e1.js" integrity="sha256-NKKM2sz6o3R3Rp6MLFlEnXk8FNDihYROqVknDgrNqeE=" defer></script>
-</body>
-</html>
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:hi@ogging.dev>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.34a28cdaccfaa37477469e8c2c59449d793c14d0e285844ea959270e0acda9e1.js integrity="sha256-NKKM2sz6o3R3Rp6MLFlEnXk8FNDihYROqVknDgrNqeE=" defer></script></body></html>

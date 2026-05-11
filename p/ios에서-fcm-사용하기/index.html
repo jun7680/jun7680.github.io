@@ -1,333 +1,72 @@
-<!DOCTYPE html>
-<html lang="ko" data-theme="dark">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>iOS에서 FCM 사용하기! — 오깅중</title>
-<meta name="description" content="FCM을 적용해보자!">
-<meta name="author" content="Ock">
-<meta property="og:type" content="article">
-<meta property="og:title" content="iOS에서 FCM 사용하기!">
-<meta property="og:site_name" content="오깅중">
-<meta property="og:description" content="FCM을 적용해보자!">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
-
-
-<link rel="stylesheet" href="/css/main.min.68c6a48303ea40fdb4be98ff93c5f05741d111bddb28b9a247a3bf31fdfd2ab0.css" integrity="sha256-aMakgwPqQP20vpj/k8XwV0HREb3bKLmiR6O/Mf39KrA=">
-
-<link rel="alternate" type="application/rss+xml" href="https://jun7680.github.io/index.xml" title="오깅중 RSS">
-
-
-
-</head>
-<body>
-<div class="scroll-progress"><div id="progress-bar"></div></div>
-<header class="site-header">
-  <div class="site-header__inner">
-    <a href="https://jun7680.github.io/" class="wordmark" aria-label="오깅중 홈">
-      <span>오깅중</span>
-      <span class="wordmark__cursor" aria-hidden="true"></span>
-      <span class="wordmark__mono">/ ogging.dev</span>
-    </a>
-    <nav class="site-nav">
-      
-      
-        <a href="/" >Home</a>
-      
-        <a href="/archives/" >Archives</a>
-      
-        <a href="/tags/" >Tags</a>
-      
-        <a href="/categories/" >Categories</a>
-      
-    </nav>
-    <div class="header-tools">
-      <button class="search-btn" id="search-btn" type="button" aria-label="검색 열기">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <span>검색</span>
-        <kbd>⌘K</kbd>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main class="page">
-  <div>
-    
-
-
-<article class="article reveal-in">
-  <header class="article__header">
-    <div class="article__meta">
-      <span>FCM</span>
-      <span>·</span>
-      <span>JAN 10, 2022</span>
-      <span>·</span>
-      <span>2분 읽기</span>
-    </div>
-    <h1 class="article__title">iOS에서 FCM 사용하기!</h1>
-    <p class="article__desc">FCM을 적용해보자!</p>
-  </header>
-  <div class="article__body">
-    <h2 id="fcm">FCM</h2>
-<ul>
-<li>Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!</li>
-</ul>
-<h3 id="fcm-설정">FCM 설정</h3>
-<p>준비 사항</p>
-<ul>
-<li>Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.</li>
-<li>XCode의 APP &gt; Capabilities에서 푸시 알림 사용 설정을 한다.</li>
-<li><a href="https://console.firebase.google.com/u/0/">Firebase Console</a>에서 프로젝트를 추가한다.</li>
-</ul>
-<h4 id="firebase-앱-등록">Firebase 앱 등록</h4>
-<ul>
-<li>
-<p>프로젝트를 추가하고 나오면 중앙에 <img src="FCM_iOS+.png" alt="">
-iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 <strong>GoogleService-Info.plist</strong>를 다운받을수 있다.</p>
-</li>
-<li>
-<p>Xcode 프로젝트로 돌아가 SPM에 <code>https://github.com/firebase/firebase-ios-sdk</code>를 추가 해준다.<br>
-(최신 버전을 사용해 주는 것이 좋지만 필요하다면 이전 버전을 사용해도 무방하다)</p>
-</li>
-<li>
-<p>추가를 해주고 프로젝트에서 초기화 코드를 추가 해 주면 된다.</p>
-</li>
-</ul>
-<h4 id="firebase-초기화-코드">Firebase 초기화 코드</h4>
-<ol>
-<li>AppDelegate.swift에 가서 Firebase를 import 해준다.</li>
-</ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Swift" data-lang="Swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">Firebase</span>
-</span></span></code></pre></div><ol start="2">
-<li>didFinishLaunchingWithOptions 메서드에서 FirebaseApp.configure()를 날려준다</li>
-</ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">...</span>
-</span></span><span class="line"><span class="cl">    <span class="n">FirebaseApp</span><span class="p">.</span><span class="n">configure</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><ol start="3">
-<li>이제 시작될때 원격 알림에 앱을 등록을 해줘야 하는데 친절하게 이미 구현이 되어있다.</li>
-</ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">...</span>
-</span></span><span class="line"><span class="cl">    <span class="n">FirebaseApp</span><span class="p">.</span><span class="n">configure</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="n">application</span><span class="p">.</span><span class="n">registerForRemoteNotifications</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>다 된거 같지만 중요한 토큰 등록이 남아있다.</p>
-<h4 id="firebase-토큰-등록">Firebase 토큰 등록</h4>
-<p>토큰은 messaging:didReceiveRegistrationToken 메서드를 통해 전달 되는데 해당 메서드는 MessagingDelegate에 구현 되어있는 함수를 이용하거나 token(completion)을 사용하여 직접 토큰을 가져올 수 있다.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="o">------</span><span class="n">Delegate</span> <span class="err">이용</span>
-</span></span><span class="line"><span class="cl"><span class="kd">extension</span> <span class="nc">AppDelegate</span><span class="p">:</span> <span class="n">MessagingDelegate</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">func</span> <span class="nf">messaging</span><span class="p">(</span><span class="kc">_</span> <span class="n">messaging</span><span class="p">:</span> <span class="n">Messaging</span><span class="p">,</span> <span class="n">didReceiveRegistrationToken</span> <span class="n">fcmToken</span><span class="p">:</span> <span class="nb">String</span><span class="p">?)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">fcmToken</span> <span class="o">&lt;-</span> <span class="err">이게</span> <span class="err">넘어오는</span> <span class="err">토큰이다</span><span class="p">.</span> 
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">...</span>
-</span></span><span class="line"><span class="cl">    <span class="n">FirebaseApp</span><span class="p">.</span><span class="n">configure</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="n">application</span><span class="p">.</span><span class="n">registerForRemoteNotifications</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Messaging</span><span class="p">.</span><span class="n">messaging</span><span class="p">().</span><span class="n">delegate</span> <span class="p">=</span> <span class="kc">self</span> <span class="c1">// &lt;- 이거 안해줘서 한참을 얼탔던 기억이..</span>
-</span></span><span class="line"><span class="cl">    <span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"> 
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="o">------</span><span class="n">token</span><span class="p">(</span><span class="n">completion</span><span class="p">:)</span> <span class="err">이용</span>
-</span></span><span class="line"><span class="cl"><span class="n">Messaging</span><span class="p">.</span><span class="n">messaging</span><span class="p">().</span><span class="n">token</span> <span class="p">{</span> <span class="n">token</span><span class="p">,</span> <span class="n">error</span> <span class="k">in</span> 
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 실행 코드</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>알림 서버가 구축되어있으면 자신이 사용하는 서버에 fcm 토큰 값을 보내서 사용하면 된다!!</p>
-<p>구글의 정석적인 설명을 보고 싶으면 <a href="https://firebase.google.com/docs/cloud-messaging/ios/client">여기</a>로 가서 보면 구글의 친절한 설명을 볼 수 있다.!</p>
-<h2 id="알림-테스트를-할-경우-꼭-실제-기기에서-해보세요-시뮬에서-백번-돌려도-백번-다-안나왔던-기억이-있습니다"><del>알림 테스트를 할 경우 꼭 실제 기기에서 해보세요!! 시뮬에서 백번 돌려도 백번 다 안나왔던 기억이 있습니다.</del></h2>
-
-  </div>
-</article>
-
-  </div>
-  <aside class="sidebar">
-  
-<div class="card" id="about">
-  <div class="card__head">
-    <span class="card__title">ABOUT</span>
-    <span class="card__aux">v2.0</span>
-  </div>
-  <h3 class="about__name">오깅중</h3>
-  <p class="about__role">iOS Developer · Swift</p>
-  <p class="about__bio">"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.
-</p>
-  
-  <div class="about__links">
-    
-      <a class="pill-link" href="https://github.com/jun7680" target="_blank" rel="noopener">GitHub ↗</a>
-    
-      <a class="pill-link" href="https://instagram.com/ockkkk91" target="_blank" rel="noopener">Instagram ↗</a>
-    
-      <a class="pill-link" href="mailto:hi@ogging.dev" >Email ↗</a>
-    
-  </div>
-  
-</div>
-
-  
-  
-<div class="card">
-  <div class="card__head">
-    <span class="card__title">NOW</span>
-    <span class="now-aux"><span class="live-dot"></span> LIVE</span>
-  </div>
-  <div class="now-list">
-    
-      <div><span class="now-label">reading_</span> &#34;Modern Concurrency in Swift&#34;</div>
-    
-      <div><span class="now-label">building_</span> SwiftUI side project</div>
-    
-      <div><span class="now-label">listening_</span> lo-fi beats / focus</div>
-    
-  </div>
-</div>
-
-
-  
-
-<div class="card" id="tags">
-  <div class="card__head">
-    <span class="card__title">TAGS</span>
-    <span class="card__aux">11</span>
-  </div>
-  <div class="tags">
-    
-      <a class="tag" href="/tags/concurrency/">#concurrency<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fastlane/">#fastlane<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fcm/">#fcm<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/gcd/">#gcd<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/jekyll/">#jekyll<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/markdown/">#markdown<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/notion/">#notion<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/observable/">#observable<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/rxswift/">#rxswift<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/swift-swift-57/">#swift, swift 5,7<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uistackview/">#uistackview<span class="tag__count">1</span></a>
-    
-  </div>
-</div>
-
-
-  
-
-
-
-  
-  
-    
-  
-    
-  
-  
-<div class="card" id="archive">
-  <div class="card__head">
-    <span class="card__title">ARCHIVES</span>
-    <span class="card__aux">7 posts</span>
-  </div>
-  
-    
-    <div class="archive-row">
-      <span class="archive-row__year">2022</span>
-      <span class="archive-row__bar"><div style="width: 100%"></div></span>
-      <span class="archive-row__count">06</span>
-    </div>
-  
-    
-    <div class="archive-row">
-      <span class="archive-row__year">2020</span>
-      <span class="archive-row__bar"><div style="width: 17%"></div></span>
-      <span class="archive-row__count">01</span>
-    </div>
-  
-</div>
-
-
-</aside>
-
-</main>
-<footer class="site-footer">
-  <div class="site-footer__inner">
-    <div class="footer-block">
-      <pre class="footer-ascii">  ┌─────────────────┐
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>iOS에서 FCM 사용하기! — 오깅중</title><meta name=description content="FCM을 적용해보자!"><meta name=author content="Ock"><meta property="og:type" content="article"><meta property="og:title" content="iOS에서 FCM 사용하기!"><meta property="og:site_name" content="오깅중"><meta property="og:description" content="FCM을 적용해보자!"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.083a71654903a59dd51e4c36c2ad9984d806c2449222faec89bda397c0733b55.css integrity="sha256-CDpxZUkDpZ3VHkw2wq2ZhNgGwkSSIvrsib2jl8BzO1U="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>FCM</span>
+<span>·</span>
+<span>JAN 10, 2022</span>
+<span>·</span>
+<span>2분 읽기</span></div><h1 class=article__title>iOS에서 FCM 사용하기!</h1><p class=article__desc>FCM을 적용해보자!</p></header><div class=article__body><h2 id=fcm>FCM</h2><ul><li>Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!</li></ul><h3 id=fcm-설정>FCM 설정</h3><p>준비 사항</p><ul><li>Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.</li><li>XCode의 APP > Capabilities에서 푸시 알림 사용 설정을 한다.</li><li><a href=https://console.firebase.google.com/u/0/>Firebase Console</a>에서 프로젝트를 추가한다.</li></ul><h4 id=firebase-앱-등록>Firebase 앱 등록</h4><ul><li><p>프로젝트를 추가하고 나오면 중앙에 <img src=FCM_iOS+.png alt>
+iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 <strong>GoogleService-Info.plist</strong>를 다운받을수 있다.</p></li><li><p>Xcode 프로젝트로 돌아가 SPM에 <code>https://github.com/firebase/firebase-ios-sdk</code>를 추가 해준다.<br>(최신 버전을 사용해 주는 것이 좋지만 필요하다면 이전 버전을 사용해도 무방하다)</p></li><li><p>추가를 해주고 프로젝트에서 초기화 코드를 추가 해 주면 된다.</p></li></ul><h4 id=firebase-초기화-코드>Firebase 초기화 코드</h4><ol><li>AppDelegate.swift에 가서 Firebase를 import 해준다.</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-Swift data-lang=Swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>Firebase</span>
+</span></span></code></pre></div><ol start=2><li>didFinishLaunchingWithOptions 메서드에서 FirebaseApp.configure()를 날려준다</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>application</span><span class=p>(</span><span class=kc>_</span> <span class=n>application</span><span class=p>:</span> <span class=n>UIApplication</span><span class=p>,</span> <span class=n>didFinishLaunchingWithOptions</span> <span class=n>launchOptions</span><span class=p>:</span> <span class=p>[</span><span class=n>UIApplication</span><span class=p>.</span><span class=n>LaunchOptionsKey</span><span class=p>:</span> <span class=nb>Any</span><span class=p>]?)</span> <span class=p>-&gt;</span> <span class=nb>Bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=n>FirebaseApp</span><span class=p>.</span><span class=n>configure</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><ol start=3><li>이제 시작될때 원격 알림에 앱을 등록을 해줘야 하는데 친절하게 이미 구현이 되어있다.</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>application</span><span class=p>(</span><span class=kc>_</span> <span class=n>application</span><span class=p>:</span> <span class=n>UIApplication</span><span class=p>,</span> <span class=n>didFinishLaunchingWithOptions</span> <span class=n>launchOptions</span><span class=p>:</span> <span class=p>[</span><span class=n>UIApplication</span><span class=p>.</span><span class=n>LaunchOptionsKey</span><span class=p>:</span> <span class=nb>Any</span><span class=p>]?)</span> <span class=p>-&gt;</span> <span class=nb>Bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=n>FirebaseApp</span><span class=p>.</span><span class=n>configure</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>application</span><span class=p>.</span><span class=n>registerForRemoteNotifications</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>다 된거 같지만 중요한 토큰 등록이 남아있다.</p><h4 id=firebase-토큰-등록>Firebase 토큰 등록</h4><p>토큰은 messaging:didReceiveRegistrationToken 메서드를 통해 전달 되는데 해당 메서드는 MessagingDelegate에 구현 되어있는 함수를 이용하거나 token(completion)을 사용하여 직접 토큰을 가져올 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=o>------</span><span class=n>Delegate</span> <span class=err>이용</span>
+</span></span><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>AppDelegate</span><span class=p>:</span> <span class=n>MessagingDelegate</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>messaging</span><span class=p>(</span><span class=kc>_</span> <span class=n>messaging</span><span class=p>:</span> <span class=n>Messaging</span><span class=p>,</span> <span class=n>didReceiveRegistrationToken</span> <span class=n>fcmToken</span><span class=p>:</span> <span class=nb>String</span><span class=p>?)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>fcmToken</span> <span class=o>&lt;-</span> <span class=err>이게</span> <span class=err>넘어오는</span> <span class=err>토큰이다</span><span class=p>.</span> 
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>application</span><span class=p>(</span><span class=kc>_</span> <span class=n>application</span><span class=p>:</span> <span class=n>UIApplication</span><span class=p>,</span> <span class=n>didFinishLaunchingWithOptions</span> <span class=n>launchOptions</span><span class=p>:</span> <span class=p>[</span><span class=n>UIApplication</span><span class=p>.</span><span class=n>LaunchOptionsKey</span><span class=p>:</span> <span class=nb>Any</span><span class=p>]?)</span> <span class=p>-&gt;</span> <span class=nb>Bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=n>FirebaseApp</span><span class=p>.</span><span class=n>configure</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>application</span><span class=p>.</span><span class=n>registerForRemoteNotifications</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>Messaging</span><span class=p>.</span><span class=n>messaging</span><span class=p>().</span><span class=n>delegate</span> <span class=p>=</span> <span class=kc>self</span> <span class=c1>// &lt;- 이거 안해줘서 한참을 얼탔던 기억이..</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>------</span><span class=n>token</span><span class=p>(</span><span class=n>completion</span><span class=p>:)</span> <span class=err>이용</span>
+</span></span><span class=line><span class=cl><span class=n>Messaging</span><span class=p>.</span><span class=n>messaging</span><span class=p>().</span><span class=n>token</span> <span class=p>{</span> <span class=n>token</span><span class=p>,</span> <span class=n>error</span> <span class=k>in</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 실행 코드</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>알림 서버가 구축되어있으면 자신이 사용하는 서버에 fcm 토큰 값을 보내서 사용하면 된다!!</p><p>구글의 정석적인 설명을 보고 싶으면 <a href=https://firebase.google.com/docs/cloud-messaging/ios/client>여기</a>로 가서 보면 구글의 친절한 설명을 볼 수 있다.!</p><h2 id=알림-테스트를-할-경우-꼭-실제-기기에서-해보세요-시뮬에서-백번-돌려도-백번-다-안나왔던-기억이-있습니다><del>알림 테스트를 할 경우 꼭 실제 기기에서 해보세요!! 시뮬에서 백번 돌려도 백번 다 안나왔던 기억이 있습니다.</del></h2></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:hi@ogging.dev>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>11</span></div><div class=tags><a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
+<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>7 posts</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
+<span class=archive-row__bar><div style=width:17%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │
-  └─────────────────┘</pre>
-      <p style="font-size: 13px; color: var(--ink-2); margin: 0; max-width: 40ch;">
-        iOS, Swift, 그리고 가끔 다른 것들. <br/>
-"Don't worry if it doesn't work right."
-
-      </p>
-    </div>
-    <div class="footer-block">
-      <h4>NAVIGATE</h4>
-      <ul>
-        
-          <li><a href="/">Home</a></li>
-        
-          <li><a href="/archives/">Archives</a></li>
-        
-          <li><a href="/tags/">Tags</a></li>
-        
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-    <div class="footer-block">
-      <h4>ELSEWHERE</h4>
-      <ul>
-        
-          <li><a href="https://github.com/jun7680" target="_blank" rel="noopener">GitHub ↗</a></li>
-        
-          <li><a href="https://instagram.com/ockkkk91" target="_blank" rel="noopener">Instagram ↗</a></li>
-        
-          <li><a href="mailto:hi@ogging.dev" >Email ↗</a></li>
-        
-        <li><a href="https://jun7680.github.io/index.xml">RSS ↗</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-baseline">
-    <span>© 2020–2026 오깅중</span>
-    <span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span>
-  </div>
-</footer>
-
-<div class="palette-backdrop" id="palette-backdrop" hidden data-index-url="https://jun7680.github.io/index.json">
-  <div class="palette" role="dialog" aria-modal="true" aria-label="검색">
-    <div class="palette__input">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="palette-input" type="text" placeholder="포스트 검색…" autocomplete="off" />
-      <kbd>ESC</kbd>
-    </div>
-    <div class="palette__list" id="palette-list"></div>
-    <div class="palette__empty" id="palette-empty" hidden>검색 결과가 없습니다.</div>
-  </div>
-</div>
-
-
-<script src="/js/main.min.34a28cdaccfaa37477469e8c2c59449d793c14d0e285844ea959270e0acda9e1.js" integrity="sha256-NKKM2sz6o3R3Rp6MLFlEnXk8FNDihYROqVknDgrNqeE=" defer></script>
-</body>
-</html>
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:hi@ogging.dev>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.34a28cdaccfaa37477469e8c2c59449d793c14d0e285844ea959270e0acda9e1.js integrity="sha256-NKKM2sz6o3R3Rp6MLFlEnXk8FNDihYROqVknDgrNqeE=" defer></script></body></html>

@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Notion on 오깅중</title>
-    <link>https://jun7680.github.io/categories/notion/</link>
-    <description>Recent content in Notion on 오깅중</description>
-    <generator>Hugo</generator>
-    <language>ko</language>
-    <lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://jun7680.github.io/categories/notion/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Notion으로 Posting</title>
-      <link>https://jun7680.github.io/p/notion/</link>
-      <pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate>
-      <guid>https://jun7680.github.io/p/notion/</guid>
-      <description>&lt;h3 id=&#34;글-작성&#34;&gt;글 작성&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;---&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;layout: post&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;title: 제목&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;subtitle: 부제목&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;date: 글 작성 시간&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;categories: 카테고리&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tags: 테그 or [테그, 테그....]&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comments: true &amp;lt;- 댓글 사용 여부&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;---&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;&#xA;&lt;h4&gt;layout - 내가 사용한 테마에서는 글 작성시 post, 페이지(상단) 추가시 page.&lt;/h4&gt;&#xA;&lt;h4&gt;title, subtitle 둘다 문자열로 입력.&lt;/h4&gt;&#xA;&lt;p&gt;&lt;del&gt;처음에 마크다운 문법 에러가 계속 났었는데 알고보니 따옴표&amp;hellip;&lt;/del&gt;&lt;br&gt;&#xA;&lt;del&gt;노션이나 다른 곳에서 복사해서 사용할 경우 따옴표에 주의해야 한다.&lt;/del&gt;&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Notion on 오깅중</title><link>https://jun7680.github.io/categories/notion/</link><description>Recent content in Notion on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/categories/notion/index.xml" rel="self" type="application/rss+xml"/><item><title>Notion으로 Posting</title><link>https://jun7680.github.io/p/notion/</link><pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/notion/</guid><description>&lt;h3 id="글-작성"&gt;글 작성&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-markdown" data-lang="markdown"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;layout: post
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;title: 제목
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;subtitle: 부제목
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;date: 글 작성 시간
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;categories: 카테고리
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;tags: 테그 or [테그, 테그....]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;comments: true &amp;lt;- 댓글 사용 여부
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h4&gt;layout - 내가 사용한 테마에서는 글 작성시 post, 페이지(상단) 추가시 page.&lt;/h4&gt;
+&lt;h4&gt;title, subtitle 둘다 문자열로 입력.&lt;/h4&gt;
+&lt;p&gt;&lt;del&gt;처음에 마크다운 문법 에러가 계속 났었는데 알고보니 따옴표&amp;hellip;&lt;/del&gt;&lt;br&gt;
+&lt;del&gt;노션이나 다른 곳에서 복사해서 사용할 경우 따옴표에 주의해야 한다.&lt;/del&gt;&lt;/p&gt;</description></item></channel></rss>
