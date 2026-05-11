@@ -1,0 +1,220 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지) — 오깅중</title><meta name=description content="SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-2-primary-key-traps/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-2-primary-key-traps/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)"><meta property="article:published_time" content="2026-05-11T11:00:00+09:00"><meta property="article:modified_time" content="2026-05-11T11:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="PrimaryKey"><meta property="article:tag" content="Predicate"><meta property="article:tag" content="Migration"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Realm"><meta property="article:tag" content="Swift"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)"><meta name=twitter:description content="SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-2-primary-key-traps/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.03a9108cbccac9c923e9a52f6eef73851630a119a3cacc9d8e9311ec46747a8f.css integrity="sha256-A6kQjLzKyckj6aUvbu9zhRYwoRmjysydjpMR7EZ0eo8="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 11, 2026</span>
+<span>·</span>
+<span>12분 읽기</span></div><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</h1><p class=article__desc>SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기.</p></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — SwiftData <code>@Attribute(.unique)</code> Primary Key를 쓰다 silent로 무너지는 3가지를 만났다. ① <code>.invalidInt</code> 같은 sentinel을 PK 기본값으로 두면 row 충돌이 난다. ② <code>String.hashValue</code>는 프로세스 재시작마다 시드가 랜덤이라 PK가 안 맞는다. ③ <code>#Predicate</code> 안에서 enum 비교는 silent fail 한다. <strong>결정적 해시(Boost <code>hash_combine</code> 포팅) + rawValue 컬럼 분리 + lookup-then-upsert</strong>로 막았다. 총 6편 시리즈의 <strong>2편(Primary Key 함정 편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략편</a>에서 Realm을 떠나기로 한 결정과 일괄 마이그레이션 전략을 정리했다. 결정이 잡힌 다음부터는 코드를 굴리는 일이다. 그런데 코드 굴리자마자, 가장 먼저 발등을 찍은 게 <strong>Primary Key</strong>였다.</p><p>SwiftData의 <code>@Attribute(.unique)</code>는 보기엔 단순하다. <code>@Attribute(.unique) var id: Int</code> 한 줄 박으면 끝나는 것처럼 생겼다. 그런데 이 한 줄이 silent하게 무너지는 시나리오가 셋이나 있더라. 컴파일은 멀쩡히 되고, 런타임에 throw도 안 한다. 그냥 row가 사라지거나, 쿼리가 0건 리턴하거나, lookup이 안 맞는 식이다.</p><p>이 글은 그 3가지를 한 편으로 묶어서 정리한다. <del>한 번 호되게 데여서 다시 안 잊으려고 적는 거기도 함.</del></p><hr><h2 id=이-글에서-다룰-3가지-함정>이 글에서 다룰 3가지 함정</h2><p>먼저 결론부터. PK를 어떻게 만들지 결정하는 흐름은 이렇게 굴러간다.</p><pre class=mermaid>flowchart TD
+    Start[새 @Model entity에<br>PrimaryKey가 필요]:::neutral
+    Q1{init 시점에 PK 입력값을<br>모두 확보 가능한가?}:::decision
+    T1[sentinel 기본값으로<br>잠시 두기 .invalidInt = -1]:::trap
+    Out1[함정 1<br>row 충돌 · silent overwrite]:::bad
+
+    Q2{어떤 함수로 PK를<br>만들 것인가?}:::decision
+    T2[String hashValue 사용<br>해시 한 줄로 끝]:::trap
+    Out2[함정 2<br>프로세스마다 시드 랜덤<br>upsert 깨짐]:::bad
+
+    Q3{Container 타입을<br>그대로 컬럼에 저장할까?}:::decision
+    T3["#Predicate에서<br>enum 직접 비교"]:::trap
+    Out3[함정 3<br>매크로가 enum 못 풀어<br>silent 0건 리턴]:::bad
+
+    Fix1[결정적 해시 자체 구현<br>Boost hash_combine 포팅]:::good
+    Fix2[rawValue 컬럼 분리<br>+ Predicate 진입 전 unwrap]:::good
+    Done[안전한 PK · 안전한 쿼리]:::ok
+
+    Start --> Q1
+    Q1 -- No --> T1 --> Out1
+    Q1 -- Yes --> Q2
+    Q2 -- "String hashValue" --> T2 --> Out2
+    Q2 -- "결정적 함수" --> Fix1
+    Fix1 --> Q3
+    Q3 -- "enum 그대로" --> T3 --> Out3
+    Q3 -- "rawValue 컬럼 분리" --> Fix2
+    Fix2 --> Done
+
+    classDef neutral fill:#2d3748,stroke:#a0aec0,stroke-width:2px,color:#f7fafc
+    classDef decision fill:#1a365d,stroke:#63b3ed,stroke-width:2px,color:#ebf8ff
+    classDef trap fill:#742a2a,stroke:#fc8181,stroke-width:1px,stroke-dasharray: 4 3,color:#fff5f5
+    classDef bad fill:#9b2c2c,stroke:#feb2b2,stroke-width:2px,color:#fff5f5
+    classDef good fill:#22543d,stroke:#68d391,stroke-width:2px,color:#f0fff4
+    classDef ok fill:#276749,stroke:#9ae6b4,stroke-width:2px,color:#f0fff4
+</pre><p>세 분기에 빨강 경로 셋이 박혀 있다. 이게 이 글에서 다룰 함정 3종이다. 한 줄 요약은 이렇다.</p><table><thead><tr><th>함정</th><th>증상</th><th>원인 한 줄</th><th>해결 한 줄</th></tr></thead><tbody><tr><td>sentinel 기본값</td><td>row 충돌·silent overwrite</td><td>sentinel을 PK 기본값으로 둠</td><td>init에서 결정적 해시로 즉시 결정</td></tr><tr><td><code>String.hashValue</code></td><td>upsert 깨짐, lookup 실패</td><td>프로세스마다 시드 랜덤 (Swift 4.2+)</td><td>자체 결정적 해시 함수</td></tr><tr><td><code>#Predicate</code> enum</td><td>쿼리 0건, silent fail</td><td>매크로가 enum/rawValue 못 풀음</td><td>rawValue 컬럼 분리 + 진입 전 unwrap</td></tr></tbody></table><p>이제 하나씩 본다.</p><hr><h2 id=함정-1--invalidint-스캐폴드가-pk-충돌을-만든다>함정 1 — <code>.invalidInt</code> 스캐폴드가 PK 충돌을 만든다</h2><p>entity에 default 값으로 sentinel을 두는 관행이 있다. 보통은 &ldquo;초기화 안 된 상태"를 표시하기 위한 -1 같은 값이다. 이걸 <code>@Attribute(.unique)</code> PK에 그대로 박는 게 가장 흔한 함정이다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>Int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>let</span> <span class=nv>invalidInt</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>BasicSummaryEntityV2</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Attribute</span><span class=p>(.</span><span class=n>unique</span><span class=p>)</span> <span class=kd>var</span> <span class=nv>id</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=p>.</span><span class=n>invalidInt</span>   <span class=c1>// ❌</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>remoteItemID</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=p>.</span><span class=n>invalidInt</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// ...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>문제는 <code>@Attribute(.unique)</code> 컬럼에 같은 sentinel 값이 들어간 row 두 개가 동시에 insert되면 <strong>두 번째 insert가 silent로 첫 번째를 덮어쓰거나 throw</strong>한다는 점이다. 마이그레이션 직후 init 흐름에서 id를 잠시 sentinel로 두는 패턴이 있으면, 어디서 사고가 났는지 추적이 진짜 어렵다. 콘솔에 아무것도 안 찍히는 경우도 있다.</p><h3 id=해결--init-시점에-pk를-결정해버린다>해결 — init 시점에 PK를 결정해버린다</h3><p><strong>id는 init 시점에 반드시 유효한 값으로 결정</strong>한다. sentinel을 PK로 쓰지 않는다. 다른 entity 필드를 조합해 안정적으로 id를 만든다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>BasicSummaryEntityV2</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Attribute</span><span class=p>(.</span><span class=n>unique</span><span class=p>)</span> <span class=kd>var</span> <span class=nv>id</span><span class=p>:</span> <span class=nb>Int</span>   <span class=c1>// sentinel 없음</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>remoteItemID</span><span class=p>:</span> <span class=nb>Int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(</span><span class=n>remoteItemID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>,</span> <span class=n>containerRowID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>,</span> <span class=cm>/* ... */</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// id 는 항상 유효한 deterministic 해시로 결정</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>id</span> <span class=p>=</span> <span class=kc>Self</span><span class=p>.</span><span class=n>makeID</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>remoteItemID</span><span class=p>:</span> <span class=n>remoteItemID</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>containerRowID</span><span class=p>:</span> <span class=n>containerRowID</span>
+</span></span><span class=line><span class=cl>        <span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>remoteItemID</span> <span class=p>=</span> <span class=n>remoteItemID</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// ...</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>핵심은 &ldquo;잠깐 sentinel이었다가 나중에 채워진다"가 아니라 &ldquo;처음부터 끝까지 유효한 값만 존재한다"는 점이다. init에서 deterministic 함수로 PK를 만들어버리면 sentinel이 PK 컬럼에 들어갈 일 자체가 없다.</p><p>문제는 이 &ldquo;deterministic 함수"를 어떻게 만들지인데, 이게 다음 함정으로 이어진다.</p><hr><h2 id=함정-2--stringhashvalue는-프로세스-재시작마다-랜덤>함정 2 — <code>String.hashValue</code>는 프로세스 재시작마다 랜덤</h2><p>&ldquo;deterministic 해시를 만들어야 한다"고 정하면, 가장 먼저 떠오르는 게 <code>String.hashValue</code>다. 입력을 문자열로 합쳐서 <code>.hashValue</code> 한 줄로 끝내고 싶어진다. 이게 두 번째 함정.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 절대 금지</span>
+</span></span><span class=line><span class=cl><span class=kd>static</span> <span class=kd>func</span> <span class=nf>makeID</span><span class=p>(</span><span class=n>remoteID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>,</span> <span class=n>type</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=nb>Int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s>&#34;</span><span class=si>\(</span><span class=n>remoteID</span><span class=si>)</span><span class=s>-</span><span class=si>\(</span><span class=n>type</span><span class=si>)</span><span class=s>&#34;</span><span class=p>.</span><span class=n>hashValue</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>Swift 4.2 이상에서 <code>Hashable.hashValue</code>는 <strong>각 프로세스 실행마다 다른 시드를 사용</strong>한다. 이건 보안 목적의 의도된 동작이다(hash collision 공격 방어). 그래서 PK 용도로는 <strong>절대 부적합</strong>하다.</p><p>위 코드는 앱 첫 실행에서 PK <code>X</code>를 만들어 SwiftData에 저장한다. 다음 실행에서 같은 입력으로 호출해도 **다른 PK <code>Y</code>**가 나온다. 그래서 upsert 흐름에서 row가 새로 insert되거나(중복) lookup이 실패한다(원래 row를 못 찾음). 두 경우 다 silent failure. 콘솔에 아무 경고도 안 찍힌다. <del>이게 진짜 잡기 까다롭다.</del></p><h3 id=해결--결정적-해시-자체-구현>해결 — 결정적 해시 자체 구현</h3><p><code>hashValue</code>를 쓸 수 없으니 직접 만든다. Boost의 <code>hash_combine</code> 포팅이 짧고 빠르다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>DeterministicHash</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>/// Boost hash_combine 포팅. 시드와 무관하게 같은 입력 → 같은 출력.</span>
+</span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>func</span> <span class=nf>combine</span><span class=p>(</span><span class=kc>_</span> <span class=n>values</span><span class=p>:</span> <span class=nb>Int</span><span class=p>...)</span> <span class=p>-&gt;</span> <span class=nb>Int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nv>seed</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>value</span> <span class=k>in</span> <span class=n>values</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>seed</span> <span class=o>^=</span> <span class=n>value</span> <span class=o>&amp;+</span> <span class=nb>Int</span><span class=p>(</span><span class=n>bitPattern</span><span class=p>:</span> <span class=mh>0x9E3779B97F4A7C15</span><span class=p>)</span> <span class=o>&amp;+</span> <span class=p>(</span><span class=n>seed</span> <span class=o>&lt;&lt;</span> <span class=mi>6</span><span class=p>)</span> <span class=o>&amp;+</span> <span class=p>(</span><span class=n>seed</span> <span class=o>&gt;&gt;</span> <span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>seed</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>func</span> <span class=nf>fromString</span><span class=p>(</span><span class=kc>_</span> <span class=n>string</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=nb>Int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// ASCII/UTF-8 결정적 해시 (djb2)</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nv>hash</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=mi>5381</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>byte</span> <span class=k>in</span> <span class=n>string</span><span class=p>.</span><span class=n>utf8</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>hash</span> <span class=p>=</span> <span class=p>((</span><span class=n>hash</span> <span class=o>&lt;&lt;</span> <span class=mi>5</span><span class=p>)</span> <span class=o>&amp;+</span> <span class=n>hash</span><span class=p>)</span> <span class=o>&amp;+</span> <span class=nb>Int</span><span class=p>(</span><span class=n>byte</span><span class=p>)</span>  <span class=c1>// djb2</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>hash</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>BasicSummaryEntityV2</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>func</span> <span class=nf>makeID</span><span class=p>(</span><span class=n>remoteItemID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>,</span> <span class=n>containerRowID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=nb>Int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>DeterministicHash</span><span class=p>.</span><span class=n>combine</span><span class=p>(</span><span class=n>remoteItemID</span><span class=p>,</span> <span class=n>containerRowID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>combine</code>은 정수 값들을 받아서 golden ratio 상수(<code>0x9E3779B97F4A7C15</code>)와 XOR/shift로 섞는다. 시드가 항상 0으로 시작하니까 같은 입력은 항상 같은 출력. <code>&+</code>는 overflow add라서 큰 값을 만나도 trap 안 한다.</p><p>문자열 입력이 필요하면 <code>fromString</code>(djb2 변형)을 거쳐서 <code>Int</code>로 만든 다음 <code>combine</code>에 넣으면 된다.</p><h3 id=pk-마이그레이션--기존-row-비우기>PK 마이그레이션 — 기존 row 비우기</h3><p>여기서 한 가지 더. 이미 <code>String.hashValue</code> 기반 PK로 저장된 row가 있다면, 새 해시 함수로 바꿔도 그 row들의 PK는 옛날 값 그대로다. lookup이 계속 깨진다. 가장 안전한 방법은 <strong>마이그레이션 시점에 해당 테이블 row 전부 삭제</strong>하고 다음 sync에서 새 PK로 재생성하는 것.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// SwiftData 부트스트랩 시점, 마이그레이션 플래그 체크 후 1회만</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>static</span> <span class=kd>func</span> <span class=nf>resetSummaryTablesForPKMigration</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=n>ModelContext</span><span class=p>)</span> <span class=kr>throws</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>BasicSummaryEntityV2</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>SecondarySummaryEntityV2</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>TertiarySummaryEntityV2</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=n>context</span><span class=p>.</span><span class=n>save</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>UserDefaults</span><span class=p>.</span><span class=n>standard</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=kc>true</span><span class=p>,</span> <span class=n>forKey</span><span class=p>:</span> <span class=s>&#34;didMigrateDeterministicPK&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>흐름은 이렇다.</p><pre class=mermaid>sequenceDiagram
+    participant App as 앱
+    participant UD as UserDefaults
+    participant SD as SwiftData<br>ModelContext
+    participant Sync as 서버 Sync
+
+    App->>UD: didMigrateDeterministicPK 확인
+    alt 이미 마이그레이션됨
+        UD-->>App: true
+        App-->>App: 일반 흐름 진입
+    else 최초 PK 마이그레이션
+        UD-->>App: false
+        Note over App,SD: 기존 row의 PK는<br>String.hashValue 기반 (불안정)
+        App->>SD: context.delete(Item.self)
+        App->>SD: context.delete(ItemA.self)
+        App->>SD: context.delete(ItemB.self)
+        App->>SD: context.save()
+        SD-->>App: 테이블 비움 완료
+        App->>UD: didMigrateDeterministicPK = true
+        App->>Sync: 핵심 도메인 sync 요청
+        Sync-->>App: row 복원 데이터
+        App->>SD: 새 PK (DeterministicHash) 로 insert
+        Note over App,SD: 이제 같은 입력 → 같은 PK<br>upsert 안정화
+    end
+</pre><p>이 흐름은 <a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략편</a>에서 정한 &ldquo;데이터 보존 vs sync 복원&rdquo; 전략의 연장선이다. 캐시성 데이터는 잃어도 sync로 복원되니까 row를 비워도 안전하다. 진짜 보존해야 하는 로컬 전용 데이터는 별도 백업·복원 흐름으로 처리한다(이 부분도 Part 1에서 정리).</p><p>플래그를 <code>UserDefaults</code>에 박아서 1회성으로 만드는 게 포인트. 두 번째 부팅부터는 분기를 안 탄다.</p><hr><h2 id=함정-3--predicate에서-enum-비교가-silent-fail>함정 3 — <code>#Predicate</code>에서 enum 비교가 silent fail</h2><p>PK 만들기를 안전하게 해놨다고 끝이 아니다. 데이터를 조회할 때 또 한 번 발등을 찍힌다.</p><p>SwiftData의 <code>#Predicate</code> 매크로는 컴파일 타임에 NSPredicate-비슷한 쿼리로 변환된다. 이게 일반 Swift 코드처럼 보여도 사실 <strong>제한된 표현식만 풀 수 있다</strong>. 그래서 enum을 직접 비교하면 silent fail한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>ContainerType</span><span class=p>:</span> <span class=nb>String</span><span class=p>,</span> <span class=n>Codable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>primary</span><span class=p>,</span> <span class=n>secondary</span><span class=p>,</span> <span class=n>archived</span><span class=p>,</span> <span class=n>filtered</span><span class=p>,</span> <span class=cm>/* ... */</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ContainerEntityV2</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>type</span><span class=p>:</span> <span class=n>ContainerType</span>   <span class=c1>// rawRepresentable</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// ...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// ❌ silent fail — 0건 리턴 또는 의도와 다른 결과</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>predicate</span> <span class=p>=</span> <span class=p>#</span><span class=n>Predicate</span><span class=p>&lt;</span><span class=n>ContainerEntityV2</span><span class=p>&gt;</span> <span class=p>{</span> <span class=n>container</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=n>container</span><span class=p>.</span><span class=n>type</span> <span class=p>==</span> <span class=p>.</span><span class=n>primary</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// ❌ 또 다른 silent fail — type.rawValue 표현이 macro 컨텍스트에서 못 풀림</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>predicate2</span> <span class=p>=</span> <span class=p>#</span><span class=n>Predicate</span><span class=p>&lt;</span><span class=n>ContainerEntityV2</span><span class=p>&gt;</span> <span class=p>{</span> <span class=n>container</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=n>container</span><span class=p>.</span><span class=n>type</span><span class=p>.</span><span class=n>rawValue</span> <span class=p>==</span> <span class=s>&#34;primary&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>두 패턴 다 컴파일은 통과한다. 그런데 런타임에 쿼리가 0건을 리턴하거나 의도와 다른 결과를 준다. 에러 메시지도 없다. <del>또 silent fail이다.</del></p><h3 id=해결--predicate-진입-전에-unwrap-stored-property는-primitive로>해결 — Predicate 진입 전에 unwrap, stored property는 primitive로</h3><p>원칙은 두 개.</p><ol><li><strong><code>@Model</code>의 stored property는 SwiftData가 이해하는 primitive 타입으로</strong>(<code>String</code>, <code>Int</code>, <code>Date</code>, &mldr;). enum 변환은 computed property로 분리한다.</li><li><strong><code>#Predicate</code> 안에서는 primitive만 쓴다</strong>. enum 비교는 호출자에서 <code>rawValue</code>로 풀어둔 다음 closure로 캡처해서 전달한다.</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>containers</span><span class=p>(</span><span class=n>type</span><span class=p>:</span> <span class=n>ContainerType</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=p>[</span><span class=n>ContainerEntityV2</span><span class=p>]</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>typeRaw</span> <span class=p>=</span> <span class=n>type</span><span class=p>.</span><span class=n>rawValue</span>   <span class=c1>// ✅ 진입 전 unwrap</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>descriptor</span> <span class=p>=</span> <span class=n>FetchDescriptor</span><span class=p>&lt;</span><span class=n>ContainerEntityV2</span><span class=p>&gt;(</span>
+</span></span><span class=line><span class=cl>        <span class=n>predicate</span><span class=p>:</span> <span class=p>#</span><span class=n>Predicate</span> <span class=p>{</span> <span class=n>container</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>container</span><span class=p>.</span><span class=n>typeRaw</span> <span class=p>==</span> <span class=n>typeRaw</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>(</span><span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>fetch</span><span class=p>(</span><span class=n>descriptor</span><span class=p>))</span> <span class=p>??</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ContainerEntityV2</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>typeRaw</span><span class=p>:</span> <span class=nb>String</span>   <span class=c1>// ✅ enum 대신 rawValue 컬럼</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>type</span><span class=p>:</span> <span class=n>ContainerType</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>ContainerType</span><span class=p>(</span><span class=n>rawValue</span><span class=p>:</span> <span class=n>typeRaw</span><span class=p>)</span> <span class=p>??</span> <span class=p>.</span><span class=n>primary</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이렇게 짜면 <code>#Predicate</code> 안은 String 비교만 본다. SwiftData가 풀 수 있는 형태다. 외부 API 표면(<code>type: ContainerType</code> 인자, computed property)은 그대로 유지되니까 호출하는 쪽 코드도 안 바꿔도 된다.</p><p>핵심은 **&ldquo;매크로 안에서는 풀 수 있는 표현만 쓴다&rdquo;**다. enum, rawValue, 옵셔널 unwrap, 메서드 호출 같은 건 진입 전에 다 풀어두고 closure 캡처로 넘긴다.</p><hr><h2 id=부수-함정--attributeunique의-throw-행동>부수 함정 — <code>@Attribute(.unique)</code>의 throw 행동</h2><p>위 3가지가 메인이고, 마지막으로 작은 함정 하나. <code>@Attribute(.unique)</code> 충돌 시 동작은 옵션에 따라 다르다.</p><table><thead><tr><th>옵션</th><th>충돌 시 동작</th></tr></thead><tbody><tr><td><code>.preserveValueOnDeletion</code> 등 명시 없음</td><td>기본은 throw (<code>SwiftDataError.uniqueConstraintViolation</code>)</td></tr><tr><td><code>ModelContext.insert</code> 직후 <code>save()</code></td><td>save에서 throw</td></tr><tr><td><code>insert</code>만 호출 후 save 안 함</td><td>다음 save까지 누적, save 시점에 throw</td></tr></tbody></table><p>그래서 upsert 패턴을 구현할 때는 <strong>insert 전에 lookup → 있으면 update, 없으면 insert</strong>로 명시적으로 분리한다. <code>FetchDescriptor</code> 한 번 더 도는 비용은 받아들이는 게 낫다. silent fail 추적하는 비용보다 훨씬 싸다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>static</span> <span class=kd>func</span> <span class=nf>upsert</span><span class=p>(</span><span class=kc>_</span> <span class=n>summary</span><span class=p>:</span> <span class=n>BasicSummaryEntityV2</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>id</span> <span class=p>=</span> <span class=n>summary</span><span class=p>.</span><span class=n>id</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>descriptor</span> <span class=p>=</span> <span class=n>FetchDescriptor</span><span class=p>&lt;</span><span class=n>BasicSummaryEntityV2</span><span class=p>&gt;(</span>
+</span></span><span class=line><span class=cl>        <span class=n>predicate</span><span class=p>:</span> <span class=p>#</span><span class=n>Predicate</span> <span class=p>{</span> <span class=nv>$0</span><span class=p>.</span><span class=n>id</span> <span class=p>==</span> <span class=n>id</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=kd>let</span> <span class=nv>existing</span> <span class=p>=</span> <span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>fetch</span><span class=p>(</span><span class=n>descriptor</span><span class=p>).</span><span class=bp>first</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>existing</span><span class=p>.</span><span class=n>merge</span><span class=p>(</span><span class=n>from</span><span class=p>:</span> <span class=n>summary</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>context</span><span class=p>.</span><span class=bp>insert</span><span class=p>(</span><span class=n>summary</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>여기서도 <code>let id = summary.id</code>로 진입 전 unwrap을 해뒀다. closure가 캡처할 값은 항상 closure 진입 전에 풀어두는 게 안전한 패턴이다.</p><hr><h2 id=체크리스트>체크리스트</h2><p>비슷한 작업 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> PK 필드에 sentinel default가 없는가</li><li><input disabled type=checkbox> PK 만드는 함수가 결정적인가 (<code>String.hashValue</code>, <code>Date()</code> 같은 시드/시간 의존 X)</li><li><input disabled type=checkbox> <code>#Predicate</code> 안에 enum 직접 비교 없는가</li><li><input disabled type=checkbox> <code>@Model</code> stored property가 SwiftData primitive 타입인가</li><li><input disabled type=checkbox> PK 변경 시 기존 row 비우는 마이그레이션 흐름이 있는가</li><li><input disabled type=checkbox> upsert 패턴이 lookup → insert/update로 분리돼 있는가</li></ul><hr><h2 id=회고>회고</h2><p>이 편을 굴리면서 다시 확인한 게 하나 있다. SwiftData의 <strong>silent failure는 대부분 매크로 경계에서 일어난다</strong>. <code>@Attribute(.unique)</code>, <code>@Model</code>, <code>#Predicate</code> 같은 매크로는 컴파일 타임에 SQL-비슷한 쿼리로 풀리는데, 매크로가 풀 수 있는 표현식 범위가 일반 Swift보다 좁다. 그 경계를 모르고 일반 Swift 감각으로 코드를 박으면, 컴파일은 통과하고 런타임에 조용히 깨진다.</p><p>특히 <code>String.hashValue</code> 함정은 한 번 박혀서 운영에 나가면 발견이 어렵다. lookup이 실패하는 게 &ldquo;데이터가 원래 없었던 건지 PK가 안 맞는 건지&rdquo; 콜드 패스에서 구별이 안 된다. 그래서 PK 만드는 함수는 <strong>처음부터 결정적</strong>이어야 한다. <del>이걸 한 번 데이고 나서야 배움.</del></p><p>다음 편(Part 3 — DAO 패턴)에서는 이렇게 만든 entity들을 어떻게 안전하게 다룰지 — class 인스턴스 DAO vs enum + static 메서드 — 를 비교한다. SwiftData에서 라이프사이클을 어떻게 단순화할 수 있는지가 주제다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li>Part 2 — Primary Key 함정 (이 글)</li><li>Part 3 — DAO 패턴 (다음 편 예정)</li><li>Part 4 — Combine 통합 (다음 편 예정)</li><li>Part 5 — Async/Await 통합 (다음 편 예정)</li><li>Part 6 — View 다중 mount 디버깅 (다음 편 예정)</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>20</span></div><div class=tags><a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>2</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>2</span></a>
+<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
+<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>2</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>2</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>9 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:33%></div></span><span class=archive-row__count>02</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
+<span class=archive-row__bar><div style=width:17%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.6b47f8d2eb961910f07fb203577b278c614d612f2c1746efdb7f4f267079d7fa.js integrity="sha256-a0f40uuWGRDwf7IDV3snjGFNYS8sF0bv239PJnB51/o=" defer></script><script type=module>
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+</script></body></html>
