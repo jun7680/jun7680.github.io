@@ -1,447 +1,75 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>오깅중</title>
-        <link>https://jun7680.github.io/</link>
-        <description>Recent content on 오깅중</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Swift 5.7 개선 사항!!</title>
-        <link>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</link>
-        <pubDate>Wed, 15 Jun 2022 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</guid>
-        <description>&lt;h1 id=&#34;swift-57-개선-사항&#34;&gt;Swift 5.7 개선 사항&lt;/h1&gt;
-&lt;p&gt;Swift 5.7이 소개되면서 개발자들에게 많은 부분에서 편의성을 제공하려는 모습이 보이는거 같다&lt;/p&gt;
-&lt;p&gt;일단 다양한 개선 사항이 있는데, SPM성능 향상, 표준 라이브러리 향상, 빌드 속도 향상 Swift의 편의성 등등 다양한 개선사항이 소개 됐다!!&lt;/p&gt;
-&lt;p&gt;그중에 개발하면서 유용하게 쓰일 Swift Language 개선 사항을 중점으로 소개해 보려고 한다.&lt;/p&gt;
-&lt;h3 id=&#34;if-let-shorthand-for-unwrapping-optionals&#34;&gt;if let shorthand for unwrapping optionals&lt;/h3&gt;
-&lt;p&gt;많은 개발자들이 옵셔설 언래핑을 진행할때 &lt;code&gt;if let&lt;/code&gt;, &lt;code&gt;guard let&lt;/code&gt; 등을 통해 진행 하고 계실건데 이전에는 아래와 같은 쉐도잉 작업이 필요했더랬죠?&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;
-
-&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;test&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;test&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;bp&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;쉐도잉이라 함은 if, guard 문에서 사용될 프로퍼티레 옵셔널 값을 추출한 겁니다!!&lt;/p&gt;
-&lt;p&gt;다시 말해 위에 있는 if 블록을 말하는거죠&lt;/p&gt;
-&lt;p&gt;지금은 너무나 익숙해져서 큰 불편함이 없지만 어쩔수 없이 변수명을 길게 사용할때가 되면 길어지는 코드에 어지럼을 느끼고 애매한 줄바꿈을 진행해야 할때가 분명 있으셨을거에요ㅎㅎ.. &lt;del&gt;전 그랬거든요&lt;/del&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;wwdcPresentationContentFromOptional&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;GOOD&amp;#34;&lt;/span&gt;
-
-&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;content&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;wwdcPresentationContentFromOptional&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;bp&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이런식으로 좀 애매하게 줄이게 되더라고요.. 좀 더 정확한 변수명을 원해서 변수이름을 길게 써줬는데? 언래핑을 해줄때 다시 애매해지는 경향이 있더라고요???&lt;/p&gt;
-&lt;p&gt;그런데 이제 Swift 5.7에서는 이런 부분을 줄일수 있게 해줬더라고요&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;GOOD&amp;#34;&lt;/span&gt;
-
-&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;content&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;bp&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;어때요 굉장히 맘에 들지 않나요???? 전 무척 맘에 들더라고요&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;아주 간단하게 사용할수 있어서 굉장히 좋아 보이더라고요👏🏻&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;multi-statement-closure-type-inference&#34;&gt;Multi-statement closure type inference&lt;/h3&gt;
-&lt;p&gt;이제 클로져에서 반환타입을 가질때 자동 타입추론을 해줘서 명시적으로 반환 타입을 적어줄 필요가 없어지게 됐답니다!!&lt;/p&gt;
-&lt;p&gt;이전에는 반드시 반환타입을 작성해 줬더라면 이제는&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;test&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;30&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;50&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;test2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;bp&#34;&gt;map&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;number&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; 
- 	&lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;Test number is &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;\(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;number&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;                      
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
-&lt;p&gt;안드의 타입추론을 이제 부러워 하지 않아도 되겠네요 ㅎㅎ..&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;결론&#34;&gt;결론&lt;/h3&gt;
-&lt;p&gt;개발하기 편한 환경을 만들어 주기 위해 많은 노력을 해주는걸로 보이네요😁&lt;/p&gt;
-&lt;p&gt;좀 더 많은 개선 사항이 있으니까 천천히 다시 읽어봐야겠어요✍️&lt;/p&gt;
-&lt;h3 id=&#34;참고자료&#34;&gt;참고자료&lt;/h3&gt;
-&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.hackingwithswift.com/articles/249/whats-new-in-swift-5-7&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://www.hackingwithswift.com/articles/249/whats-new-in-swift-5-7&lt;/a&gt;&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>UIStackView Animation show/hide 버그</title>
-        <link>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</link>
-        <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</guid>
-        <description>&lt;h3 id=&#34;문제점&#34;&gt;문제점&lt;/h3&gt;
-&lt;p&gt;먼저 UIStackView에서 hidden property를 사용하여 숨김?을 처리하게 되면 이게 이상하게 지속적으로 stack에 쌓이게 된다.&lt;/p&gt;
-&lt;p&gt;이게 무슨말이냐면 숨김 버튼을 계속 누르게 되면 누른 만큼 stackview는 숨겨진다고 생각하면 되는데 5번 누르면 show를 5번 눌러줘야 다시 화면에 나타난다.&lt;/p&gt;
-&lt;p&gt;처음에 코드를 잘못 짠줄 알고 디버그를 엄청 열심히 해봤는데 코드는 이상이 없고 코드는 거짓말을 하지 않는다고 하지만 진짜 거짓말 당하는 기분이 들었었다.&lt;/p&gt;
-&lt;h3 id=&#34;해결방법&#34;&gt;해결방법&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testShow&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;k&#34;&gt;guard&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;isHidden&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;        
-  &lt;span class=&#34;n&#34;&gt;isHidden&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testHide&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;k&#34;&gt;guard&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;isHidden&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-  &lt;span class=&#34;n&#34;&gt;isHidden&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;일단 저는 이렇게 UIView Extension을 만들어서 사용하고 있습니다.&lt;/p&gt;
-&lt;p&gt;그럼 끗!&lt;/p&gt;
-&lt;h3 id=&#34;참고사이트&#34;&gt;참고사이트&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://stackoverflow.com/questions/33240635/hidden-property-cannot-be-changed-within-an-animation-block&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://stackoverflow.com/questions/33240635/hidden-property-cannot-be-changed-within-an-animation-block&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://stackoverflow.com/questions/43831695/stackview-ishidden-attribute-not-updating-as-expected&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://stackoverflow.com/questions/43831695/stackview-ishidden-attribute-not-updating-as-expected&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        </item>
-        <item>
-        <title>iOS Fastlane을 적용해보자</title>
-        <link>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
-        <pubDate>Thu, 03 Mar 2022 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid>
-        <description>&lt;h3 id=&#34;도입이유&#34;&gt;도입이유&lt;/h3&gt;
-&lt;p&gt;친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀&lt;/p&gt;
-&lt;h5 id=&#34;현-배포-절차&#34;&gt;현 배포 절차&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 &lt;del&gt;(대략 30분&amp;hellip;?)&lt;/del&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h5 id=&#34;도입-후-절차&#34;&gt;도입 후 절차&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;fastlane &amp;lsquo;lane명&amp;rsquo; 끗!&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다&lt;/p&gt;
-&lt;h2 id=&#34;설치--업로드&#34;&gt;설치 &amp;amp; 업로드&lt;/h2&gt;
-&lt;p&gt;Homebrew를 이용해 Fastlane을 설치 할건데 Homebrew가 설치되어 있지 않으면 설치를 하고 오자. -&amp;gt; &lt;a class=&#34;link&#34; href=&#34;https://brew.sh/index_ko&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;바로가기&lt;/a&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;brew install fastlane
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;를 터미널에 입력해 주면 알아서 설치가 진행이 된다.&lt;/p&gt;
-&lt;p&gt;만약 설치가 안된다면 명령어 추천이 있을경우 따라하면 되고 안돼면&amp;hellip;. 구글링을 통해 해결해보자. (화이팅)&lt;/p&gt;
-&lt;p&gt;그 다음 이제 fastlane을 적용할 프로젝트에 가서&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;fastlane init
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;명령어로 fastlane 초기화를 진행해줍니다.&lt;/p&gt;
-&lt;p&gt;&lt;figure 
-	&gt;
-	&lt;a href=&#34;https://jun7680.github.io/fastlane.png&#34; &gt;
-		&lt;img src=&#34;https://jun7680.github.io/fastlane.png&#34;
-			
-			
-			
-			loading=&#34;lazy&#34;
-			&gt;
-	&lt;/a&gt;
-	
-&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;저는 여기서 2번으로 진행했는데 일단 테스트 플라이트에 올려보는게 목적이라 2번으로 진행했습니다.&lt;/p&gt;
-&lt;p&gt;무엇을 선택해도 크게 상관없이 나중에 직접 추가할 수 있으니까 맘 편하게 선택해주세요.&lt;/p&gt;
-&lt;p&gt;번호 선택후 엔터를 누르면 막 뭐라고 설명이 나오고 엔터를 몇번 치다보면 설정이 완료 된다.&lt;/p&gt;
-&lt;p&gt;설정이 완료 되면 fastlane 이라는 디렉토리가 생성되고 디렉토리 들어가면 다음과 같은 파일이 생성되어있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Appfile
-Fastfile
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 이 두가지 설정을 통해 우리가 사용할 명령어를 설정해 주면 된다. (거의 다 됐습니다.)&lt;/p&gt;
-&lt;p&gt;이제 해당 프로젝트를 협업하며 작업할 경우를 대비 작업도 따로 해주었다&lt;/p&gt;
-&lt;p&gt;우선 fastlane/.env파일을 만들어&lt;/p&gt;
-&lt;h6 id=&#34;fastlane폴더에서-들어가서-만들경우---vi-env&#34;&gt;fastlane폴더에서 들어가서 만들경우 -&amp;gt; vi /.env&lt;/h6&gt;
-&lt;h6 id=&#34;fastlane폴더-밖에서-만들경우---vi-fastlaneenv&#34;&gt;fastlane폴더 밖에서 만들경우 -&amp;gt; vi fastlane/.env&lt;/h6&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;nv&#34;&gt;APP_IDENTIFIER&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;앱 Identifier ex)com.test.test&amp;#34;&lt;/span&gt;
-&lt;span class=&#34;nv&#34;&gt;APPLE_ID&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;자신의 계정&amp;#34;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;를 추가해주고 저장한다.&lt;/p&gt;
-&lt;p&gt;나중에 push 할때 해당 파일만 .gitignore에 추가해주고 push를 해주는게 충돌이 나지 않고 편안한다.&lt;/p&gt;
-&lt;p&gt;AppFile을 열어 이제 다음과 같이 변경해주자&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;app_identifier(ENV[&amp;#34;APP_IDENTIFIER&amp;#34;]) # The bundle identifier of your app
-apple_id(ENV[&amp;#34;APPLE_ID&amp;#34;]) # Your Apple email address
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 env파일을 통해 App identifire, Apple id를 가져오게 된다. 정말 편리하다&lt;/p&gt;
-&lt;p&gt;이제 마지막으로 Fastfile에 들어가 다음과 같이 세팅을 해주면 됩니다&lt;/p&gt;
-&lt;p&gt;아마 기본적으로 세팅이 되어 있으니 크게 바꾸지 않아도 되는데&lt;/p&gt;
-&lt;p&gt;추가로 필요한 Action에 대한 정보는 &lt;a class=&#34;link&#34; href=&#34;https://docs.fastlane.tools/actions/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;여기&lt;/a&gt;에서 확인 가능!!&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;default_platform(:ios)
-
-platform :ios do
-  desc &amp;#34;lane에 대한 설명&amp;#34;
-  lane : 사용할 lane명 do
-	get_certificates 
-	get_provisioning_profile
-	increment_build_number(build_number: latest_testflight_build_number + 1)
-	build_app(configuration: &amp;#34;Debug&amp;#34;)
-	upload_to_testflight
-
-  end
-end
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
-&lt;p&gt;platform :ios do -&amp;gt; 플랫폼&lt;/p&gt;
-&lt;p&gt;desc &amp;ldquo;lane에 대한 설명&amp;rdquo;&lt;/p&gt;
-&lt;p&gt;lane : 사용할 lane명 do -&amp;gt; 배포시 fastlane 레인명 으로 사용된다. do는 지우지 말기!&lt;/p&gt;
-&lt;p&gt;get_certificates -&amp;gt; certificates 가져오는 action&lt;/p&gt;
-&lt;p&gt;get_provisioning_profile -&amp;gt; 프로필 가져오는 action&lt;/p&gt;
-&lt;p&gt;increment_build_number(build_number: latest_testflight_build_number + 1) -&amp;gt; 이게 이제 빌드 번호를 올려주는 action&lt;/p&gt;
-&lt;p&gt;&lt;del&gt;(분명 테플에 안올라가 있는데 배포를 하고 나니 빌드 버전이 2가 되버렸다.. 처음 올리는 빌드버전일때는 0을 넣고 진행을 해야하는건가..?)&lt;/del&gt;&lt;/p&gt;
-&lt;p&gt;build_app(configuration : &amp;ldquo;Debug&amp;rdquo; ) -&amp;gt; 앱 빌드 action입니다. configuration은 맞게 설정해 주시면 되요!! 테플에 올라갈꺼라 Debug로 해줬습니다.&lt;/p&gt;
-&lt;p&gt;upload_to_testflight -&amp;gt; 테플에 올리는 명령어!!!&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;추가적으로 action들을 더 넣어줄수 있는데 사용자들이 입맛에 맞게 사용하면 될꺼 같다.&lt;/p&gt;
-&lt;p&gt;설정이 끝나면 이제&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;fastlane &amp;#34;lane명&amp;#34;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;입력하면 알아서 쭉 돌아간다!!!&lt;/p&gt;
-&lt;p&gt;이게 어떤 설정을 해주면 테플에 올라가는 거를 기다리지 않고 다른 작업도 할 수 있다고 하는데&lt;/p&gt;
-&lt;p&gt;차분히 기다렸다.&lt;/p&gt;
-&lt;p&gt;fastlane결과를 찍어둔게 사라졌는데 암튼 &lt;strong&gt;17분&lt;/strong&gt;을 절약했다고 써있어서 뿌듯&lt;/p&gt;
-&lt;h3 id=&#34;인증-관련&#34;&gt;인증 관련&lt;/h3&gt;
-&lt;p&gt;굉장히 까다로운 인증절차를 따라야 하는데 일단 Sigh, Cert를 이용한 인증 방법을 이용하였고, 좀더 다양한 큰 규모로 넘어가면 Match를 이용한 인증을 시도해야 한다.&lt;/p&gt;
-&lt;p&gt;하지만 굉장히 까다로운 세팅이 있다고 들었&amp;hellip;&lt;/p&gt;
-&lt;p&gt;일단 Cert를 이용할때&lt;/p&gt;
-&lt;p&gt;&lt;figure 
-	&gt;
-	&lt;a href=&#34;https://jun7680.github.io/fastlane_error.png&#34; &gt;
-		&lt;img src=&#34;https://jun7680.github.io/fastlane_error.png&#34;
-			
-			
-			
-			loading=&#34;lazy&#34;
-			&gt;
-	&lt;/a&gt;
-	
-&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;처음 하면 분명 이런 에러를 마주치게 되는데 여기서 정확히 32번 정도를 애플 로그인 비밀번호를 입력했는데&amp;hellip; 그게 아니었다..&lt;/p&gt;
-&lt;p&gt;계속 오타가 나는줄 알고 한글자씩 쳐보기도 했다&amp;hellip; &lt;del&gt;해킹 당한줄&lt;/del&gt;&lt;/p&gt;
-&lt;p&gt;로그인 비번이 아니라 앱 비번을 입력해줘야 하는데 아마 이거 설정이 안되어 있어서 나는 에러니까&lt;/p&gt;
-&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://appleid.apple.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;이쪽&lt;/a&gt;에서 설정을 해주도록 하자&lt;/p&gt;
-&lt;p&gt;로그인을 하게 되면 다음과 같은 화면을 보게 되는데 분홍색 박스의 앱 암호를 눌러 설정해 준 암호로 로그인을 하면 정상적으로 된다.!!&lt;/p&gt;
-&lt;p&gt;&lt;figure 
-	&gt;
-	&lt;a href=&#34;https://jun7680.github.io/appid.png&#34; &gt;
-		&lt;img src=&#34;https://jun7680.github.io/appid.png&#34;
-			
-			
-			
-			loading=&#34;lazy&#34;
-			&gt;
-	&lt;/a&gt;
-	
-&lt;/figure&gt;&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>GCD(Grand Central Dispatch), Concurrency</title>
-        <link>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</link>
-        <pubDate>Tue, 11 Jan 2022 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</guid>
-        <description>&lt;h1 id=&#34;gcd&#34;&gt;GCD&lt;/h1&gt;
-&lt;ul&gt;
-&lt;li&gt;iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.&lt;br&gt;
-GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!&lt;br&gt;
-Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;gcd예제&#34;&gt;GCD예제&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testGCD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;n&#34;&gt;testGCD2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; 
-     &lt;span class=&#34;n&#34;&gt;testGCD3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; 
-        &lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-     &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;
-&lt;h3 id=&#34;gcd-에러-핸들링&#34;&gt;GCD 에러 핸들링&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testErrorHandler&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;@&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;escaping&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;guard&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-    &lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;nil&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;GCD같은 경우에 completion에 데이터와 에러를 같이 보내주게 되는데 발생하는 결과마다 handler를 작성해야 하는 번거로움이 있다.&lt;/p&gt;
-&lt;h1 id=&#34;swift-concurrency&#34;&gt;Swift Concurrency&lt;/h1&gt;
-&lt;ul&gt;
-&lt;li&gt;새로 소개된 동시성 프로그래밍 API이다. 무려 WWDC 2021에서 새로 나왔다. 동시성 프로그래밍을 가독성 좋게 깔끔하게 작성하고자 도입된 개념이다.&lt;br&gt;
-자세한 설명은 &lt;a class=&#34;link&#34; href=&#34;https://developer.apple.com/videos/play/wwdc2021/10132/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Apple Develop&lt;/a&gt;에서 확인하면 된다.!&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;concurrency-예제&#34;&gt;Concurrency 예제&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testGCD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;throws&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Int&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;firstResult&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;try&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;testGCD2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-  &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;secondResult&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;try&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;testGCD3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-  
-  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;secondResult&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;단순한 예제로만 봐도 가독성이 훨씬 좋아졌다. &lt;del&gt;나만 그런가?&lt;/del&gt;&lt;/p&gt;
-&lt;h3 id=&#34;concurrency-에러-핸들링&#34;&gt;Concurrency 에러 핸들링&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testErrorHandler&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;throws&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Result&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-  &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-  &lt;span class=&#34;k&#34;&gt;guard&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
-    &lt;span class=&#34;k&#34;&gt;throw&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Error&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-  
-  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Result&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Concurrency를 사용하게 되면 에러는 thorw로 데이터 전달은 return으로 분리 할 수 있다. 이렇게 되면 completion handler를 사용하지 않아 콜백이 없어지고 가독성 또한 좋아진다.&lt;/p&gt;
-&lt;p&gt;기존 GCD로 짜여있던 코드를 이제 Concurrency로 변환하여 가독성 높은 코드로 만들어 놔야겠다. ~~(언제바꾸지)~~😱&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>iOS에서 FCM 사용하기!</title>
-        <link>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link>
-        <pubDate>Mon, 10 Jan 2022 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid>
-        <description>&lt;img src="https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/FCM.png" alt="Featured image of post iOS에서 FCM 사용하기!" /&gt;&lt;h2 id=&#34;fcm&#34;&gt;FCM&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;fcm-설정&#34;&gt;FCM 설정&lt;/h3&gt;
-&lt;p&gt;준비 사항&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.&lt;/li&gt;
-&lt;li&gt;XCode의 APP &amp;gt; Capabilities에서 푸시 알림 사용 설정을 한다.&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.firebase.google.com/u/0/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Firebase Console&lt;/a&gt;에서 프로젝트를 추가한다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;firebase-앱-등록&#34;&gt;Firebase 앱 등록&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;프로젝트를 추가하고 나오면 중앙에 &lt;figure 
-	&gt;
-	&lt;a href=&#34;https://jun7680.github.io/FCM_iOS&amp;#43;.png&#34; &gt;
-		&lt;img src=&#34;https://jun7680.github.io/FCM_iOS&amp;#43;.png&#34;
-			
-			
-			
-			loading=&#34;lazy&#34;
-			&gt;
-	&lt;/a&gt;
-	
-&lt;/figure&gt;
-iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 &lt;strong&gt;GoogleService-Info.plist&lt;/strong&gt;를 다운받을수 있다.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Xcode 프로젝트로 돌아가 SPM에 &lt;code&gt;https://github.com/firebase/firebase-ios-sdk&lt;/code&gt;를 추가 해준다.&lt;br&gt;
-(최신 버전을 사용해 주는 것이 좋지만 필요하다면 이전 버전을 사용해도 무방하다)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;추가를 해주고 프로젝트에서 초기화 코드를 추가 해 주면 된다.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;firebase-초기화-코드&#34;&gt;Firebase 초기화 코드&lt;/h4&gt;
-&lt;ol&gt;
-&lt;li&gt;AppDelegate.swift에 가서 Firebase를 import 해준다.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Swift&#34; data-lang=&#34;Swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Firebase&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;didFinishLaunchingWithOptions 메서드에서 FirebaseApp.configure()를 날려준다&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didFinishLaunchingWithOptions&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchOptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchOptionsKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Bool&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-    &lt;span class=&#34;n&#34;&gt;FirebaseApp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
-&lt;li&gt;이제 시작될때 원격 알림에 앱을 등록을 해줘야 하는데 친절하게 이미 구현이 되어있다.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didFinishLaunchingWithOptions&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchOptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchOptionsKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Bool&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-    &lt;span class=&#34;n&#34;&gt;FirebaseApp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-    &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registerForRemoteNotifications&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다 된거 같지만 중요한 토큰 등록이 남아있다.&lt;/p&gt;
-&lt;h4 id=&#34;firebase-토큰-등록&#34;&gt;Firebase 토큰 등록&lt;/h4&gt;
-&lt;p&gt;토큰은 messaging:didReceiveRegistrationToken 메서드를 통해 전달 되는데 해당 메서드는 MessagingDelegate에 구현 되어있는 함수를 이용하거나 token(completion)을 사용하여 직접 토큰을 가져올 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;o&#34;&gt;------&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Delegate&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;이용&lt;/span&gt;
-&lt;span class=&#34;kd&#34;&gt;extension&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;AppDelegate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MessagingDelegate&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didReceiveRegistrationToken&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fcmToken&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-        &lt;span class=&#34;n&#34;&gt;fcmToken&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;이게&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;넘어오는&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;토큰이다&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt; 
-    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;didFinishLaunchingWithOptions&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchOptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UIApplication&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchOptionsKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]?)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Bool&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-    &lt;span class=&#34;n&#34;&gt;FirebaseApp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;configure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-    &lt;span class=&#34;n&#34;&gt;application&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;registerForRemoteNotifications&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-    &lt;span class=&#34;n&#34;&gt;Messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;delegate&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;self&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;- 이거 안해줘서 한참을 얼탔던 기억이..&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
- 
-
-&lt;span class=&#34;o&#34;&gt;------&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:)&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;이용&lt;/span&gt;
-&lt;span class=&#34;n&#34;&gt;Messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;messaging&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;token&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;error&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; 
-
-&lt;span class=&#34;c1&#34;&gt;// 실행 코드&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;알림 서버가 구축되어있으면 자신이 사용하는 서버에 fcm 토큰 값을 보내서 사용하면 된다!!&lt;/p&gt;
-&lt;p&gt;구글의 정석적인 설명을 보고 싶으면 &lt;a class=&#34;link&#34; href=&#34;https://firebase.google.com/docs/cloud-messaging/ios/client&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;여기&lt;/a&gt;로 가서 보면 구글의 친절한 설명을 볼 수 있다.!&lt;/p&gt;
-&lt;h2 id=&#34;알림-테스트를-할-경우-꼭-실제-기기에서-해보세요-시뮬에서-백번-돌려도-백번-다-안나왔던-기억이-있습니다&#34;&gt;&lt;del&gt;알림 테스트를 할 경우 꼭 실제 기기에서 해보세요!! 시뮬에서 백번 돌려도 백번 다 안나왔던 기억이 있습니다.&lt;/del&gt;&lt;/h2&gt;
-</description>
-        </item>
-        <item>
-        <title>Hot Observable, Cold Observable</title>
-        <link>https://jun7680.github.io/p/hot-observable-cold-observable/</link>
-        <pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid>
-        <description>&lt;img src="https://jun7680.github.io/p/hot-observable-cold-observable/Observable.png" alt="Featured image of post Hot Observable, Cold Observable" /&gt;&lt;p&gt;&lt;strong&gt;습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!&lt;/strong&gt;&lt;/p&gt;
-&lt;h4 id=&#34;개념&#34;&gt;개념&lt;/h4&gt;
-&lt;p&gt;먼저 공식문서에 따르면 (&lt;a class=&#34;link&#34; href=&#34;https://reactivex.io/documentation/observable.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://reactivex.io/documentation/observable.html&lt;/a&gt;)&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;“Hot” and “Cold” Observables
-When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.
-In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;라고 설명 되어있는데 &lt;del&gt;(영어라 모르겠다..)&lt;/del&gt;&lt;/p&gt;
-&lt;p&gt;아는 단어 총 동원해서 보면 hot, cold의 차이점은 구독 시점에 따른 아이템 방출 방법 이라고 되어 있다.&lt;/p&gt;
-&lt;p&gt;Hot🔥 은 생성됨과 동시에 아이템을 방출하고 나중에 구독한 옵저버는 이전값을 받을수 없고(ex: 라이브 방송)&lt;br&gt;
-Cold❄️ 는 옵저버가 구독하기 전에 발생한 아이템에 대해 받아볼 수 있다.(ex: VOD).&lt;/p&gt;
-&lt;p&gt;다시말해 Hot은 구독 이후 발생한 아이템들에 대한 방출이 이루어 지고, Cold는 구독 시점 이전에 발생한 아이템들도 방출해준다고 되어있다.&lt;br&gt;
-&lt;del&gt;(잘못된 점 있으면 댓글 부탁드립니다)&lt;/del&gt;&lt;/p&gt;
-&lt;h4 id=&#34;hot-observable&#34;&gt;Hot Observable&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Timer, Subject, UIEvent 등등&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;cold-observable&#34;&gt;Cold Observable&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Single, junt, of 등등 컴포넌트&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;del&gt;Operator들에 대해 더 자세히 알아봐야겠다.&lt;/del&gt;&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Notion으로 Posting</title>
-        <link>https://jun7680.github.io/p/notion/</link>
-        <pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate>
-        
-        <guid>https://jun7680.github.io/p/notion/</guid>
-        <description>&lt;img src="https://jun7680.github.io/p/notion/notion_logo.png" alt="Featured image of post Notion으로 Posting" /&gt;&lt;h3 id=&#34;글-작성&#34;&gt;글 작성&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;---
-layout: post
-title: 제목
-subtitle: 부제목
-date: 글 작성 시간
-categories: 카테고리
-tags: 테그 or [테그, 테그....]
-comments: true &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;댓글&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;사용&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;여부&lt;/span&gt;
-&lt;span class=&#34;na&#34;&gt;---&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
-&lt;!-- raw HTML omitted --&gt;
-&lt;!-- raw HTML omitted --&gt;
-&lt;p&gt;&lt;del&gt;처음에 마크다운 문법 에러가 계속 났었는데 알고보니 따옴표&amp;hellip;&lt;/del&gt;&lt;br&gt;
-&lt;del&gt;노션이나 다른 곳에서 복사해서 사용할 경우 따옴표에 주의해야 한다.&lt;/del&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;글 작성후 _post라는 폴더 안에 md파일을 넣어준다.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;md파일을 넣을때 &lt;strong&gt;yyyy-mm-dd-제목&lt;/strong&gt; 의 형식을 맞춰서 넣어줘야 포스팅 된다.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        </item>
-        
-    </channel>
+  <channel>
+    <title>오깅중</title>
+    <link>https://jun7680.github.io/</link>
+    <description>Recent content on 오깅중</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jun7680.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Swift 5.7 개선 사항!!</title>
+      <link>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</link>
+      <pubDate>Wed, 15 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/swift-5.7-%EA%B0%9C%EC%84%A0-%EC%82%AC%ED%95%AD/</guid>
+      <description>&lt;h1 id=&#34;swift-57-개선-사항&#34;&gt;Swift 5.7 개선 사항&lt;/h1&gt;&#xA;&lt;p&gt;Swift 5.7이 소개되면서 개발자들에게 많은 부분에서 편의성을 제공하려는 모습이 보이는거 같다&lt;/p&gt;&#xA;&lt;p&gt;일단 다양한 개선 사항이 있는데, SPM성능 향상, 표준 라이브러리 향상, 빌드 속도 향상 Swift의 편의성 등등 다양한 개선사항이 소개 됐다!!&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>UIStackView Animation show/hide 버그</title>
+      <link>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</link>
+      <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/uistackview-animation-show/hide-%EB%B2%84%EA%B7%B8/</guid>
+      <description>&lt;h3 id=&#34;문제점&#34;&gt;문제점&lt;/h3&gt;&#xA;&lt;p&gt;먼저 UIStackView에서 hidden property를 사용하여 숨김?을 처리하게 되면 이게 이상하게 지속적으로 stack에 쌓이게 된다.&lt;/p&gt;&#xA;&lt;p&gt;이게 무슨말이냐면 숨김 버튼을 계속 누르게 되면 누른 만큼 stackview는 숨겨진다고 생각하면 되는데 5번 누르면 show를 5번 눌러줘야 다시 화면에 나타난다.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>iOS Fastlane을 적용해보자</title>
+      <link>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
+      <pubDate>Thu, 03 Mar 2022 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid>
+      <description>&lt;h3 id=&#34;도입이유&#34;&gt;도입이유&lt;/h3&gt;&#xA;&lt;p&gt;친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀&lt;/p&gt;&#xA;&lt;h5 id=&#34;현-배포-절차&#34;&gt;현 배포 절차&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 &lt;del&gt;(대략 30분&amp;hellip;?)&lt;/del&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h5 id=&#34;도입-후-절차&#34;&gt;도입 후 절차&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;fastlane &amp;rsquo;lane명&amp;rsquo; 끗!&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>GCD(Grand Central Dispatch), Concurrency</title>
+      <link>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</link>
+      <pubDate>Tue, 11 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/gcdgrand-central-dispatch-concurrency/</guid>
+      <description>&lt;h1 id=&#34;gcd&#34;&gt;GCD&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;iOS 개발에서 주로 사용되고 있는 동시성 프로그래밍 API, Swift 전 Objective-C부터 존재했던 개념이다.&lt;br&gt;&#xA;GCD를 사용하면 async로 작업을 수행할 수 있고, 탈출 클로저를 이용한 completion handler를 통해 완료. 작업을 해주면 된다.!&lt;br&gt;&#xA;Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이다.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;gcd예제&#34;&gt;GCD예제&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-swift&#34; data-lang=&#34;swift&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;testGCD&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;Void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;testGCD2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;n&#34;&gt;testGCD3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>iOS에서 FCM 사용하기!</title>
+      <link>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link>
+      <pubDate>Mon, 10 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid>
+      <description>&lt;h2 id=&#34;fcm&#34;&gt;FCM&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;fcm-설정&#34;&gt;FCM 설정&lt;/h3&gt;&#xA;&lt;p&gt;준비 사항&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.&lt;/li&gt;&#xA;&lt;li&gt;XCode의 APP &amp;gt; Capabilities에서 푸시 알림 사용 설정을 한다.&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://console.firebase.google.com/u/0/&#34;&gt;Firebase Console&lt;/a&gt;에서 프로젝트를 추가한다.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h4 id=&#34;firebase-앱-등록&#34;&gt;Firebase 앱 등록&lt;/h4&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;프로젝트를 추가하고 나오면 중앙에 &lt;img src=&#34;FCM_iOS+.png&#34; alt=&#34;&#34;&gt;&#xA;iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 &lt;strong&gt;GoogleService-Info.plist&lt;/strong&gt;를 다운받을수 있다.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Hot Observable, Cold Observable</title>
+      <link>https://jun7680.github.io/p/hot-observable-cold-observable/</link>
+      <pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h4 id=&#34;개념&#34;&gt;개념&lt;/h4&gt;&#xA;&lt;p&gt;먼저 공식문서에 따르면 (&lt;a href=&#34;https://reactivex.io/documentation/observable.html&#34;&gt;https://reactivex.io/documentation/observable.html&lt;/a&gt;)&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;“Hot” and “Cold” Observables&#xA;When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.&#xA;In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Notion으로 Posting</title>
+      <link>https://jun7680.github.io/p/notion/</link>
+      <pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/p/notion/</guid>
+      <description>&lt;h3 id=&#34;글-작성&#34;&gt;글 작성&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;---&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;layout: post&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;title: 제목&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;subtitle: 부제목&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;date: 글 작성 시간&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;categories: 카테고리&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tags: 테그 or [테그, 테그....]&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comments: true &amp;lt;- 댓글 사용 여부&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;---&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;&#xA;&lt;h4&gt;layout - 내가 사용한 테마에서는 글 작성시 post, 페이지(상단) 추가시 page.&lt;/h4&gt;&#xA;&lt;h4&gt;title, subtitle 둘다 문자열로 입력.&lt;/h4&gt;&#xA;&lt;p&gt;&lt;del&gt;처음에 마크다운 문법 에러가 계속 났었는데 알고보니 따옴표&amp;hellip;&lt;/del&gt;&lt;br&gt;&#xA;&lt;del&gt;노션이나 다른 곳에서 복사해서 사용할 경우 따옴표에 주의해야 한다.&lt;/del&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Archives</title>
+      <link>https://jun7680.github.io/archives/</link>
+      <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/archives/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Search</title>
+      <link>https://jun7680.github.io/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://jun7680.github.io/search/</guid>
+      <description>&lt;p&gt;이 블로그는 헤더 우측의 검색 버튼 또는 &lt;code&gt;⌘K&lt;/code&gt;로 검색을 열 수 있습니다.&lt;/p&gt;</description>
+    </item>
+  </channel>
 </rss>

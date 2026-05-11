@@ -4,17 +4,16 @@
     <title>FCM on 오깅중</title>
     <link>https://jun7680.github.io/categories/fcm/</link>
     <description>Recent content in FCM on 오깅중</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Mon, 10 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/categories/fcm/index.xml" rel="self" type="application/rss+xml" />
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 10 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jun7680.github.io/categories/fcm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>iOS에서 FCM 사용하기!</title>
       <link>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link>
       <pubDate>Mon, 10 Jan 2022 00:00:00 +0000</pubDate>
-      
       <guid>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid>
-      <description>FCM Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션! FCM 설정 준비 사항 Apple 개발자 계정의 푸시 알림 인증 키를</description>
+      <description>&lt;h2 id=&#34;fcm&#34;&gt;FCM&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;fcm-설정&#34;&gt;FCM 설정&lt;/h3&gt;&#xA;&lt;p&gt;준비 사항&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.&lt;/li&gt;&#xA;&lt;li&gt;XCode의 APP &amp;gt; Capabilities에서 푸시 알림 사용 설정을 한다.&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://console.firebase.google.com/u/0/&#34;&gt;Firebase Console&lt;/a&gt;에서 프로젝트를 추가한다.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h4 id=&#34;firebase-앱-등록&#34;&gt;Firebase 앱 등록&lt;/h4&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;프로젝트를 추가하고 나오면 중앙에 &lt;img src=&#34;FCM_iOS+.png&#34; alt=&#34;&#34;&gt;&#xA;iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 &lt;strong&gt;GoogleService-Info.plist&lt;/strong&gt;를 다운받을수 있다.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

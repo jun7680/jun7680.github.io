@@ -4,17 +4,16 @@
     <title>Fastlane on 오깅중</title>
     <link>https://jun7680.github.io/tags/fastlane/</link>
     <description>Recent content in Fastlane on 오깅중</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Thu, 03 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/fastlane/index.xml" rel="self" type="application/rss+xml" />
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Thu, 03 Mar 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jun7680.github.io/tags/fastlane/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>iOS Fastlane을 적용해보자</title>
       <link>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</link>
       <pubDate>Thu, 03 Mar 2022 00:00:00 +0000</pubDate>
-      
       <guid>https://jun7680.github.io/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/</guid>
-      <description>도입이유 친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀 현 배포 절차 클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 (대략 30분&amp;hellip;?</description>
+      <description>&lt;h3 id=&#34;도입이유&#34;&gt;도입이유&lt;/h3&gt;&#xA;&lt;p&gt;친구랑 얘기하다 원시인 소리를 들었다&amp;hellip;😀&lt;/p&gt;&#xA;&lt;h5 id=&#34;현-배포-절차&#34;&gt;현 배포 절차&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;클린 -&amp;gt; Product -&amp;gt; Archive -&amp;gt; 완료 콜백 올때까지 대기 -&amp;gt; 업로드 &lt;del&gt;(대략 30분&amp;hellip;?)&lt;/del&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h5 id=&#34;도입-후-절차&#34;&gt;도입 후 절차&lt;/h5&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;fastlane &amp;rsquo;lane명&amp;rsquo; 끗!&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>
