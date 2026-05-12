@@ -1,0 +1,252 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅) — 오깅중</title><meta name=description content="마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)"><meta property="article:published_time" content="2026-05-12T11:25:00+09:00"><meta property="article:modified_time" content="2026-05-12T11:25:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Realm"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Migration"><meta property="article:tag" content="Debugging"><meta property="article:tag" content="RaceCondition"><meta property="article:tag" content="Combine"><meta property="article:tag" content="ViewLifecycle"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)"><meta name=twitter:description content="마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.03a9108cbccac9c923e9a52f6eef73851630a119a3cacc9d8e9311ec46747a8f.css integrity="sha256-A6kQjLzKyckj6aUvbu9zhRYwoRmjysydjpMR7EZ0eo8="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 12, 2026</span>
+<span>·</span>
+<span>14분 읽기</span></div><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</h1><p class=article__desc>마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리.</p></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — 마이그레이션 후 리스트 진입 시 스켈레톤이 두 번 깜빡이는 회귀가 보였다. 가설 5개를 짜서 누적 패치를 시도했는데 진짜 원인은 그 5개에 없었다. <code>ObjectIdentifier(self).hashValue</code> 진단 로그 한 줄로 <code>NoteListStore</code>가 <strong>3번 init</strong>되는 걸 5분 만에 확인. 원인은 <code>subscribeAccount</code>가 <code>loadFirstFolder()</code> 결과로 받아온 <code>.invalidInt(-1)</code> sentinel을 첫 emit으로 흘렸고, 기존 가드 <code>1 != -1</code>이 그대로 통과하면서 가짜 folder로 attach가 한 번 더 일어났던 것. <code>accountFirstFolder.folderID.isValid</code> 가드 한 줄 + attach 책임 단일화 + <code>attachedFolderID</code> latch 3중으로 구조적으로 막았다. 총 6편 시리즈의 <strong>마지막, 6편(View 다중 mount 디버깅 편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p>이전 편 → <a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></p><p><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5</a> 회고 끝줄에서 &ldquo;마이그레이션 끝났다고 안심한 자리에서 또 다른 race가 나왔다 — View가 두 번 mount되는 경로"를 다음 편 떡밥으로 던져뒀다. 이번 편이 그 자리다.</p><p>증상은 단순했다. 진입 시 스켈레톤이 두 번 깜빡임. 그런데 이번엔 publisher 안도, 호출 시그니처도 아니고 — View가 통째로 두 번(정확히는 세 번) 살아나고 있었다&mldr; 마이그레이션 끝났다고 안심한 자리에서 또 다른 race가 나왔다. 이번엔 UI lifecycle 쪽이다.</p><hr><h2 id=증상--스켈레톤이-두-번-깜빡임>증상 — 스켈레톤이 두 번 깜빡임</h2><p>리스트 화면 진입 시 사용자 인지 흐름:</p><pre tabindex=0><code>1. 진입
+2. EmptyView 또는 placeholder 잠깐 노출
+3. 스켈레톤 UI 표시
+4. 스켈레톤 사라짐
+5. 또 스켈레톤이 나타남
+6. 데이터 표시
+</code></pre><p>핵심은 한 줄 가정이다 — <strong>스켈레톤 N번 깜빡임 = State 인스턴스 N+1개 이상 생성</strong>. <code>ObservableObject</code>의 <code>isShowSkeleton</code> 초기값이 <code>true</code>라면, 새 인스턴스가 살아날 때마다 스켈레톤이 다시 표시된다. 그러니까 깜빡임을 잡고 싶으면 인스턴스 개수부터 잡아야 한다.</p><hr><h2 id=진단--objectidentifier로-mount-횟수-측정>진단 — <code>ObjectIdentifier</code>로 mount 횟수 측정</h2><p>여기서 하지 말아야 할 일이 가설 누적이었다. 그런데 처음엔 그걸 했다. publisher 첫 emit이 두 번 흘러서 그런가, <code>@StateObject</code>가 재생성되나, 부모 뷰가 다시 그려지나, <code>onAppear</code>가 두 번 불리나, 뷰 식별자가 깨졌나&mldr; 5개를 누적했는데 진짜 원인은 그 5개에 없었다 ㅋㅋㅋ</p><p>추측 그만하고 측정으로 넘어갔다. Store/ViewModel <code>init</code>/<code>deinit</code>에 인스턴스 식별자를 박는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>NoteListStore</span><span class=p>:</span> <span class=n>ObservableObject</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(</span><span class=n>presenter</span><span class=p>:</span> <span class=n>NoteListEvents</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>presenter</span> <span class=p>=</span> <span class=n>presenter</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>state</span> <span class=p>=</span> <span class=n>State</span><span class=p>(</span><span class=cm>/* ... */</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=bp>print</span><span class=p>(</span><span class=s>&#34;[mount] Store init ptr=</span><span class=si>\(</span><span class=nb>ObjectIdentifier</span><span class=si>(</span><span class=kc>self</span><span class=si>)</span><span class=p>.</span><span class=n>hashValue</span><span class=si>)</span><span class=s> &#34;</span> <span class=o>+</span>
+</span></span><span class=line><span class=cl>              <span class=s>&#34;isShowSkeleton=</span><span class=si>\(</span><span class=n>state</span><span class=p>.</span><span class=n>isShowSkeleton</span><span class=si>)</span><span class=s>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>bind</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>deinit</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=bp>print</span><span class=p>(</span><span class=s>&#34;[mount] Store deinit ptr=</span><span class=si>\(</span><span class=nb>ObjectIdentifier</span><span class=si>(</span><span class=kc>self</span><span class=si>)</span><span class=p>.</span><span class=n>hashValue</span><span class=si>)</span><span class=s>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>attach/detach 함수와 publisher sink 진입에도 같이 박아둔다. 호출자가 누군지도 같이 봐야 하니까 <code>Thread.callStackSymbols</code> 까지 끌고 온다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// configureList 진입</span>
+</span></span><span class=line><span class=cl><span class=bp>print</span><span class=p>(</span><span class=s>&#34;[attach] requested=</span><span class=si>\(</span><span class=n>folder</span><span class=p>.</span><span class=n>folderID</span><span class=si>)</span><span class=s> &#34;</span> <span class=o>+</span>
+</span></span><span class=line><span class=cl>      <span class=s>&#34;attached=</span><span class=si>\(</span><span class=nb>String</span><span class=si>(</span><span class=n>describing</span><span class=p>:</span> <span class=n>attachedFolderID</span><span class=si>))</span><span class=s> &#34;</span> <span class=o>+</span>
+</span></span><span class=line><span class=cl>      <span class=s>&#34;bypass=</span><span class=si>\(</span><span class=n>attachedFolderID</span> <span class=p>==</span> <span class=n>folder</span><span class=p>.</span><span class=n>folderID</span><span class=si>)</span><span class=s> &#34;</span> <span class=o>+</span>
+</span></span><span class=line><span class=cl>      <span class=s>&#34;caller=</span><span class=si>\(</span><span class=n>Thread</span><span class=p>.</span><span class=n>callStackSymbols</span><span class=p>.</span><span class=bp>dropFirst</span><span class=si>()</span><span class=p>.</span><span class=kr>prefix</span><span class=si>(</span><span class=mi>3</span><span class=si>)</span><span class=p>.</span><span class=n>joined</span><span class=si>(</span><span class=n>separator</span><span class=p>:</span> <span class=s>&#34; | &#34;</span><span class=si>))</span><span class=s>&#34;</span><span class=p>)</span>
+</span></span></code></pre></div><p>Xcode console에서 <code>[mount]</code> 필터를 걸고 한 번 진입.</p><pre tabindex=0><code>[mount] Store init ptr=-4241383073414229073   ← #1
+[mount] Store init ptr=810623052023089279     ← #2
+[mount] Store init ptr=-2943669789172097750   ← #3
+</code></pre><p>3번. 사용자 인지의 깜빡임 2번 뒤에 mount는 3번이었다&mldr; measurement와 사용자 인지가 다르다는 것도 하나의 발견이었다. 첫 번째 init이 너무 빨리 지나가서 사용자 눈에는 깜빡임이 두 번으로 보였을 뿐, 실제 살아난 store는 셋이었다.</p><p>이쯤에서 가설 5개가 다 의미 없어졌다. mount가 3번이라는 사실 하나로 후보가 좁혀진다 — publisher든 child VC attach든, 어딘가에서 같은 함수가 세 번 호출되고 있다.</p><hr><h2 id=원인--publisher-다중-trigger--invalid-sentinel>원인 — Publisher 다중 trigger + invalid sentinel</h2><p><code>[attach]</code> 로그에서 잡힌 호출자를 따라가니 attach 함수가 <strong>두 publisher</strong>에서 각자 호출되고 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 안티패턴 — subscribe 두 곳이 각자 attach 트리거</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>subscribeFolderTitle</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>useCases</span><span class=p>.</span><span class=n>subscribeFolders</span><span class=p>.</span><span class=n>execute</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sink</span><span class=p>(</span><span class=n>with</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>owner</span><span class=p>,</span> <span class=n>folders</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=kd>let</span> <span class=nv>folder</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>preferredFolder</span><span class=p>(</span><span class=n>from</span><span class=p>:</span> <span class=n>folders</span><span class=p>)</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>owner</span><span class=p>.</span><span class=n>currentFolder</span><span class=p>?.</span><span class=n>folderID</span> <span class=o>!=</span> <span class=n>folder</span><span class=p>.</span><span class=n>folderID</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>owner</span><span class=p>.</span><span class=n>configureList</span><span class=p>(</span><span class=n>folder</span><span class=p>:</span> <span class=n>folder</span><span class=p>)</span>   <span class=c1>// attach 트리거 A</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}.</span><span class=n>store</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>&amp;</span><span class=n>cancellable</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>subscribeAccount</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>useCases</span><span class=p>.</span><span class=n>subscribeAccountData</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sink</span><span class=p>(</span><span class=n>with</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>owner</span><span class=p>,</span> <span class=kc>_</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=kd>let</span> <span class=nv>firstFolder</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>loadFirstFolder</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>owner</span><span class=p>.</span><span class=n>currentFolder</span><span class=p>?.</span><span class=n>folderID</span> <span class=o>!=</span> <span class=n>firstFolder</span><span class=p>.</span><span class=n>folderID</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>owner</span><span class=p>.</span><span class=n>configureList</span><span class=p>(</span><span class=n>folder</span><span class=p>:</span> <span class=n>firstFolder</span><span class=p>)</span>   <span class=c1>// attach 트리거 B</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}.</span><span class=n>store</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>&amp;</span><span class=n>cancellable</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>진단 로그에서 잡힌 실제 시퀀스:</p><pre tabindex=0><code>[publisher] titleEmit folderID=1 currentFolderID=nil
+[attach] requested=1 attached=nil → bypass=false  ← attach #1 (정상)
+[publisher] accountEmit firstFolderID=-1          ← invalidInt!!
+[attach] requested=-1 attached=1 → bypass=false   ← attach #2 (가짜 folder)
+[publisher] titleEmit folderID=1 currentFolderID=-1
+[attach] requested=1 attached=-1 → bypass=false   ← attach #3 (다시 정상)
+</code></pre><p><code>subscribeAccount</code>가 흘려보낸 <code>loadFirstFolder()</code> 값이 <strong><code>.invalidInt(-1)</code></strong>. 기존 가드 <code>currentFolderID != firstFolderID</code>는 <code>1 != -1</code>이라 그대로 통과한다&mldr; silent로 가짜 folder에 attach해버리고, 그 다음에 다시 진짜 folder로 attach. <strong>mount 3번</strong>이 그렇게 만들어진 것.</p><p><code>.invalidInt</code>가 어디서 새어나왔는지는 시리즈 다른 편에서 본 모양이다. Realm → SwiftData 마이그레이션 직후 캐시가 비어있는 시점에 <code>loadFirstFolder()</code>가 entity의 <code>initEmpty()</code> sentinel을 그대로 흘렸다. <a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2의 <code>.invalidInt</code> 함정</a>이 UI lifecycle 자리까지 따라온 셈이다.</p><p>이 흐름을 한눈에 보려고 시퀀스로 그렸다.</p><pre class=mermaid>sequenceDiagram
+    participant View as View<br>(skeleton ON)
+    participant SubT as subscribeFolderTitle<br>(folderID 스트림)
+    participant SubA as subscribeAccount<br>(firstFolderID 스트림)
+    participant Cfg as configureList(folder:)
+    participant Store as NoteListStore<br>(init 카운터)
+    participant NC as NotificationCenter<br>(.noteDidChange)
+
+    Note over View,NC: 안티패턴 — publisher 책임 분산 + sentinel(-1) 가드 누락
+
+    View->>SubT: 진입 → 구독 시작
+    SubT-->>Cfg: emit folderID = 1
+    Cfg->>Store: init #1 (folderID=1)
+    Store-->>NC: addObserver #1 살아있음
+
+    View->>SubA: 동시 구독 시작
+    SubA-->>Cfg: emit firstFolderID = -1 (sentinel)
+    Note over Cfg: 가드 1 != -1 통과<br>(sentinel 미검사)
+    Cfg->>Store: init #2 (folderID=-1)
+    Store-->>NC: addObserver #2 살아있음
+
+    SubT-->>Cfg: 재emit folderID = 1
+    Cfg->>Store: init #3 (folderID=1)
+    Store-->>NC: addObserver #3 살아있음
+
+    Note over View,NC: 사용자: 스켈레톤 두 번 깜빡임<br>NotificationCenter 1회 발화 → 3개 store 동시 반응
+</pre><blockquote><p><em>그림 1. 안티패턴 시퀀스. 두 publisher가 같은 attach 함수를 따로 호출하고, sentinel(-1)이 가드를 통과해버려서 store가 3번 살아난다. observer도 같이 셋이 되니까 이후 <code>NotificationCenter</code> 한 번 쏠 때마다 store 3개가 동시 반응하는 구조가 된다.</em></p></blockquote><hr><h2 id=해결-1--invalid-sentinel-가드>해결 1 — Invalid sentinel 가드</h2><p>먼저 sentinel을 <code>subscribeAccount</code> 안에서 잡았다. 한 줄이면 끝난다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>subscribeAccount</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>useCases</span><span class=p>.</span><span class=n>subscribeAccountData</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>removeDuplicates</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=p>{</span> <span class=nv>$0</span><span class=p>.</span><span class=n>email</span> <span class=p>==</span> <span class=nv>$1</span><span class=p>.</span><span class=n>email</span> <span class=o>&amp;&amp;</span> <span class=nv>$0</span><span class=p>.</span><span class=n>isConnectingAccount</span> <span class=p>==</span> <span class=nv>$1</span><span class=p>.</span><span class=n>isConnectingAccount</span> <span class=p>})</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=bp>filter</span><span class=p>({</span> <span class=nv>$0</span><span class=p>.</span><span class=n>isConnectingAccount</span> <span class=p>})</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sink</span><span class=p>(</span><span class=n>with</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>owner</span><span class=p>,</span> <span class=kc>_</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=kd>let</span> <span class=nv>currentFolderID</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>currentFolder</span><span class=p>?.</span><span class=n>folderID</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=kd>let</span> <span class=nv>accountFirstFolder</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>loadFirstFolder</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=c1>// invalid sentinel 가드 — 캐시 비어있는 시점 race 차단</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=n>accountFirstFolder</span><span class=p>.</span><span class=n>folderID</span><span class=p>.</span><span class=n>isValid</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=n>currentFolderID</span> <span class=o>!=</span> <span class=n>accountFirstFolder</span><span class=p>.</span><span class=n>folderID</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>owner</span><span class=p>.</span><span class=n>currentFolder</span> <span class=p>=</span> <span class=n>accountFirstFolder</span>
+</span></span><span class=line><span class=cl>            <span class=n>owner</span><span class=p>.</span><span class=n>configureList</span><span class=p>(</span><span class=n>folder</span><span class=p>:</span> <span class=n>accountFirstFolder</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}.</span><span class=n>store</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>&amp;</span><span class=n>cancellable</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>핵심은 <code>accountFirstFolder.folderID.isValid</code> 한 줄&mldr; 진짜 한 줄이다. <code>removeDuplicates</code>로 중복 emit 잡고, <code>filter</code>로 비활성 계정 차단하고, sentinel 가드로 캐시 빈 시점 차단. 이 셋이 publisher 입구에서 잡아둔 안전망이다.</p><hr><h2 id=해결-2--attach-책임-단일화>해결 2 — Attach 책임 단일화</h2><p>가드 한 줄로 표층 race는 잡혔지만 구조 문제는 그대로다. <strong>두 publisher가 같은 attach 함수를 부른다</strong>는 것 자체가 race 자리다. 그래서 attach 트리거 권한을 한쪽으로 정한다.</p><p><code>subscribeFolderTitle</code>이 진입 시 state 결정 권한을 갖는다. <code>subscribeAccount</code>는 진짜 계정 전환에만 반응. <code>currentFolderID</code>가 nil이면 아직 결정되지 않은 시점이니까 손대지 않는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>subscribeAccount</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>useCases</span><span class=p>.</span><span class=n>subscribeAccountData</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sink</span><span class=p>(</span><span class=n>with</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>owner</span><span class=p>,</span> <span class=kc>_</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// currentFolderID가 nil이면 아직 결정 안 됨 — subscribeFolderTitle이 할 일</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=kd>let</span> <span class=nv>currentFolderID</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>currentFolder</span><span class=p>?.</span><span class=n>folderID</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=kd>let</span> <span class=nv>firstFolder</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>loadFirstFolder</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=n>firstFolder</span><span class=p>.</span><span class=n>folderID</span><span class=p>.</span><span class=n>isValid</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=n>currentFolderID</span> <span class=o>!=</span> <span class=n>firstFolder</span><span class=p>.</span><span class=n>folderID</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=c1>// 진짜 계정 전환 시에만 reattach</span>
+</span></span><span class=line><span class=cl>            <span class=n>owner</span><span class=p>.</span><span class=n>configureList</span><span class=p>(</span><span class=n>folder</span><span class=p>:</span> <span class=n>firstFolder</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}.</span><span class=n>store</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>&amp;</span><span class=n>cancellable</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이 가드가 들어가면 진입 직후 <code>subscribeAccount</code>가 흘리는 첫 emit은 무조건 <code>currentFolderID == nil</code> 분기에서 잡힌다. 첫 결정은 항상 <code>subscribeFolderTitle</code>이 하고, <code>subscribeAccount</code>는 사용자가 계정을 바꿨을 때에만 끼어든다.</p><hr><h2 id=해결-3--attachedfolderid-추적>해결 3 — <code>attachedFolderID</code> 추적</h2><p>마지막 안전망은 attach 함수 자체에 latch를 두는 것이다. 이미 같은 folder에 attach돼 있다면 다시 attach하지 않는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>var</span> <span class=nv>attachedFolderID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>?</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>configureList</span><span class=p>(</span><span class=n>folder</span><span class=p>:</span> <span class=n>FolderItem</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=n>attachedFolderID</span> <span class=o>!=</span> <span class=n>folder</span><span class=p>.</span><span class=n>folderID</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>attachedFolderID</span> <span class=p>=</span> <span class=n>folder</span><span class=p>.</span><span class=n>folderID</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>DispatchQueue</span><span class=p>.</span><span class=n>main</span><span class=p>.</span><span class=n>async</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=kd>let</span> <span class=nv>self</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>controllable</span><span class=p>?.</span><span class=n>detachListChild</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span><span class=p>.</span><span class=n>controllable</span><span class=p>?.</span><span class=n>attachListChild</span><span class=p>(</span><span class=cm>/* ... */</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>세 가드를 합치면 — invalid sentinel 차단 + attach 책임 단일화 + <code>attachedFolderID</code> latch — mount 다중화는 구조적으로 불가능해진다. 한 자리만 막으면 다른 자리에서 또 새는 race도 같이 닫힌다.</p><p>해결 흐름을 같은 6 lane으로 다시 그렸다.</p><pre class=mermaid>sequenceDiagram
+    participant View as View<br>(skeleton ON)
+    participant SubT as subscribeFolderTitle<br>(folderID 스트림)
+    participant SubA as subscribeAccount<br>(firstFolderID 스트림)
+    participant Cfg as configureList(folder:)<br>+ isValid 가드
+    participant Store as NoteListStore<br>(init 1회)
+    participant NC as NotificationCenter<br>(.noteDidChange)
+
+    Note over View,NC: 해결 — publisher 책임 단일화 + sentinel(-1) 가드 추가
+
+    View->>SubT: 진입 → 구독 시작
+    SubT-->>Cfg: emit folderID = 1
+    Cfg->>Cfg: isValid(1) 통과
+    Cfg->>Store: init #1 (folderID=1)
+    Store-->>NC: addObserver 1개
+
+    View->>SubA: 동시 구독 시작
+    SubA-->>Cfg: emit firstFolderID = -1 (sentinel)
+    Cfg->>Cfg: isValid(-1) 차단<br>return early
+    Note over Store: store 그대로 #1 유지
+
+    SubT-->>Cfg: 재emit folderID = 1
+    Cfg->>Cfg: removeDuplicates → drop
+    Note over Store: 추가 init 없음
+
+    Note over View,NC: 사용자: 스켈레톤 한 번<br>NotificationCenter 1회 발화 → store 1개만 반응
+</pre><blockquote><p><em>그림 2. 그림 1과 같은 6 lane으로 그린 해결 시퀀스. sentinel(-1)을 publisher 입구에서 잡고, 같은 folderID 재emit은 <code>removeDuplicates</code>로 떨어뜨린다. store 1개만 살고 observer도 1개만 남으니까 <code>NotificationCenter</code> 한 번 쏠 때 store 1개만 반응하는 모양이 된다.</em></p></blockquote><hr><h2 id=부산물-1--잉여-컨테이너-단순화>부산물 1 — 잉여 컨테이너 단순화</h2><p>디버깅하다 보니 컨테이너 자체가 실질적으로 잉여였다 ㅋㅋㅋ 페이지 컨트롤러 + 커스텀 탭 뷰 컨테이너로 감싸고 있었는데, 실제로는 모든 폴더가 단일 페이지였고 (탭 height를 0으로 강제 숨김), 특정 종류의 폴더도 별개 entity로 분리돼 있어서 탭이라는 추상이 의미 없었다. 결국 단일 컨테이너 뷰 한 장으로 충분했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Before — 약 300줄</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>pageViewController</span> <span class=p>=</span> <span class=n>UIPageViewController</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>tabView</span> <span class=p>=</span> <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>var</span> <span class=nv>viewControllers</span> <span class=p>=</span> <span class=p>[</span><span class=n>UIViewController</span><span class=p>]()</span>
+</span></span><span class=line><span class=cl><span class=c1>// ... + UIPageViewControllerDelegate / UIPageViewControllerDataSource</span>
+</span></span><span class=line><span class=cl><span class=c1>//     + UIScrollViewDelegate</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// After — 약 240줄</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>listContainerView</span><span class=p>:</span> <span class=n>UIView</span> <span class=p>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>view</span> <span class=p>=</span> <span class=n>UIView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>view</span><span class=p>.</span><span class=n>backgroundColor</span> <span class=p>=</span> <span class=p>.</span><span class=n>clear</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>view</span>
+</span></span><span class=line><span class=cl><span class=p>}()</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kr>weak</span> <span class=kd>var</span> <span class=nv>currentListViewController</span><span class=p>:</span> <span class=n>UIViewController</span><span class=p>?</span>
+</span></span></code></pre></div><p>깜빡임의 직접 원인은 아니었다. 다만 mount가 일어날 수 있는 surface 자체가 줄어들면 이후 비슷한 race를 또 만났을 때 디버깅 표면이 좁아진다. 잉여 컨테이너를 들어내는 건 여기서는 부산물이지만, 단순화 자체가 다음 race의 비용을 낮춰준다.</p><hr><h2 id=부산물-2--스켈레톤-최소-노출-시간-안전망>부산물 2 — 스켈레톤 최소 노출 시간 안전망</h2><p>근본 race를 잡았어도 미세한 race가 다시 생길 가능성은 남는다. 사용자 인지 일관성 보장용 안전망으로 스켈레톤 최소 노출 시간 가드를 같이 박아뒀다. 결정 근거(왜 500ms인지)는 별도 측정 없이 보조 가드 수치로 정한 값이다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>var</span> <span class=nv>initialAppearAt</span><span class=p>:</span> <span class=n>Date</span><span class=p>?</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>minimumSkeletonDuration</span><span class=p>:</span> <span class=n>TimeInterval</span> <span class=p>=</span> <span class=mf>0.5</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// onAppear 시점 기록</span>
+</span></span><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>onAppear</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>initialAppearAt</span> <span class=p>=</span> <span class=n>Date</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// ...</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// skeleton 해제 신호 도착해도 최소 500ms 보장</span>
+</span></span><span class=line><span class=cl><span class=n>presenter</span><span class=p>.</span><span class=n>hideSkeletonSignal</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>sink</span><span class=p>(</span><span class=n>with</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>owner</span><span class=p>,</span> <span class=kc>_</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>appearAt</span> <span class=p>=</span> <span class=n>owner</span><span class=p>.</span><span class=n>initialAppearAt</span> <span class=p>??</span> <span class=n>Date</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>elapsed</span> <span class=p>=</span> <span class=n>Date</span><span class=p>().</span><span class=n>timeIntervalSince</span><span class=p>(</span><span class=n>appearAt</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>delay</span> <span class=p>=</span> <span class=bp>max</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=n>owner</span><span class=p>.</span><span class=n>minimumSkeletonDuration</span> <span class=o>-</span> <span class=n>elapsed</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>apply</span><span class=p>:</span> <span class=p>(</span><span class=n>NoteListStore</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=nb>Void</span> <span class=p>=</span> <span class=p>{</span> <span class=n>store</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>store</span><span class=p>.</span><span class=n>state</span><span class=p>.</span><span class=n>isShowSkeleton</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>            <span class=n>store</span><span class=p>.</span><span class=n>state</span><span class=p>.</span><span class=n>isShowEmpty</span> <span class=p>=</span> <span class=n>store</span><span class=p>.</span><span class=n>state</span><span class=p>.</span><span class=n>items</span><span class=p>.</span><span class=bp>isEmpty</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>delay</span> <span class=o>&gt;</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>DispatchQueue</span><span class=p>.</span><span class=n>main</span><span class=p>.</span><span class=n>asyncAfter</span><span class=p>(</span><span class=n>deadline</span><span class=p>:</span> <span class=p>.</span><span class=n>now</span><span class=p>()</span> <span class=o>+</span> <span class=n>delay</span><span class=p>)</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=n>owner</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=k>guard</span> <span class=kd>let</span> <span class=nv>owner</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=n>apply</span><span class=p>(</span><span class=n>owner</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>apply</span><span class=p>(</span><span class=n>owner</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></div><p>근본 race는 위 3중 가드로 잡았으니 이 안전망은 사용자 인지 안정 자리에서 미세 race용 보조 가드 정도다. 이게 없어도 동작은 정상이지만, 스켈레톤이 너무 빨리 사라졌다 다시 나타나는 마지막 1 프레임짜리 race를 위쪽에서 미리 흡수해준다.</p><hr><h2 id=mount-다중화-디버깅-체크리스트>Mount 다중화 디버깅 체크리스트</h2><p>비슷한 증상을 만났을 때 순서대로 점검할 항목이다.</p><ol><li><strong>인스턴스 ID 측정 먼저</strong> — <code>ObjectIdentifier(self).hashValue</code>로 init 횟수부터 확인. 추측 누적 전에 측정.</li><li><strong>Attach 함수 호출처 grep</strong> — publisher sink 안에서 호출되는 attach 함수가 둘 이상이면 다중 trigger 의심.</li><li><strong>Invalid sentinel 가드</strong> — publisher가 캐시 비어있는 시점에 <code>.invalidInt</code>, <code>-1</code>, <code>0</code>, 빈 문자열 같은 값을 첫 emit으로 흘릴 수 있는지.</li><li><strong>Attach 책임 단일화</strong> — state 결정 권한을 한 publisher만 가지게.</li><li><strong>Attached state 추적</strong> — <code>attachedFolderID</code> 같은 latch.</li><li><strong><code>CurrentValueSubject</code> 초기값</strong> — subscribe 즉시 흘리는 첫 emit이 의도와 맞는지 (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 참고</a>).</li><li><strong><code>Task { await }</code> fire-and-forget</strong> — sync 완료 알림이 필요한 흐름이라면 async 시그니처로 (<a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 참고</a>).</li><li><strong>최소 노출 시간 안전망</strong> — 사용자 인지 일관성 보장용 보조 가드.</li></ol><hr><h2 id=디버깅-비용-비교>디버깅 비용 비교</h2><table><thead><tr><th>접근</th><th>시간</th><th>결과</th></tr></thead><tbody><tr><td>가설 기반 패치 누적</td><td>수 시간</td><td>race 일부 잡힘, 진짜 원인 못 잡음</td></tr><tr><td>진단 로그 + console 필터링</td><td>5분</td><td>mount 횟수 정확히 측정, 원인 즉시 식별</td></tr></tbody></table><p><strong>측정 비용은 가설 검증 비용보다 거의 항상 싸다.</strong> <code>print</code> 한 줄 박는 게 새 가설 짜는 것보다 빠르다&mldr; 알면서도 또 가설부터 짠다. 그래서 체크리스트 1번에 측정을 박아둔다.</p><hr><h2 id=회고--시리즈를-닫으며>회고 — 시리즈를 닫으며</h2><p>이번 시리즈는 Realm → SwiftData 마이그레이션 중에 마주친 함정들을 정리한 묶음이었다. 한 줄로 다시 늘어놓으면 이렇다.</p><ul><li><strong><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></strong> — iOS 17 + 일괄 + sync 복원</li><li><strong><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></strong> — sentinel, hashValue 랜덤, Predicate enum</li><li><strong><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></strong> — enum + static</li><li><strong><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></strong> — NotificationCenter merge</li><li><strong><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></strong> — fire-and-forget 제거</li><li><strong>Part 6 — View 다중 mount 디버깅</strong> (이 글)</li></ul><p>Part 3·4·5·6 안티패턴이 다 같은 모양이었다&mldr; 글 다 쓰고 나서야 보였다. autosave 타이밍, publisher 첫 emit, fire-and-forget, 그리고 sentinel을 흘리는 publisher까지 — 표층 증상은 다 다르지만 한 단계 위에서 보면 전부 <strong>신호가 거짓말하는 자리</strong>다. 동기 시그니처가 비동기를 숨기든, publisher가 캐시 비어있는 시점에 sentinel을 흘리든, layer 사이에 정직하게 드러나야 할 신호가 한 발 늦거나 가짜 값으로 새어나오면 그 자리마다 race가 따라온다.</p><p>3대 공통 교훈으로 묶으면 이렇게 되더라.</p><ol><li><strong>마이그레이션은 layer 한 곳만 바꾸는 게 아니다</strong> — Storage(Part 2·3), Reactive Pattern(Part 4), Concurrency(Part 5), UI lifecycle(Part 6) 전부 영향을 받는다. SwiftData 한 줄을 바꾸면 그 위 호출 체인 전체가 같이 흔들린다.</li><li><strong>silent failure가 가장 위험하다</strong> — <code>.invalidInt</code> 가드, <code>hashValue</code> 랜덤, <code>#Predicate</code> enum, fire-and-forget. 모두 빌드는 통과하지만 런타임에서 silent로 새어나온다. Part 6 마지막 자리에서 <code>.invalidInt(-1)</code>이 다시 등장한 게 시리즈 thesis를 닫아주는 우연이었다.</li><li><strong>측정이 추측을 이긴다</strong> — <code>ObjectIdentifier</code> 한 줄, console 필터 5분이 가설 5개를 이긴다. 이번 편 디버깅이 이 thesis가 도구로 박힌 자리고, 시리즈 전체로 보면 Part 2의 sentinel 측정, Part 3의 캐시 횟수 측정, Part 4의 emit 시점 측정, Part 5의 sync 완료 시점 측정이 다 같은 결의 동작이었다.</li></ol><p>비슷한 마이그레이션을 시작하는 분이 있다면 이 시리즈가 시간을 아껴드렸기를. 마이그레이션은 끝났다고 안심한 자리에서 race가 한 번 더 나오기 마련이고, 그때마다 가설부터 짜지 말고 측정부터 박는 쪽이 거의 항상 이긴다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></li><li><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></li><li>Part 6 — View 다중 mount 디버깅 (이 글)</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>29</span></div><div class=tags><a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>1</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>6</span></a>
+<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
+<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>6</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>13 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
+<span class=archive-row__bar><div style=width:17%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.6b47f8d2eb961910f07fb203577b278c614d612f2c1746efdb7f4f267079d7fa.js integrity="sha256-a0f40uuWGRDwf7IDV3snjGFNYS8sF0bv239PJnB51/o=" defer></script><script type=module>
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+</script></body></html>
