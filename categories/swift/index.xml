@@ -33,11 +33,40 @@ Serial DispatchQueue, concurrent DispatchQueue 모두 작업 순서는 FIFO 이�
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description></item><item><title>Hot Observable, Cold Observable</title><link>https://jun7680.github.io/p/hot-observable-cold-observable/</link><pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid><description>&lt;p&gt;&lt;strong&gt;습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!&lt;/strong&gt;&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 예제에는 두번의 콜백이 발생후 complection을 실행하기에 가독성이 크게 해치지 않지만 정말 만약에 점점 더 많은 콜백이 발생할 경우의 가독성은 생각만 해도 &lt;del&gt;끔직하다&lt;/del&gt;&lt;/p&gt;</description></item><item><title>iOS에서 FCM 사용하기!</title><link>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link><pubDate>Mon, 10 Jan 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/ios%EC%97%90%EC%84%9C-fcm-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid><description>&lt;h2 id="fcm"&gt;FCM&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Firebase Cloud Messaging으로 구글에서 무료로 메시지를 안정적으로 전송할 수 있는 교차 플랫폼 메시징 솔루션!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="fcm-설정"&gt;FCM 설정&lt;/h3&gt;
+&lt;p&gt;준비 사항&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Apple 개발자 계정의 푸시 알림 인증 키를 가져온다.&lt;/li&gt;
+&lt;li&gt;XCode의 APP &amp;gt; Capabilities에서 푸시 알림 사용 설정을 한다.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://console.firebase.google.com/u/0/"&gt;Firebase Console&lt;/a&gt;에서 프로젝트를 추가한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="firebase-앱-등록"&gt;Firebase 앱 등록&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;프로젝트를 추가하고 나오면 중앙에 &lt;img src="FCM_iOS+.png" alt=""&gt;
+iOS+를 눌러 App Bundle ID를 넣고 다음을 누르면 &lt;strong&gt;GoogleService-Info.plist&lt;/strong&gt;를 다운받을수 있다.&lt;/p&gt;</description></item><item><title>Hot Observable, Cold Observable</title><link>https://jun7680.github.io/p/hot-observable-cold-observable/</link><pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/hot-observable-cold-observable/</guid><description>&lt;p&gt;&lt;strong&gt;습관처럼 사용하는 Observable에 대해서 제대로 알고 쓰고자 다시 정리를 해보았다!&lt;/strong&gt;&lt;/p&gt;
 &lt;h4 id="개념"&gt;개념&lt;/h4&gt;
 &lt;p&gt;먼저 공식문서에 따르면 (&lt;a href="https://reactivex.io/documentation/observable.html"&gt;https://reactivex.io/documentation/observable.html&lt;/a&gt;)&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;blockquote&gt;
 &lt;p&gt;“Hot” and “Cold” Observables
 When does an Observable begin emitting its sequence of items? It depends on the Observable. A “hot” Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A “cold” Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items, and so such an observer is guaranteed to see the whole sequence from the beginning.
-In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.&lt;/p&gt;</description></item></channel></rss>
+In some implementations of ReactiveX, there is also something called a “Connectable” Observable. Such an Observable does not begin emitting items until its Connect method is called, whether or not any observers have subscribed to it.&lt;/p&gt;</description></item><item><title>Notion으로 Posting</title><link>https://jun7680.github.io/p/notion/</link><pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/notion/</guid><description>&lt;h3 id="글-작성"&gt;글 작성&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-markdown" data-lang="markdown"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;layout: post
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;title: 제목
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;subtitle: 부제목
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;date: 글 작성 시간
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;categories: 카테고리
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;tags: 테그 or [테그, 테그....]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;comments: true &amp;lt;- 댓글 사용 여부
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h4&gt;layout - 내가 사용한 테마에서는 글 작성시 post, 페이지(상단) 추가시 page.&lt;/h4&gt;
+&lt;h4&gt;title, subtitle 둘다 문자열로 입력.&lt;/h4&gt;
+&lt;p&gt;&lt;del&gt;처음에 마크다운 문법 에러가 계속 났었는데 알고보니 따옴표&amp;hellip;&lt;/del&gt;&lt;br&gt;
+&lt;del&gt;노션이나 다른 곳에서 복사해서 사용할 경우 따옴표에 주의해야 한다.&lt;/del&gt;&lt;/p&gt;</description></item></channel></rss>
