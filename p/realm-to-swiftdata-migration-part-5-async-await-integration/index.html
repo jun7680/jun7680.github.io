@@ -1,0 +1,232 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합) — 오깅중</title><meta name=description content="동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-5-async-await-integration/><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-5-async-await-integration/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-5-async-await-integration/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)"><meta property="article:published_time" content="2026-05-12T10:30:00+09:00"><meta property="article:modified_time" content="2026-05-12T10:30:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Realm"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Migration"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="AsyncAwait"><meta property="article:tag" content="Task"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)"><meta name=twitter:description content="동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-5-async-await-integration/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.03a9108cbccac9c923e9a52f6eef73851630a119a3cacc9d8e9311ec46747a8f.css integrity="sha256-A6kQjLzKyckj6aUvbu9zhRYwoRmjysydjpMR7EZ0eo8="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 12, 2026</span>
+<span>·</span>
+<span>10분 읽기</span></div><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)</h1><p class=article__desc>동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리.</p></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — 동기 메서드 안의 <code>Task { await ... }</code> 는 호출자가 sync 완료를 알 수 없는 fire-and-forget이다. SwiftData 같은 비동기 저장소를 이걸로 갱신하고 바로 query를 돌리면 옛 캐시가 먼저 도착해서 skeleton 해제 직후 EmptyView가 한 프레임 깜빡이는 race가 생긴다. 해결은 <code>async</code> 시그니처를 호출 체인 위로 정직하게 전파하고 <code>await</code>로 완료를 보장하는 것. 그 과정에서 <code>async throws</code> 오버로드 자동 선택 함정, <code>Task</code> vs <code>Task.detached</code>, Combine sink 안의 <code>Task</code> cancellation, Combine ↔ async 다리 패턴까지 같이 정리. 총 6편 시리즈의 <strong>5편(Async/Await 통합 편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p>이전 편 → <a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></p><p><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4</a> 회고 끝줄에서 &ldquo;백그라운드 sync에서 SwiftData를 어떻게 다루는지, 흔히 빠지는 fire-and-forget 안티패턴은 뭔지"를 다음 편 떡밥으로 던져뒀다. 이번 편이 그 자리다.</p><p>이상하게도 증상은 Part 4 함정 1과 거의 같은 모양으로 다시 나타났다. 진입 직후 EmptyView 한 프레임 깜빡임. 분명 책임 분리 + <code>receive(on:)</code> 가드는 다 들어가 있는데 같은 모양 회귀가 또 보였다&mldr; 원인은 더 위쪽이었다. publisher 첫 emit 자체가 아니라 sync를 호출한 그 위 흐름이 거짓말을 하고 있었다.</p><hr><h2 id=안티패턴--동기-메서드-안의-task--await->안티패턴 — 동기 메서드 안의 <code>Task { await }</code></h2><p>문제의 sync 매니저는 이런 모양이었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 안티패턴 — fire-and-forget</span>
+</span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>NoteSyncManager</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>sync</span><span class=p>(</span><span class=n>isDelayed</span><span class=p>:</span> <span class=nb>Bool</span> <span class=p>=</span> <span class=kc>false</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>isDelayed</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>delayedRequester</span><span class=p>.</span><span class=n>post</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Task</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>await</span> <span class=n>noteQuery</span><span class=p>.</span><span class=n>operate</span><span class=p>(</span><span class=n>enableRemoteQuery</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>호출자는 동기 시그니처라 가정하고 바로 다음 줄에서 query를 돌린다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 안티패턴 호출자 — sync 완료 전에 query 호출</span>
+</span></span><span class=line><span class=cl><span class=kr>override</span> <span class=kd>func</span> <span class=nf>requestRemoteData</span><span class=p>(...)</span> <span class=p>-&gt;</span> <span class=n>Result</span><span class=p>&lt;</span><span class=n>QueryOffset</span><span class=p>,</span> <span class=n>Error</span><span class=p>&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>isRefresh</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>noteSyncManager</span><span class=p>.</span><span class=n>sync</span><span class=p>()</span>   <span class=c1>// 즉시 리턴</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>result</span> <span class=p>=</span> <span class=n>NoteRemoteQuery</span><span class=p>().</span><span class=n>query</span><span class=p>(...)</span>   <span class=c1>// 옛 캐시로 query</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>result</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>noteSyncManager.sync()</code> 가 동기 메서드라 호출자는 sync 완료 시점을 모른다. 내부의 <code>Task</code> 가 백그라운드에서 돌고 있을 뿐 호출은 즉시 리턴해버려서, 다음 줄 <code>query()</code> 가 SwiftData 갱신 전 캐시로 결과를 돌려준다. 시그니처가 비동기성을 거짓말한 자리다.</p><p>이 흐름이 만드는 회귀를 시간 순으로 풀면 이렇다.</p><ol><li><code>requestRemoteData</code> 호출</li><li><code>sync()</code> 호출 → 내부 Task 시작, 호출은 즉시 리턴</li><li><code>query()</code> — SwiftData 옛 캐시로 <code>Result.success(offset)</code> 반환</li><li>페이징 컴포넌트가 <code>.success</code> 이벤트를 흘림</li><li>skeleton 해제 분기를 탐</li><li>notes 는 아직 <code>[]</code> — <code>isShowEmpty = true</code></li><li>EmptyView 한 프레임 노출</li><li>한참 후 Task 완료, SwiftData 갱신, <code>NotificationCenter</code> 가 <code>.noteDidChange</code> 이벤트를 보냄</li><li>구독자가 <code>notes = [data]</code> 로 갱신</li><li>정상 리스트 표시</li></ol><p>사용자 입장에선 진입 → 깜빡 → 리스트. 어디서 뭐가 깨진 건지 한 번에 안 보임 ㅋㅋㅋ</p><pre class=mermaid>sequenceDiagram
+    participant View as View<br>(skeleton ON)
+    participant Req as requestRemoteData<br>(동기 시그니처)
+    participant Sync as NoteSyncManager<br>.sync() — 동기
+    participant Task as Task { await }<br>(fire-and-forget)
+    participant SD as SwiftData<br>(NoteRemoteQuery)
+    participant Sink as Sink<br>(UI 갱신 분기)
+
+    Note over View,Sink: 안티패턴 — 동기 메서드 안에 Task { await } 숨김
+
+    View->>Req: refresh 진입
+    Req->>Sync: sync() 호출
+    Sync->>Task: Task { await remoteFetch() } 띄움
+    Sync-->>Req: 즉시 return (완료 모름)
+    Note over Task: 백그라운드 실행 중<br>(아직 SwiftData 미갱신)
+    Req->>SD: query() 즉시 호출
+    SD-->>Req: 옛 캐시로 .success([])
+    Req-->>Sink: PagingDataSource .success 발행
+    Sink-->>View: skeleton 해제 분기<br>notes = [] → EmptyView
+    Note over View,Sink: 한 프레임 깜빡임 race
+    Task->>SD: (한참 후) remote 데이터 write
+    SD-->>Sink: NotificationCenter .noteDidChange
+    Sink-->>View: 정상 리스트 갱신
+</pre><blockquote><p><em>그림 1. 회귀 시퀀스. <code>sync()</code> 가 즉시 리턴하면서 <code>query()</code> 가 옛 캐시로 먼저 도착하고, 한참 뒤에야 백그라운드 Task가 SwiftData를 갱신하면서 정상 리스트가 들어온다. 두 흐름 사이의 한 프레임이 EmptyView 깜빡임 자리.</em></p></blockquote><p>Part 4 함정 1과 모양은 비슷하지만 원인 층이 다르다. Part 4는 publisher 첫 emit이 즉시 동기로 흘렀던 거고, Part 5는 sync 호출 자체가 fire-and-forget이라 옛 캐시 query가 먼저 도착한 것. 같은 EmptyView 깜빡임 증상이라도 가드 자리가 publisher 안이냐 호출 시그니처냐가 갈린다.</p><hr><h2 id=해결--async-시그니처-전파--await-보장>해결 — <code>async</code> 시그니처 전파 + <code>await</code> 보장</h2><p>해결은 sync 매니저에 <code>async</code> 오버로드를 같이 두는 것부터.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 해결 — async 메서드도 같이 제공</span>
+</span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>NoteSyncManager</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>/// 동기 fire-and-forget — 백그라운드 sync 트리거 용</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>sync</span><span class=p>(</span><span class=n>isDelayed</span><span class=p>:</span> <span class=nb>Bool</span> <span class=p>=</span> <span class=kc>false</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>isDelayed</span> <span class=p>{</span> <span class=cm>/* ... */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Task</span> <span class=p>{</span> <span class=n>await</span> <span class=n>noteQuery</span><span class=p>.</span><span class=n>operate</span><span class=p>(</span><span class=n>enableRemoteQuery</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>/// async — 호출자가 완료를 await 가능</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>sync</span><span class=p>()</span> <span class=n>async</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>await</span> <span class=n>noteQuery</span><span class=p>.</span><span class=n>operate</span><span class=p>(</span><span class=n>enableRemoteQuery</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>동기 버전은 &ldquo;백그라운드 트리거 전용"으로 남기고, 호출자가 sync 완료를 알아야 하는 자리에는 <code>async</code> 버전을 쓰게 한다. 호출자도 <code>async</code> 로 같이 끌어올린다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 해결 호출자 — await 보장 흐름</span>
+</span></span><span class=line><span class=cl><span class=kr>override</span> <span class=kd>func</span> <span class=nf>requestRemoteData</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>offset</span><span class=p>:</span> <span class=nb>Int</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>limit</span><span class=p>:</span> <span class=nb>Int</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>isRefresh</span><span class=p>:</span> <span class=nb>Bool</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>Result</span><span class=p>&lt;</span><span class=n>QueryOffset</span><span class=p>,</span> <span class=n>Error</span><span class=p>&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>isRefresh</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>await</span> <span class=n>noteSyncManager</span><span class=p>.</span><span class=n>sync</span><span class=p>()</span>   <span class=c1>// SwiftData 갱신 완료까지 대기</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>queryOffset</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>NoteRemoteQuery</span><span class=p>().</span><span class=n>query</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>.</span><span class=n>success</span><span class=p>(</span><span class=n>queryOffset</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>.</span><span class=n>failure</span><span class=p>(</span><span class=n>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>한 자리만 고치고 끝났으면 좋았는데&mldr; 시그니처가 호출 체인 위로 자꾸 번져 올라간다. 페이징 컴포넌트 호출 측은 평소 동기 메서드라 <code>Task</code> 로 비동기 경계를 만들어 감싼다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 페이징 컴포넌트 — Task로 비동기 경계 잡기</span>
+</span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>request</span><span class=p>(</span><span class=n>isRefresh</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Task</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=kd>let</span> <span class=nv>self</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>result</span> <span class=p>=</span> <span class=n>await</span> <span class=kc>self</span><span class=p>.</span><span class=n>requestRemoteData</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>offset</span><span class=p>:</span> <span class=n>queryOffset</span><span class=p>.</span><span class=n>offset</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>limit</span><span class=p>:</span> <span class=n>queryOffset</span><span class=p>.</span><span class=n>limit</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>isRefresh</span><span class=p>:</span> <span class=n>isRefresh</span>
+</span></span><span class=line><span class=cl>        <span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>switch</span> <span class=n>result</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>success</span><span class=p>(</span><span class=kd>let</span> <span class=nv>queryOffset</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span><span class=p>.</span><span class=n>onSuccess</span><span class=p>(</span><span class=n>queryOffset</span><span class=p>:</span> <span class=n>queryOffset</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>failure</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span><span class=p>.</span><span class=n>onError</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이 흐름을 다시 그림으로 보면 race가 어디서 사라지는지 한눈에 보인다.</p><pre class=mermaid>sequenceDiagram
+    participant View as View<br>(skeleton ON)
+    participant Req as requestRemoteData<br>(async throws)
+    participant Sync as NoteSyncManager<br>.sync() async
+    participant Task as await<br>(완료까지 정지)
+    participant SD as SwiftData<br>(NoteRemoteQuery)
+    participant Sink as Sink<br>(UI 갱신 분기)
+
+    Note over View,Sink: 해결 — async 시그니처 전파 + await 보장
+
+    View->>Req: Task { await refresh() }
+    Req->>Sync: await sync()
+    Sync->>Task: remote fetch 진행
+    Task->>SD: SwiftData write 완료
+    SD-->>Task: 갱신 끝
+    Task-->>Sync: 반환
+    Sync-->>Req: sync 완료 시점 보장
+    Req->>SD: try await query()
+    SD-->>Req: 최신 데이터로 .success(notes)
+    Req-->>Sink: PagingDataSource .success 발행
+    Sink-->>View: skeleton 해제 분기<br>notes = [...] → 정상 리스트
+    Note over View,Sink: race 없음 — 한 흐름으로 정렬
+</pre><blockquote><p><em>그림 2. 같은 6 participant lane으로 그린 해결 시퀀스. <code>await sync()</code> 가 SwiftData write 완료까지 정지해주니까 그 다음 줄 <code>try await query()</code> 는 항상 최신 데이터로 돌아온다. 그림 1과 1번 화살표만 바꿨는데 이후 흐름이 한 줄로 정렬됨.</em></p></blockquote><hr><h2 id=async-throws-오버로드-함정><code>async throws</code> 오버로드 함정</h2><p><code>async</code> 로 끌어올리는 도중에 한 번 더 걸렸다. query 메서드가 동기 <code>Result</code> 버전과 신규 <code>async throws</code> 버전을 둘 다 들고 있는 자리였다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>class</span> <span class=nc>NoteRemoteQuery</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 동기 버전 (옛 코드 호환용)</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>query</span><span class=p>(...)</span> <span class=p>-&gt;</span> <span class=n>Result</span><span class=p>&lt;</span><span class=n>QueryOffset</span><span class=p>,</span> <span class=n>Error</span><span class=p>&gt;</span> <span class=p>{</span> <span class=cm>/* ... */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 신규 async throws 버전</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>query</span><span class=p>(...)</span> <span class=n>async</span> <span class=kr>throws</span> <span class=p>-&gt;</span> <span class=n>QueryOffset</span> <span class=p>{</span> <span class=cm>/* ... */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>await</code> 컨텍스트 안에서 <code>query(...)</code> 를 부르면 컴파일러가 두 번째 시그니처를 자동 선택한다. 그 결과 <code>try</code> 키워드가 필요해지고 반환 타입이 <code>QueryOffset</code> 이라 기존 <code>Result</code> 패턴 그대로 못 쓴다. <code>try</code> 안 붙였다고 빨간 줄 떠서 그제야 알았음 ㅋㅋㅋ</p><p>해결은 <code>do { try await ... ; return .success } catch { return .failure }</code> 로 throws → Result 변환 wrap을 한 자리에서 해주는 것.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// throws → Result 변환 표준 wrap</span>
+</span></span><span class=line><span class=cl><span class=kr>override</span> <span class=kd>func</span> <span class=nf>requestRemoteData</span><span class=p>(...)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>Result</span><span class=p>&lt;</span><span class=n>QueryOffset</span><span class=p>,</span> <span class=n>Error</span><span class=p>&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>isRefresh</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>await</span> <span class=n>noteSyncManager</span><span class=p>.</span><span class=n>sync</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>queryOffset</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>NoteRemoteQuery</span><span class=p>().</span><span class=n>query</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>.</span><span class=n>success</span><span class=p>(</span><span class=n>queryOffset</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>.</span><span class=n>failure</span><span class=p>(</span><span class=n>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이 wrap 패턴이 마이그레이션 중 throws ↔ Result 경계 자리의 표준이 됐다. <code>Result</code> 인터페이스를 들고 가야 하는 옛 호출 측과 throws 시그니처가 자연스러운 신규 query 사이를 한 줄짜리 어댑터로 봉합한다.</p><hr><h2 id=task-vs-taskdetached><code>Task</code> vs <code>Task.detached</code></h2><p>마이그레이션 중 actor isolation 망가지는 자리 색출하면서 정한 룰.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Task</span> <span class=p>{</span> <span class=n>await</span> <span class=kc>self</span><span class=p>.</span><span class=n>requestRemoteData</span><span class=p>(...)</span> <span class=p>}</span>          <span class=c1>// 일반적으로 충분</span>
+</span></span><span class=line><span class=cl><span class=n>Task</span><span class=p>.</span><span class=n>detached</span> <span class=p>{</span> <span class=n>await</span> <span class=kc>self</span><span class=p>.</span><span class=n>requestRemoteData</span><span class=p>(...)</span> <span class=p>}</span> <span class=c1>// 가능한 한 피함</span>
+</span></span></code></pre></div><p><code>Task.detached</code> 는 부모 컨텍스트의 actor isolation 과 priority 를 상속하지 않는다. 대부분의 경우 <code>Task</code> 한 줄로 충분하고, <code>detached</code> 는 명확한 이유 (예: actor isolation 의도적 우회) 가 있을 때만. 거의 모든 자리에서 <code>Task</code> 한 줄로 충분하다&mldr; <code>Task.detached</code> 는 본 적 없다 정도로 두는 게 안전.</p><hr><h2 id=combine-sink-안에서-task-사용>Combine sink 안에서 <code>Task</code> 사용</h2><p>Combine <code>sink</code> 클로저는 <code>@escaping</code> 이지만 <code>async</code> 가 아니다. async 호출이 필요하면 <code>Task</code> 로 감싼다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>publisher</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>sink</span><span class=p>(</span><span class=n>with</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>owner</span><span class=p>,</span> <span class=n>value</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=n>Task</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=n>owner</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>await</span> <span class=n>owner</span><span class=p>?.</span><span class=n>handle</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>store</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>&amp;</span><span class=n>cancellables</span><span class=p>)</span>
+</span></span></code></pre></div><p>여기서 한 가지 주의할 게 있다. <code>Task</code> 의 cancellation 은 <code>AnyCancellable</code> cancel 과 무관하다. publisher 가 종료돼도, <code>cancellables</code> 가 해제돼도, 그 안에서 띄운 Task 는 별도로 계속 실행된다. <code>AnyCancellable</code> cancel 하면 안의 Task 도 같이 죽을 줄 알았는데&mldr; 별도다. 필요하면 <code>Task</code> reference 를 직접 들고 있다가 끄는 식으로 관리한다.</p><hr><h2 id=패턴--combine--async-다리-놓기>패턴 — Combine + async 다리 놓기</h2><p>마이그레이션 중 한동안 Combine 쪽 흐름과 async 쪽 흐름이 공존하는 구간이 있다. 두 세계 사이를 오갈 수 있는 어댑터 두 개를 표준 도구로 박아뒀다.</p><p>먼저 <code>AnyPublisher</code> 를 <code>async</code> 컨텍스트에서 한 값만 await 하는 쪽.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>Publisher</span> <span class=k>where</span> <span class=n>Failure</span> <span class=p>==</span> <span class=n>Never</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>firstValue</span><span class=p>()</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>Output</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>await</span> <span class=n>withCheckedContinuation</span> <span class=p>{</span> <span class=n>continuation</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=kd>var</span> <span class=nv>cancellable</span><span class=p>:</span> <span class=n>AnyCancellable</span><span class=p>?</span>
+</span></span><span class=line><span class=cl>            <span class=n>cancellable</span> <span class=p>=</span> <span class=kc>self</span><span class=p>.</span><span class=bp>first</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                <span class=p>.</span><span class=n>sink</span> <span class=p>{</span> <span class=n>value</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                    <span class=n>continuation</span><span class=p>.</span><span class=n>resume</span><span class=p>(</span><span class=n>returning</span><span class=p>:</span> <span class=n>value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=n>cancellable</span><span class=p>?.</span><span class=n>cancel</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 사용</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>firstNotes</span> <span class=p>=</span> <span class=n>await</span> <span class=n>NoteDAO</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>subscribeForDataSource</span><span class=p>(</span><span class=n>folderID</span><span class=p>:</span> <span class=n>folderID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>firstValue</span><span class=p>()</span>
+</span></span></code></pre></div><p>반대로 async 결과를 publisher 로 흘려보내는 쪽.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>Task</span> <span class=k>where</span> <span class=n>Failure</span> <span class=p>==</span> <span class=n>Never</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>publisher</span><span class=p>:</span> <span class=n>AnyPublisher</span><span class=p>&lt;</span><span class=n>Success</span><span class=p>,</span> <span class=n>Never</span><span class=p>&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Deferred</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Future</span> <span class=p>{</span> <span class=n>promise</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=n>Task</span> <span class=p>{</span> <span class=p>[</span><span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                    <span class=kd>let</span> <span class=nv>value</span> <span class=p>=</span> <span class=n>await</span> <span class=kc>self</span><span class=p>.</span><span class=n>value</span>
+</span></span><span class=line><span class=cl>                    <span class=n>promise</span><span class=p>(.</span><span class=n>success</span><span class=p>(</span><span class=n>value</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>eraseToAnyPublisher</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>두 어댑터 모두 마이그레이션 과정에서 두 세계 공존 구간 봉합용으로 갖고 있는 참고 패턴이다. 모든 자리에 강요하는 룰은 아니고, 두 흐름을 한 자리에서 이어야 할 때 표준 모양으로 꺼내쓰는 정도.</p><hr><h2 id=안티패턴-회상--동기-메서드-안에-숨겨진-비동기>안티패턴 회상 — 동기 메서드 안에 숨겨진 비동기</h2><p>이번 편 안티패턴을 시리즈의 다른 안티패턴들과 같이 묶어 놓고 보면 같은 모양이 보인다.</p><table><thead><tr><th>안티패턴</th><th>결과</th></tr></thead><tbody><tr><td>동기 메서드 안의 <code>Task { await }</code> (Part 5)</td><td>호출자가 완료 못 앎 → race</td></tr><tr><td>동기 method 안에서 <code>DispatchQueue.global().async</code> + send (Part 5 변형)</td><td>동일 — 동기 시그니처 거짓말</td></tr><tr><td>Publisher 가 캐시 즉시 emit (Part 4)</td><td>첫 emit 가드 빠지면 race</td></tr><tr><td>동기 method 안의 SwiftData 자동 갱신 가정 (Part 3)</td><td>autosave 타이밍 race</td></tr></tbody></table><p>Part 3·4·5 안티패턴이 다 같은 모양이었다는 게 글 다 쓰고 나서야 보였다&mldr; 표층 증상은 다 다르지만 (&ldquo;autosave 타이밍 race&rdquo;, &ldquo;publisher 첫 emit race&rdquo;, &ldquo;fire-and-forget race&rdquo;) 한 단계 위로 추상화하면 전부 <strong>&ldquo;동기 시그니처 안에 비동기를 숨겨둔&rdquo; 거짓말</strong>의 변형이다.</p><p>그래서 한 줄 규칙으로 도출됐다.</p><blockquote><p><strong>호출자가 알아야 하는 비동기 결과가 있으면, 메서드 시그니처가 <code>async</code> / <code>throws</code> / completion 으로 그 비동기를 정직하게 드러내야 한다.</strong></p></blockquote><p>이번 시리즈 전체의 thesis 한 줄.</p><hr><h2 id=체크리스트>체크리스트</h2><p>비슷한 마이그레이션 시작하기 전에 점검해 보면 좋을 항목.</p><ul><li><input disabled type=checkbox> 동기 메서드 안에 <code>Task { await }</code> 가 있다면 <code>async</code> 시그니처도 같이 제공하는가</li><li><input disabled type=checkbox> sync 완료가 호출자에게 필요한 흐름에서 fire-and-forget 안 쓰는가</li><li><input disabled type=checkbox> <code>async throws</code> 오버로드 호출 시 <code>try await</code> + Result wrap 패턴이 일관적인가</li><li><input disabled type=checkbox> Combine <code>sink</code> 안의 <code>Task</code> 가 cancellation 관리되는가 (<code>AnyCancellable</code> 과 별도)</li><li><input disabled type=checkbox> <code>Task.detached</code> 사용 시 의도적 이유가 명확한가</li><li><input disabled type=checkbox> 스레드 격리 (<code>@MainActor</code> 등) 가 sync 완료 흐름과 일관되는가</li></ul><hr><h2 id=회고>회고</h2><p>Part 4가 이벤트 흐름 경계였다면 Part 5는 호출 시그니처 경계다. SwiftData가 Realm과 다르게 비동기 저장소라는 사실이 호출 체인 모든 자리에 영향을 준다. 한 메서드 시그니처를 <code>async</code> 로 바꾸면 그 호출자도, 그 호출자의 호출자도 <code>async</code> 가 따라온다. 한 자리만 고치고 끝나면 좋겠지만 그렇게 안 됐다.</p><p>회귀가 처음 어떻게 발견됐는지, 시그니처 전파가 정확히 어디까지 번졌는지 같은 구체 정황은 노트에 남겨두지 않아 회상으로 다 적기는 어렵다. 다만 그 과정에서 분명한 건 — 동기 시그니처로 비동기를 숨기는 자리가 보일 때마다 어디선가 race가 한 발 뒤에 따라온다는 것. Part 3 autosave 타이밍, Part 4 publisher 첫 emit, Part 5 fire-and-forget이 다 같은 거짓말의 다른 모양이었다.</p><p>마이그레이션이 끝났다고 안심한 자리에서 또 다른 race가 나왔다 — View 가 두 번 mount 되는 경로. 다음 편(Part 6)에서 다룬다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></li><li><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li>Part 5 — Async/Await 통합 (이 글)</li><li>Part 6 — View 다중 mount 디버깅 (다음 편 예정)</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>26</span></div><div class=tags><a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>1</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>1</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>5</span></a>
+<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
+<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>5</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>5</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>12 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:83%></div></span><span class=archive-row__count>05</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
+<span class=archive-row__bar><div style=width:17%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.6b47f8d2eb961910f07fb203577b278c614d612f2c1746efdb7f4f267079d7fa.js integrity="sha256-a0f40uuWGRDwf7IDV3snjGFNYS8sF0bv239PJnB51/o=" defer></script><script type=module>
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+</script></body></html>

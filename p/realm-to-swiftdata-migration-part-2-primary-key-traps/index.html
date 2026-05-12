@@ -178,22 +178,23 @@
 </span></span><span class=line><span class=cl>        <span class=n>context</span><span class=p>.</span><span class=bp>insert</span><span class=p>(</span><span class=n>summary</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>여기서도 <code>let id = summary.id</code>로 진입 전 unwrap을 해뒀다. closure가 캡처할 값은 항상 closure 진입 전에 풀어두는 게 안전한 패턴이다.</p><hr><h2 id=체크리스트>체크리스트</h2><p>비슷한 작업 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> PK 필드에 sentinel default가 없는가</li><li><input disabled type=checkbox> PK 만드는 함수가 결정적인가 (<code>String.hashValue</code>, <code>Date()</code> 같은 시드/시간 의존 X)</li><li><input disabled type=checkbox> <code>#Predicate</code> 안에 enum 직접 비교 없는가</li><li><input disabled type=checkbox> <code>@Model</code> stored property가 SwiftData primitive 타입인가</li><li><input disabled type=checkbox> PK 변경 시 기존 row 비우는 마이그레이션 흐름이 있는가</li><li><input disabled type=checkbox> upsert 패턴이 lookup → insert/update로 분리돼 있는가</li></ul><hr><h2 id=회고>회고</h2><p>이 편을 굴리면서 다시 확인한 게 하나 있다. SwiftData의 <strong>silent failure는 대부분 매크로 경계에서 일어난다</strong>. <code>@Attribute(.unique)</code>, <code>@Model</code>, <code>#Predicate</code> 같은 매크로는 컴파일 타임에 SQL-비슷한 쿼리로 풀리는데, 매크로가 풀 수 있는 표현식 범위가 일반 Swift보다 좁다. 그 경계를 모르고 일반 Swift 감각으로 코드를 박으면, 컴파일은 통과하고 런타임에 조용히 깨진다.</p><p>특히 <code>String.hashValue</code> 함정은 한 번 박혀서 운영에 나가면 발견이 어렵다. lookup이 실패하는 게 &ldquo;데이터가 원래 없었던 건지 PK가 안 맞는 건지&rdquo; 콜드 패스에서 구별이 안 된다. 그래서 PK 만드는 함수는 <strong>처음부터 결정적</strong>이어야 한다. <del>이걸 한 번 데이고 나서야 배움.</del></p><p><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a>에서는 이렇게 만든 entity들을 어떻게 안전하게 다룰지 — class 인스턴스 DAO vs enum + static 메서드 — 를 비교한다. SwiftData에서 라이프사이클을 어떻게 단순화할 수 있는지가 주제다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li>Part 2 — Primary Key 함정 (이 글)</li><li><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li>Part 5 — Async/Await 통합 (다음 편 예정)</li><li>Part 6 — View 다중 mount 디버깅 (다음 편 예정)</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+</span></span></code></pre></div><p>여기서도 <code>let id = summary.id</code>로 진입 전 unwrap을 해뒀다. closure가 캡처할 값은 항상 closure 진입 전에 풀어두는 게 안전한 패턴이다.</p><hr><h2 id=체크리스트>체크리스트</h2><p>비슷한 작업 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> PK 필드에 sentinel default가 없는가</li><li><input disabled type=checkbox> PK 만드는 함수가 결정적인가 (<code>String.hashValue</code>, <code>Date()</code> 같은 시드/시간 의존 X)</li><li><input disabled type=checkbox> <code>#Predicate</code> 안에 enum 직접 비교 없는가</li><li><input disabled type=checkbox> <code>@Model</code> stored property가 SwiftData primitive 타입인가</li><li><input disabled type=checkbox> PK 변경 시 기존 row 비우는 마이그레이션 흐름이 있는가</li><li><input disabled type=checkbox> upsert 패턴이 lookup → insert/update로 분리돼 있는가</li></ul><hr><h2 id=회고>회고</h2><p>이 편을 굴리면서 다시 확인한 게 하나 있다. SwiftData의 <strong>silent failure는 대부분 매크로 경계에서 일어난다</strong>. <code>@Attribute(.unique)</code>, <code>@Model</code>, <code>#Predicate</code> 같은 매크로는 컴파일 타임에 SQL-비슷한 쿼리로 풀리는데, 매크로가 풀 수 있는 표현식 범위가 일반 Swift보다 좁다. 그 경계를 모르고 일반 Swift 감각으로 코드를 박으면, 컴파일은 통과하고 런타임에 조용히 깨진다.</p><p>특히 <code>String.hashValue</code> 함정은 한 번 박혀서 운영에 나가면 발견이 어렵다. lookup이 실패하는 게 &ldquo;데이터가 원래 없었던 건지 PK가 안 맞는 건지&rdquo; 콜드 패스에서 구별이 안 된다. 그래서 PK 만드는 함수는 <strong>처음부터 결정적</strong>이어야 한다. <del>이걸 한 번 데이고 나서야 배움.</del></p><p><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a>에서는 이렇게 만든 entity들을 어떻게 안전하게 다룰지 — class 인스턴스 DAO vs enum + static 메서드 — 를 비교한다. SwiftData에서 라이프사이클을 어떻게 단순화할 수 있는지가 주제다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li>Part 2 — Primary Key 함정 (이 글)</li><li><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></li><li>Part 6 — View 다중 mount 디버깅 (다음 편 예정)</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
 <span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
 — iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
 <a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
 <a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
 <span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
-<span class=card__aux>24</span></div><div class=tags><a class=tag href=/tags/combine/>#combine<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>3</span></a>
+<span class=card__aux>26</span></div><div class=tags><a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>1</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>1</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
 <a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
 <a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>4</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>5</span></a>
 <a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
 <a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>4</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>5</span></a>
 <a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
 <a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
@@ -201,15 +202,16 @@
 <a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
 <a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
 <a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>4</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>5</span></a>
 <a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift/>#swift<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>4</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>11 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:67%></div></span><span class=archive-row__count>04</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=card__aux>12 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:83%></div></span><span class=archive-row__count>05</span></div><div class=archive-row><span class=archive-row__year>2022</span>
 <span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
 <span class=archive-row__bar><div style=width:17%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
