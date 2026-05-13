@@ -1,0 +1,167 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>GCD에서 Swift Concurrency로 — 콜백 지옥을 async/await로 정리하기 — 오깅중</title><meta name=description content="GCD의 DispatchQueue·QoS 기본기와, 같은 코드를 async/await로 옮길 때 무엇이 달라지는지. 콜백 지옥, 에러 핸들링 분리, 데드락 함정까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/gcd%EC%97%90%EC%84%9C-swift-concurrency%EB%A1%9C-%EC%BD%9C%EB%B0%B1-%EC%A7%80%EC%98%A5%EC%9D%84-async/await%EB%A1%9C-%EC%A0%95%EB%A6%AC%ED%95%98%EA%B8%B0/><meta property="og:type" content="article"><meta property="og:title" content="GCD에서 Swift Concurrency로 — 콜백 지옥을 async/await로 정리하기"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/gcd%EC%97%90%EC%84%9C-swift-concurrency%EB%A1%9C-%EC%BD%9C%EB%B0%B1-%EC%A7%80%EC%98%A5%EC%9D%84-async/await%EB%A1%9C-%EC%A0%95%EB%A6%AC%ED%95%98%EA%B8%B0/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="GCD의 DispatchQueue·QoS 기본기와, 같은 코드를 async/await로 옮길 때 무엇이 달라지는지. 콜백 지옥, 에러 핸들링 분리, 데드락 함정까지."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="GCD에서 Swift Concurrency로 — 콜백 지옥을 async/await로 정리하기"><meta property="article:published_time" content="2022-01-11T00:00:00Z"><meta property="article:modified_time" content="2022-01-11T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="GCD"><meta property="article:tag" content="asyncawait"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="GCD에서 Swift Concurrency로 — 콜백 지옥을 async/await로 정리하기"><meta name=twitter:description content="GCD의 DispatchQueue·QoS 기본기와, 같은 코드를 async/await로 옮길 때 무엇이 달라지는지. 콜백 지옥, 에러 핸들링 분리, 데드락 함정까지."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.ce5648b2908099cd8e2195133e07d35432444bde5affde20effc2069d36811a6.css integrity="sha256-zlZIspCAmc2OIZUTPgfTVDJES95a/94g7/wgadNoEaY="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 11, 2022</span>
+<span>·</span>
+<span>5분 읽기</span></div><h1 class=article__title>GCD에서 Swift Concurrency로 — 콜백 지옥을 async/await로 정리하기</h1><p class=article__desc>GCD의 DispatchQueue·QoS 기본기와, 같은 코드를 async/await로 옮길 때 무엇이 달라지는지. 콜백 지옥, 에러 핸들링 분리, 데드락 함정까지.</p></header><div class=article__body><p>iOS 개발에서 비동기 처리는 오랫동안 GCD(Grand Central Dispatch)가 도맡았다. 2021년 Swift Concurrency가 나오면서 async/await로 옮겨가는 분위기인데, 둘이 어떻게 다른지 그리고 GCD 코드를 들어내면서 만나는 함정을 한 번 정리해뒀다.</p><h2 id=gcd-기본기-짚고-가기>GCD 기본기 짚고 가기</h2><p>GCD는 Objective-C 시절부터 있던 저수준 동시성 API다. 작업을 큐에 넣으면 시스템 스레드풀이 알아서 굴려준다. 핵심은 큐 종류와 QoS.</p><h3 id=dispatchqueue-종류>DispatchQueue 종류</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 메인 큐 — UI 작업 전용</span>
+</span></span><span class=line><span class=cl><span class=n>DispatchQueue</span><span class=p>.</span><span class=n>main</span><span class=p>.</span><span class=n>async</span> <span class=p>{</span> <span class=cm>/* UI 업데이트 */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 글로벌 큐 — 시스템이 관리하는 백그라운드 큐</span>
+</span></span><span class=line><span class=cl><span class=n>DispatchQueue</span><span class=p>.</span><span class=n>global</span><span class=p>(</span><span class=n>qos</span><span class=p>:</span> <span class=p>.</span><span class=n>userInitiated</span><span class=p>).</span><span class=n>async</span> <span class=p>{</span> <span class=cm>/* heavy 작업 */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 커스텀 직렬 큐</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>serial</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;com.app.serial&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>serial</span><span class=p>.</span><span class=n>async</span> <span class=p>{</span> <span class=cm>/* 순차 실행 */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 커스텀 동시 큐</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>concurrent</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;com.app.concurrent&#34;</span><span class=p>,</span> <span class=n>attributes</span><span class=p>:</span> <span class=p>.</span><span class=n>concurrent</span><span class=p>)</span>
+</span></span></code></pre></div><p>직렬(serial)이든 동시(concurrent)든 <strong>작업 시작 순서는 FIFO</strong>다. 끝나는 순서까지 FIFO인 건 직렬 큐만 보장.</p><h3 id=qos--우선순위-힌트>QoS — 우선순위 힌트</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>userInteractive</span>   <span class=c1>// 화면 갱신, 애니메이션</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>userInitiated</span>     <span class=c1>// 사용자가 즉시 결과를 기다리는 작업</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=k>default</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>utility</span>           <span class=c1>// 진행 표시가 있는 장기 작업</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>background</span>        <span class=c1>// 백업, 인덱싱 등 보이지 않는 작업</span>
+</span></span></code></pre></div><p>QoS는 어디까지나 힌트다. 시스템이 상황 봐서 조정함. 그래도 명시해 두면 우선순위 역전(priority inversion) 같은 미묘한 문제를 줄여준다.</p><h2 id=gcd의-골치--콜백-지옥과-에러-핸들링>GCD의 골치 — 콜백 지옥과 에러 핸들링</h2><p>GCD로 짠 비동기 흐름은 결국 클로저 중첩으로 표현된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>loadProfile</span><span class=p>(</span><span class=n>completion</span><span class=p>:</span> <span class=p>@</span><span class=n>escaping</span> <span class=p>(</span><span class=n>Result</span><span class=p>&lt;</span><span class=n>Profile</span><span class=p>,</span> <span class=n>Error</span><span class=p>&gt;)</span> <span class=p>-&gt;</span> <span class=nb>Void</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>api</span><span class=p>.</span><span class=n>fetchUser</span> <span class=p>{</span> <span class=n>userResult</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=k>switch</span> <span class=n>userResult</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>success</span><span class=p>(</span><span class=kd>let</span> <span class=nv>user</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>api</span><span class=p>.</span><span class=n>fetchOrders</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>user</span><span class=p>.</span><span class=n>id</span><span class=p>)</span> <span class=p>{</span> <span class=n>orderResult</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=k>switch</span> <span class=n>orderResult</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=k>case</span> <span class=p>.</span><span class=n>success</span><span class=p>(</span><span class=kd>let</span> <span class=nv>orders</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                    <span class=n>cache</span><span class=p>.</span><span class=n>save</span><span class=p>(</span><span class=n>orders</span><span class=p>)</span> <span class=p>{</span> <span class=n>saveResult</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                        <span class=k>switch</span> <span class=n>saveResult</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>case</span> <span class=p>.</span><span class=n>success</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                            <span class=n>completion</span><span class=p>(.</span><span class=n>success</span><span class=p>(</span><span class=n>Profile</span><span class=p>(</span><span class=n>user</span><span class=p>:</span> <span class=n>user</span><span class=p>,</span> <span class=n>orders</span><span class=p>:</span> <span class=n>orders</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>                        <span class=k>case</span> <span class=p>.</span><span class=n>failure</span><span class=p>(</span><span class=kd>let</span> <span class=nv>error</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                            <span class=n>completion</span><span class=p>(.</span><span class=n>failure</span><span class=p>(</span><span class=n>error</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=k>case</span> <span class=p>.</span><span class=n>failure</span><span class=p>(</span><span class=kd>let</span> <span class=nv>error</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                    <span class=n>completion</span><span class=p>(.</span><span class=n>failure</span><span class=p>(</span><span class=n>error</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>failure</span><span class=p>(</span><span class=kd>let</span> <span class=nv>error</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>completion</span><span class=p>(.</span><span class=n>failure</span><span class=p>(</span><span class=n>error</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>세 단계만 들어가도 가독성이 폭락한다. 더 문제는 에러를 매 단계마다 손으로 흘려보내야 한다는 것. 한 곳이라도 빠뜨리면 <code>completion</code>이 안 불려서 호출자가 영원히 기다리게 된다.</p><h2 id=swift-concurrency--같은-흐름을-asyncawait로>Swift Concurrency — 같은 흐름을 async/await로</h2><p>WWDC 2021에서 도입된 async/await는 위 흐름을 거의 동기 코드처럼 풀어낸다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>loadProfile</span><span class=p>()</span> <span class=n>async</span> <span class=kr>throws</span> <span class=p>-&gt;</span> <span class=n>Profile</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>user</span>   <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>api</span><span class=p>.</span><span class=n>fetchUser</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>orders</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>api</span><span class=p>.</span><span class=n>fetchOrders</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>user</span><span class=p>.</span><span class=n>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=n>await</span> <span class=n>cache</span><span class=p>.</span><span class=n>save</span><span class=p>(</span><span class=n>orders</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>Profile</span><span class=p>(</span><span class=n>user</span><span class=p>:</span> <span class=n>user</span><span class=p>,</span> <span class=n>orders</span><span class=p>:</span> <span class=n>orders</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>가독성도 좋고, 에러는 <code>throws</code> 한 줄로 위임된다. <strong>데이터는 return, 에러는 throw</strong>로 채널이 분리되니까 콜백 시절의 <code>(Result?, Error?)</code> 둘 다 nil인 모호한 케이스가 사라진다.</p><h2 id=병렬로-굴리고-싶을-때--async-let>병렬로 굴리고 싶을 때 — async let</h2><p>순차로 await 하면 1번 끝나야 2번이 시작되는 게 단점일 수 있다. 의존이 없는 작업은 <code>async let</code>으로 병렬로 던지자.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>loadDashboard</span><span class=p>()</span> <span class=n>async</span> <span class=kr>throws</span> <span class=p>-&gt;</span> <span class=n>Dashboard</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>async</span> <span class=kd>let</span> <span class=nv>user</span>    <span class=p>=</span> <span class=n>api</span><span class=p>.</span><span class=n>fetchUser</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>async</span> <span class=kd>let</span> <span class=nv>banners</span> <span class=p>=</span> <span class=n>api</span><span class=p>.</span><span class=n>fetchBanners</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>async</span> <span class=kd>let</span> <span class=nv>feed</span>    <span class=p>=</span> <span class=n>api</span><span class=p>.</span><span class=n>fetchFeed</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=k>try</span> <span class=n>await</span> <span class=n>Dashboard</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>user</span><span class=p>:</span> <span class=n>user</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>banners</span><span class=p>:</span> <span class=n>banners</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>feed</span><span class=p>:</span> <span class=n>feed</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>세 요청이 동시에 떠나고, <code>await</code>에 도달했을 때 비로소 결과를 기다린다. 같은 걸 GCD로 풀려면 <code>DispatchGroup</code> + <code>notify</code> + 콜백을 직접 엮어야 한다.</p><h2 id=task--동기-컨텍스트에서-async-함수-호출하기>Task — 동기 컨텍스트에서 async 함수 호출하기</h2><p>UI 액션처럼 비동기가 아닌 곳에서 async 함수를 띄울 때는 <code>Task</code>를 쓴다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>@IBAction</span> <span class=kd>func</span> <span class=nf>reloadTapped</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Task</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kd>let</span> <span class=nv>profile</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>loadProfile</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=n>apply</span><span class=p>(</span><span class=n>profile</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>present</span><span class=p>(</span><span class=n>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>Task</code>는 자기만의 컨텍스트로 떠나고, UI 갱신은 <code>@MainActor</code>가 알아서 메인으로 호핑시켜준다. 옛 코드에서 <code>DispatchQueue.main.async {}</code> 감싸던 패턴이 거의 사라짐.</p><h2 id=gcd에서-asyncawait로-옮길-때-만난-함정>GCD에서 async/await로 옮길 때 만난 함정</h2><h3 id=1-메인-스레드-데드락>1. 메인 스레드 데드락</h3><p>GCD 시절 가장 잘 죽는 패턴.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 메인 스레드에서 이 코드를 실행하면 데드락</span>
+</span></span><span class=line><span class=cl><span class=n>DispatchQueue</span><span class=p>.</span><span class=n>main</span><span class=p>.</span><span class=n>sync</span> <span class=p>{</span> <span class=cm>/* ... */</span> <span class=p>}</span>
+</span></span></code></pre></div><p><code>sync</code>로 자신이 갇혀 있는 큐에 다시 들어가려고 해서 생기는 데드락. async/await에서도 비슷한 변형이 있는데, 메인 액터 컨텍스트에서 <code>await MainActor.run { ... }</code>을 무의식적으로 부르면 의외의 호핑이 일어난다. 대부분의 경우 그냥 메서드에 <code>@MainActor</code>를 붙이거나 호출 측 컨텍스트만 잘 잡으면 해결.</p><h3 id=2-캡처와-self의-강한-참조>2. 캡처와 self의 강한 참조</h3><p>GCD <code>DispatchQueue.global().async { self.foo() }</code> 패턴은 <code>[weak self]</code>를 의식적으로 붙여줘야 했다. <code>Task</code> 클로저도 동일. 다만 <code>Task</code>는 cancellation을 명시적으로 다룰 수 있으니까, 라이프사이클이 끝나면 <code>task?.cancel()</code>을 호출해 두면 깔끔하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>FeedVM</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>var</span> <span class=nv>task</span><span class=p>:</span> <span class=n>Task</span><span class=p>&lt;</span><span class=nb>Void</span><span class=p>,</span> <span class=n>Never</span><span class=p>&gt;?</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>load</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>task</span> <span class=p>=</span> <span class=n>Task</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=kd>let</span> <span class=nv>self</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=kc>self</span><span class=p>.</span><span class=n>refresh</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>deinit</span> <span class=p>{</span> <span class=n>task</span><span class=p>?.</span><span class=n>cancel</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h3 id=3-콜백-api를-async로-감싸기>3. 콜백 API를 async로 감싸기</h3><p>전부 새로 짤 수는 없으니 GCD 콜백을 <code>withCheckedContinuation</code>으로 감싸서 점진적으로 옮긴다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>legacyFetch</span><span class=p>()</span> <span class=n>async</span> <span class=kr>throws</span> <span class=p>-&gt;</span> <span class=n>Data</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=n>await</span> <span class=n>withCheckedThrowingContinuation</span> <span class=p>{</span> <span class=n>cont</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=n>oldAPI</span><span class=p>.</span><span class=n>fetch</span> <span class=p>{</span> <span class=n>result</span><span class=p>,</span> <span class=n>error</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=kd>let</span> <span class=nv>error</span> <span class=p>{</span> <span class=n>cont</span><span class=p>.</span><span class=n>resume</span><span class=p>(</span><span class=n>throwing</span><span class=p>:</span> <span class=n>error</span><span class=p>);</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>cont</span><span class=p>.</span><span class=n>resume</span><span class=p>(</span><span class=n>returning</span><span class=p>:</span> <span class=n>result</span><span class=p>!)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>continuation은 <strong>정확히 한 번</strong> 호출돼야 한다. 두 번 호출하면 런타임 크래시, 한 번도 안 부르면 영원히 await가 멈춤. 옛 콜백 API가 둘 다 nil이나 둘 다 값이 있는 케이스를 만들 수 있으면 가드를 잘 두자.</p><h2 id=정리>정리</h2><ul><li>GCD는 여전히 유효하지만, 새 코드는 async/await가 출발선이다.</li><li>콜백 → async/await로 옮기면 <strong>에러 채널이 throws로 단일화</strong>되고 가독성이 폭증한다.</li><li>독립 작업은 <code>async let</code>으로 병렬, UI 호출은 <code>Task</code>로 진입, 옛 콜백은 <code>withCheckedContinuation</code>으로 다리 놓기.</li><li>데드락, self 캡처, continuation 호출 횟수 — 옛 함정들이 모양만 바뀌어 따라오니까 옮길 때 잠깐 멈춰서 점검.</li></ul><p>콜백 지옥을 한 번 들어내고 나면 다시 돌아가기 싫어진다. 옛 코드도 기능 손볼 때마다 조금씩 async/await로 옮겨두면 어느 순간 콜백이 거의 안 남아 있게 된다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>46</span></div><div class=tags><a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>8</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>4</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>19 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>13</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:46%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.6b47f8d2eb961910f07fb203577b278c614d612f2c1746efdb7f4f267079d7fa.js integrity="sha256-a0f40uuWGRDwf7IDV3snjGFNYS8sF0bv239PJnB51/o=" defer></script></body></html>

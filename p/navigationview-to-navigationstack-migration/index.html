@@ -11,7 +11,7 @@
 <span>·</span>
 <span>JAN 12, 2026</span>
 <span>·</span>
-<span>3분 읽기</span></div><h1 class=article__title>NavigationView에서 NavigationStack으로 옮긴 메모</h1><p class=article__desc>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></header><div class=article__body><p>NavigationView가 iOS 16에서 deprecated된 지 한참 됐는데, 콘솔 경고 한 줄만 무시하면서 끌고 왔다. SwiftData 마이그하면서 어차피 화면들 다시 만질 일 생긴 김에 같이 옮겼다.</p><p>단순 치환은 진짜 단순하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationView</span> <span class=p>{</span>
+<span>5분 읽기</span></div><h1 class=article__title>NavigationView에서 NavigationStack으로 옮긴 메모</h1><p class=article__desc>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></header><div class=article__body><p>NavigationView가 iOS 16에서 deprecated된 지 한참 됐는데, 콘솔 경고 한 줄만 무시하면서 끌고 왔다. SwiftData 마이그하면서 어차피 화면들 다시 만질 일 생긴 김에 같이 옮겼다.</p><p>단순 치환은 진짜 단순하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationView</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>List</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>NavigationLink</span><span class=p>(</span><span class=n>destination</span><span class=p>:</span> <span class=n>DetailView</span><span class=p>())</span> <span class=p>{</span> <span class=n>Text</span><span class=p>(</span><span class=s>&#34;상세&#34;</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
@@ -49,14 +49,59 @@
 </span></span><span class=line><span class=cl>    <span class=n>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>host</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>isActive</code> binding 단계마다 켜던 NavigationView 시절보다 한결 낫다 ㅋㅋ</p><h2 id=옮기다가-시간-잡아먹은-자리>옮기다가 시간 잡아먹은 자리</h2><p><code>navigationDestination</code>을 <code>List</code>나 <code>LazyVStack</code> <strong>안쪽</strong>에 박은 게 처음 한 번. 동작이 들쭉날쭉해서 한참 봤는데, 공식 문서에 정확히 적혀 있었다.</p><blockquote><p><em>Do NOT place the navigation destination modifier inside lazy containers like List or LazyVStack&mldr;</em> — <a href=https://developer.apple.com/documentation/swiftui/view/navigationdestination(for:destination:)>navigationDestination(for:destination:) — Apple Developer</a></p></blockquote><p>lazy container는 자식 view를 필요할 때만 만든다. NavigationStack이 destination을 못 보는 순간이 생기는 거. <strong>항상 lazy container 바깥</strong>에 박는다. 문서 먼저 읽었으면 안 헤맸을 자리.</p><p>또 하나는 popToRoot. <code>path.removeLast(path.count)</code>로 길게 짰다가 한참 뒤에 <code>path.removeAll()</code>이 그냥 있다는 걸 알았다. 시그니처 한 번 봤으면 끝났을 일.</p><p>그리고 마이그 마지막에 발견한 거 — <code>NavigationLink(destination:label:)</code> 옛날 형태 그대로 둔 화면이 있었는데, 컴파일은 되는데 path 추적에 안 걸린다. 사용자가 탭해서 들어간 화면을 <code>path.removeLast()</code>로 못 뺀다. NavigationStack의 path 추적은 <a href=https://developer.apple.com/documentation/swiftui/navigationlink/init(_:value:)-810b2><code>NavigationLink(value:)</code> + <code>navigationDestination(for:)</code> 짝</a>에서만 동작하니까, 마이그할 때 NavigationLink 형태도 다 같이 바꿔야 한다.</p><p>화면 단위로 점진 마이그가 되니까 큰 PR 만들 필요는 없었다. 한 화면 옮기고 동작 확인, 다음 화면 옮기고. SwiftData 시리즈 마이그 흐름이랑 같음.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+</span></span></code></pre></div><p><code>isActive</code> binding 단계마다 켜던 NavigationView 시절보다 한결 낫다 ㅋㅋ</p><h2 id=옮기다가-시간-잡아먹은-자리>옮기다가 시간 잡아먹은 자리</h2><p><code>navigationDestination</code>을 <code>List</code>나 <code>LazyVStack</code> <strong>안쪽</strong>에 박은 게 처음 한 번. 동작이 들쭉날쭉해서 한참 봤는데, 공식 문서에 정확히 적혀 있었다.</p><blockquote><p><em>Do NOT place the navigation destination modifier inside lazy containers like List or LazyVStack&mldr;</em> — <a href=https://developer.apple.com/documentation/swiftui/view/navigationdestination(for:destination:)>navigationDestination(for:destination:) — Apple Developer</a></p></blockquote><p>lazy container는 자식 view를 필요할 때만 만든다. NavigationStack이 destination을 못 보는 순간이 생기는 거. <strong>항상 lazy container 바깥</strong>에 박는다. 문서 먼저 읽었으면 안 헤맸을 자리.</p><p>또 하나는 popToRoot. <code>path.removeLast(path.count)</code>로 길게 짰다가 한참 뒤에 <code>path.removeAll()</code>이 그냥 있다는 걸 알았다. 시그니처 한 번 봤으면 끝났을 일.</p><p>그리고 마이그 마지막에 발견한 거 — <code>NavigationLink(destination:label:)</code> 옛날 형태 그대로 둔 화면이 있었는데, 컴파일은 되는데 path 추적에 안 걸린다. 사용자가 탭해서 들어간 화면을 <code>path.removeLast()</code>로 못 뺀다. NavigationStack의 path 추적은 <a href=https://developer.apple.com/documentation/swiftui/navigationlink/init(_:value:)-810b2><code>NavigationLink(value:)</code> + <code>navigationDestination(for:)</code> 짝</a>에서만 동작하니까, 마이그할 때 NavigationLink 형태도 다 같이 바꿔야 한다.</p><p>화면 단위로 점진 마이그가 되니까 큰 PR 만들 필요는 없었다. 한 화면 옮기고 동작 확인, 다음 화면 옮기고. SwiftData 시리즈 마이그 흐름이랑 같음.</p><h2 id=navigationstack-vs-navigationsplitview>NavigationStack vs NavigationSplitView</h2><p>iPad/Mac에서 두 컬럼·세 컬럼 레이아웃을 쓰려면 <code>NavigationSplitView</code>가 따로 있다. 둘이 별개 컨테이너지만 안쪽 push 흐름은 <code>NavigationStack</code>을 다시 쓰는 구조라서 섞어 쓰는 게 자연스럽다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationSplitView</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>SidebarView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>detail</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>path</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>FeedView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Post</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>PostDetail</span><span class=p>(</span><span class=n>post</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>iPhone에선 NavigationSplitView가 자동으로 <code>NavigationStack</code>처럼 동작해서 한 코드로 양쪽 폼팩터를 커버. iPad·Mac 지원 안 하는 앱이라면 NavigationStack만 써도 충분.</p><h2 id=tabview에서-탭마다-path-따로-관리>TabView에서 탭마다 path 따로 관리</h2><p>탭 기반 앱이면 각 탭이 독립적인 navigation 히스토리를 가져야 한다. path도 탭별로 따로.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>feedPath</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>profilePath</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>TabView</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>feedPath</span><span class=p>)</span> <span class=p>{</span> <span class=n>FeedView</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>tabItem</span> <span class=p>{</span> <span class=n>Label</span><span class=p>(</span><span class=s>&#34;Feed&#34;</span><span class=p>,</span> <span class=n>systemImage</span><span class=p>:</span> <span class=s>&#34;house&#34;</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>profilePath</span><span class=p>)</span> <span class=p>{</span> <span class=n>ProfileView</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>tabItem</span> <span class=p>{</span> <span class=n>Label</span><span class=p>(</span><span class=s>&#34;Profile&#34;</span><span class=p>,</span> <span class=n>systemImage</span><span class=p>:</span> <span class=s>&#34;person&#34;</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>탭 간 이동 시 안쪽 navigation이 유지되는 기본 UX가 그대로 살아난다. 한 path 공유하면 탭 갈아탈 때 히스토리가 다 사라지니까 주의.</p><h2 id=router-패턴으로-path-외부화>Router 패턴으로 path 외부화</h2><p>스택 깊이가 깊어지면 화면마다 path를 binding으로 들고 다니는 게 번거롭다. <code>@Observable</code> 클래스 하나에 path를 묶고 환경으로 흘려보내면 어디서든 <code>router.push(.detail(id))</code>로 호출 가능.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Observable</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>Router</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>push</span><span class=p>(</span><span class=kc>_</span> <span class=n>value</span><span class=p>:</span> <span class=nb>Hashable</span><span class=p>)</span> <span class=p>{</span> <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>popToRoot</span><span class=p>()</span> <span class=p>{</span> <span class=n>path</span><span class=p>.</span><span class=bp>removeAll</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>main</span>
+</span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>App</span><span class=p>:</span> <span class=n>App</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>router</span> <span class=p>=</span> <span class=n>Router</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>Scene</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>WindowGroup</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>router</span><span class=p>.</span><span class=n>path</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>RootView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                    <span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Post</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>PostDetail</span><span class=p>(</span><span class=n>post</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>environment</span><span class=p>(</span><span class=n>router</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>DeepView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Environment</span><span class=p>(</span><span class=n>Router</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>router</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Button</span><span class=p>(</span><span class=s>&#34;취소&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>router</span><span class=p>.</span><span class=n>popToRoot</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>화면 어디서든 라우팅 가능 + 딥링크/푸시 알림 같은 외부 트리거에서도 같은 인터페이스로 push. 옛 <code>NavigationView</code> 시절 <code>@Binding var isActive</code>를 화면마다 흘려보내던 패턴이 한 번에 정리됨.</p><h2 id=정리>정리</h2><ul><li>표면적 치환은 grep으로 끝나지만, <strong>값 기반 push + navigationDestination</strong>까지 가야 NavigationStack의 가치를 누림.</li><li>destination modifier는 lazy container 바깥에. <code>NavigationLink(destination:label:)</code> 옛 형태가 남아 있으면 path 추적이 깨짐.</li><li>폼팩터 분기는 <code>NavigationSplitView</code>, 탭은 path 분리, 깊은 트리는 Router 객체로 외부화.</li></ul><p>한 화면씩 옮기면서 path 흐름이 깔끔해지는 게 보이는 마이그레이션이라 작업 자체가 꽤 재밌었다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
 <span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
 — iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
 <a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
 <a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
 <span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
-<span class=card__aux>45</span></div><div class=tags><a class=tag href=/tags/animation/>#animation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>1</span></a>
+<span class=card__aux>46</span></div><div class=tags><a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
 <a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
 <a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
 <a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
@@ -65,45 +110,45 @@
 <a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
 <a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
 <a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
-<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
 <a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
 <a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
-<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
 <a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>7</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>8</span></a>
 <a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
 <a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
 <a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
 <a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
 <a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
 <a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>1</span></a>
 <a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
 <a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
 <a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
 <a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>4</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>4</span></a>
 <a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
 <a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
 <span class=card__aux>19 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>12</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:50%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
-<span class=archive-row__bar><div style=width:8%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>13</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:46%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │

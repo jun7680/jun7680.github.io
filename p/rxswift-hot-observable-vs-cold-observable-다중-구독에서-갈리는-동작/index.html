@@ -1,0 +1,109 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>RxSwift Hot Observable vs Cold Observable — 다중 구독에서 갈리는 동작 — 오깅중</title><meta name=description content="Hot/Cold Observable의 차이는 구독 시점이 아니라 사이드 이펙트의 공유 여부. 실제 코드와 흔한 함정, 그리고 share/publish가 필요한 순간 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/rxswift-hot-observable-vs-cold-observable-%EB%8B%A4%EC%A4%91-%EA%B5%AC%EB%8F%85%EC%97%90%EC%84%9C-%EA%B0%88%EB%A6%AC%EB%8A%94-%EB%8F%99%EC%9E%91/><meta property="og:type" content="article"><meta property="og:title" content="RxSwift Hot Observable vs Cold Observable — 다중 구독에서 갈리는 동작"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/rxswift-hot-observable-vs-cold-observable-%EB%8B%A4%EC%A4%91-%EA%B5%AC%EB%8F%85%EC%97%90%EC%84%9C-%EA%B0%88%EB%A6%AC%EB%8A%94-%EB%8F%99%EC%9E%91/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="Hot/Cold Observable의 차이는 구독 시점이 아니라 사이드 이펙트의 공유 여부. 실제 코드와 흔한 함정, 그리고 share/publish가 필요한 순간 정리."><meta property="og:image" content="https://jun7680.github.io/p/rxswift-hot-observable-vs-cold-observable-%EB%8B%A4%EC%A4%91-%EA%B5%AC%EB%8F%85%EC%97%90%EC%84%9C-%EA%B0%88%EB%A6%AC%EB%8A%94-%EB%8F%99%EC%9E%91/Observable.png"><meta property="og:image:width" content="754"><meta property="og:image:height" content="373"><meta property="og:image:alt" content="RxSwift Hot Observable vs Cold Observable — 다중 구독에서 갈리는 동작"><meta property="article:published_time" content="2022-01-07T00:00:00Z"><meta property="article:modified_time" content="2022-01-07T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="RxSwift"><meta property="article:tag" content="Observable"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="RxSwift Hot Observable vs Cold Observable — 다중 구독에서 갈리는 동작"><meta name=twitter:description content="Hot/Cold Observable의 차이는 구독 시점이 아니라 사이드 이펙트의 공유 여부. 실제 코드와 흔한 함정, 그리고 share/publish가 필요한 순간 정리."><meta name=twitter:image content="https://jun7680.github.io/p/rxswift-hot-observable-vs-cold-observable-%EB%8B%A4%EC%A4%91-%EA%B5%AC%EB%8F%85%EC%97%90%EC%84%9C-%EA%B0%88%EB%A6%AC%EB%8A%94-%EB%8F%99%EC%9E%91/Observable.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.ce5648b2908099cd8e2195133e07d35432444bde5affde20effc2069d36811a6.css integrity="sha256-zlZIspCAmc2OIZUTPgfTVDJES95a/94g7/wgadNoEaY="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span>검색</span>
+<kbd>⌘K</kbd></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 07, 2022</span>
+<span>·</span>
+<span>4분 읽기</span></div><h1 class=article__title>RxSwift Hot Observable vs Cold Observable — 다중 구독에서 갈리는 동작</h1><p class=article__desc>Hot/Cold Observable의 차이는 구독 시점이 아니라 사이드 이펙트의 공유 여부. 실제 코드와 흔한 함정, 그리고 share/publish가 필요한 순간 정리.</p></header><div class=article__body><p>RxSwift를 처음 만지면 그냥 <code>.subscribe { ... }</code> 붙이면 흐름이 흘러서 별 문제없이 동작한다. 그런데 같은 Observable에 두 곳에서 구독을 걸면 갑자기 네트워크 요청이 두 번 나간다거나, 타이머가 한 번만 도는 게 아니라 구독자마다 따로 도는 식의 상황이 생긴다. 이 차이가 바로 Hot이냐 Cold냐의 문제다.</p><h2 id=정의>정의</h2><p>ReactiveX 공식 문서가 짧게 잘 정리해 둠.</p><blockquote><p>A &ldquo;hot&rdquo; Observable may begin emitting items as soon as it is created, and so any observer who later subscribes to that Observable may start observing the sequence somewhere in the middle. A &ldquo;cold&rdquo; Observable, on the other hand, waits until an observer subscribes to it before it begins to emit items.</p></blockquote><p>요지는 이렇다.</p><ul><li><strong>Cold:</strong> 구독자가 들어와야 비로소 아이템을 흘려보낸다. 구독자마다 시퀀스가 처음부터 다시 흐름. 라이브 방송이 아니라 VOD에 가까움.</li><li><strong>Hot:</strong> 구독 여부와 무관하게 흘러간다. 늦게 구독하면 그 시점 이후 아이템만 받음. 라이브 방송 쪽.</li></ul><p>핵심은 &ldquo;구독 시점"보다 <strong>사이드 이펙트가 공유되느냐</strong>다. Cold는 구독 = 새 사이드 이펙트 실행, Hot은 사이드 이펙트 하나를 여러 구독자가 공유.</p><h2 id=cold-동작-확인>Cold 동작 확인</h2><p><code>Observable.create</code>로 만든 시퀀스는 기본 Cold다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>cold</span> <span class=p>=</span> <span class=n>Observable</span><span class=p>&lt;</span><span class=nb>Int</span><span class=p>&gt;.</span><span class=n>create</span> <span class=p>{</span> <span class=n>observer</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;create block 실행&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>observer</span><span class=p>.</span><span class=n>onNext</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>observer</span><span class=p>.</span><span class=n>onNext</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>observer</span><span class=p>.</span><span class=n>onCompleted</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>Disposables</span><span class=p>.</span><span class=n>create</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>cold</span><span class=p>.</span><span class=n>subscribe</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=bp>print</span><span class=p>(</span><span class=s>&#34;A:&#34;</span><span class=p>,</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}).</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>cold</span><span class=p>.</span><span class=n>subscribe</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=bp>print</span><span class=p>(</span><span class=s>&#34;B:&#34;</span><span class=p>,</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}).</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
+</span></span></code></pre></div><p>출력:</p><pre tabindex=0><code>create block 실행
+A: 1
+A: 2
+create block 실행
+B: 1
+B: 2
+</code></pre><p><code>create block</code>이 <strong>두 번 찍힘</strong>. 구독자 두 명이 독립적인 시퀀스를 각각 받는다. 네트워크 호출이 <code>create</code> 안에 있었다면 API가 두 번 호출됐을 것.</p><h2 id=hot-동작-확인>Hot 동작 확인</h2><p><code>PublishSubject</code>는 대표적인 Hot. 외부에서 <code>onNext</code>로 값을 밀어 넣고, 구독자들이 그걸 공유해서 받는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>hot</span> <span class=p>=</span> <span class=n>PublishSubject</span><span class=p>&lt;</span><span class=nb>Int</span><span class=p>&gt;()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>hot</span><span class=p>.</span><span class=n>subscribe</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=bp>print</span><span class=p>(</span><span class=s>&#34;A:&#34;</span><span class=p>,</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}).</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>hot</span><span class=p>.</span><span class=n>onNext</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>hot</span><span class=p>.</span><span class=n>subscribe</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=bp>print</span><span class=p>(</span><span class=s>&#34;B:&#34;</span><span class=p>,</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}).</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>hot</span><span class=p>.</span><span class=n>onNext</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span></code></pre></div><p>출력:</p><pre tabindex=0><code>A: 1
+A: 2
+B: 2
+</code></pre><p>A는 1을 봤지만 <strong>B는 1을 못 봄</strong>. 구독한 시점 이후의 이벤트만 받기 때문. 같은 <code>onNext(2)</code>는 두 명이 공유해서 받음 — 사이드 이펙트가 한 번만 일어나고 그 결과를 모두가 본다.</p><h2 id=어떤-게-어디에-어울리나>어떤 게 어디에 어울리나</h2><table><thead><tr><th>케이스</th><th>어울리는 쪽</th></tr></thead><tbody><tr><td>네트워크 요청, DB 쿼리</td><td>Cold — 구독자마다 새 요청을 보내는 게 자연스러움</td></tr><tr><td>UI 이벤트(버튼 탭, 텍스트 입력)</td><td>Hot — 입력은 사용자 행위라 한 번 발생</td></tr><tr><td>알림(NotificationCenter, KVO)</td><td>Hot</td></tr><tr><td>타이머가 &ldquo;모두에게 같은 tick"이어야 할 때</td><td>Hot</td></tr><tr><td>타이머가 &ldquo;구독자마다 독립적으로 흘러야 할 때&rdquo;</td><td>Cold</td></tr></tbody></table><p>대부분의 함정은 Cold를 Hot처럼 다룰 때 생긴다. 같은 Cold Observable에 여러 구독을 걸어두고 &ldquo;값 하나만 흐르겠지&rdquo; 했는데 사이드 이펙트가 N번 일어나는 식.</p><h2 id=cold--hot-으로-바꾸는-법-share--publish>Cold → Hot 으로 바꾸는 법: share / publish</h2><p>API 호출 같은 Cold 시퀀스를 여러 구독자가 공유해야 할 때 <code>share</code>를 쓴다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>request</span> <span class=p>=</span> <span class=n>api</span><span class=p>.</span><span class=n>fetchUser</span><span class=p>()</span>           <span class=c1>// Cold</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>share</span><span class=p>(</span><span class=n>replay</span><span class=p>:</span> <span class=mi>1</span><span class=p>,</span> <span class=n>scope</span><span class=p>:</span> <span class=p>.</span><span class=n>whileConnected</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>request</span><span class=p>.</span><span class=n>subscribe</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}).</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>request</span><span class=p>.</span><span class=n>subscribe</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}).</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1>// API 호출은 한 번만. 두 구독자가 같은 응답을 본다.</span>
+</span></span></code></pre></div><p><code>share(replay:)</code>는 마지막 N개 이벤트를 늦게 들어온 구독자에게도 다시 흘려준다. 네트워크 응답을 두세 곳에서 동시에 사용해야 할 때 자주 쓰는 패턴.</p><p>조금 더 저수준으로 들어가면 <code>publish() + connect()</code> 조합이 있다. <code>publish</code>는 Cold를 <code>ConnectableObservable</code>로 바꾸고, <code>connect()</code>가 호출돼야 비로소 시퀀스가 흐른다. 구독 시점과 방출 시작 시점을 분리하고 싶을 때 쓴다. 대부분의 실무 케이스에서는 <code>share</code>로 충분.</p><h2 id=subject-종류-짚고-가기>Subject 종류 짚고 가기</h2><p>Hot은 보통 Subject를 통해 만든다. 셋이 미묘하게 달라서 한 번 정리.</p><ul><li><strong><code>PublishSubject&lt;T></code></strong> — 구독 이후 값만 받음. 가장 기본.</li><li><strong><code>BehaviorSubject&lt;T></code></strong> — 마지막 값을 1개 보관. 구독하자마자 그 값을 받음. 초기값 필수. UI 상태에 잘 어울림.</li><li><strong><code>ReplaySubject&lt;T></code></strong> — 마지막 N개를 보관. 늦게 구독해도 N개를 다시 받음. 사용 시 메모리 주의.</li></ul><p><code>BehaviorRelay</code>(예전 <code>Variable</code>)는 BehaviorSubject 위에 에러·완료가 안 흐르도록 감싼 래퍼. UI 바인딩에 가장 흔히 씀.</p><h2 id=정리>정리</h2><ul><li>구독 시점보다 <strong>사이드 이펙트의 공유 여부</strong>로 Hot/Cold를 구분하면 헷갈리지 않음.</li><li>같은 Observable에 다중 구독을 건다면 &ldquo;이게 Cold면 N번 실행된다"를 일단 의심.</li><li>네트워크 응답 공유는 <code>share(replay: 1)</code>로 단순화.</li><li>UI 상태는 <code>BehaviorRelay</code>, 이벤트는 <code>PublishSubject</code>가 보통의 출발선.</li></ul><p>이 구분 한 번 잡아두면 <code>merge</code>, <code>flatMap</code>, <code>combineLatest</code> 같은 합성 연산자 다룰 때도 &ldquo;이 시점에 시퀀스가 다시 도는 건가, 공유되는 건가"가 자연스럽게 보인다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>46</span></div><div class=tags><a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>8</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>4</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>19 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>13</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:46%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.6b47f8d2eb961910f07fb203577b278c614d612f2c1746efdb7f4f267079d7fa.js integrity="sha256-a0f40uuWGRDwf7IDV3snjGFNYS8sF0bv239PJnB51/o=" defer></script></body></html>

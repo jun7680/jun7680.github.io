@@ -9,21 +9,22 @@
 <span>검색</span>
 <kbd>⌘K</kbd></button></div></div></header><main class=page><div><section><div class=section-label><span>MIGRATION</span>
 <span class=section-label__rule></span>
-<span class=section-label__count>07</span></div><div class=posts><a class=post-row href=/p/navigationview-to-navigationstack-migration/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>NavigationView에서 NavigationStack으로 옮긴 메모</h3><p class=post-row__sub>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
-<span>3 MIN</span></div><div class=post-row__preview aria-hidden=true><span>Swift.preview</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</h3><p class=post-row__sub>마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
-<span>14 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)</h3><p class=post-row__sub>동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
-<span>10 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-5-async-await-integration/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-4-combine-integration/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 4 — Combine 통합)</h3><p class=post-row__sub>SwiftData에는 Realm Results 같은 자동 Combine publisher가 없다. Just(snapshot) + NotificationCenter merge로 직접 만들고, Just 첫 emit 즉시 흐름·이벤트 누락·잦은 이벤트·스레드 격리 4함정에 가드 거는 패턴.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
-<span>12 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-4-combine-integration/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)</h3><p class=post-row__sub>SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
-<span>11 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</h3><p class=post-row__sub>SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기.</p></div><div class=post-row__meta><b>JAN 11, 2026</b>
-<span>12 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-2-primary-key-traps/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-1-strategy/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)</h3><p class=post-row__sub>iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다.</p></div><div class=post-row__meta><b>JAN 11, 2026</b>
+<span class=section-label__count>08</span></div><div class=posts><a class=post-row href=/p/uikit-swiftui-bridging/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지</h3><p class=post-row__sub>UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리.</p></div><div class=post-row__meta><b>JAN 13, 2026</b>
+<span>7 MIN</span></div><div class=post-row__preview aria-hidden=true><span>Swift.preview</span></div></a><a class=post-row href=/p/navigationview-to-navigationstack-migration/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>NavigationView에서 NavigationStack으로 옮긴 메모</h3><p class=post-row__sub>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
+<span>5 MIN</span></div><div class=post-row__preview aria-hidden=true><span>Swift.preview</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</h3><p class=post-row__sub>마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
+<span>14 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)</h3><p class=post-row__sub>동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
+<span>10 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-5-async-await-integration/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-4-combine-integration/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 4 — Combine 통합)</h3><p class=post-row__sub>SwiftData에는 Realm Results 같은 자동 Combine publisher가 없다. Just(snapshot) + NotificationCenter merge로 직접 만들고, Just 첫 emit 즉시 흐름·이벤트 누락·잦은 이벤트·스레드 격리 4함정에 가드 거는 패턴.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
+<span>12 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-4-combine-integration/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)</h3><p class=post-row__sub>SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지.</p></div><div class=post-row__meta><b>JAN 12, 2026</b>
+<span>11 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</h3><p class=post-row__sub>SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기.</p></div><div class=post-row__meta><b>JAN 11, 2026</b>
+<span>12 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-2-primary-key-traps/cover.png) aria-hidden=true></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-1-strategy/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)</h3><p class=post-row__sub>iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다.</p></div><div class=post-row__meta><b>JAN 11, 2026</b>
 <span>13 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/cover.png) aria-hidden=true></div></a></div></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
 <span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
 — iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
 <a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
 <a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
 <span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
-<span class=card__aux>45</span></div><div class=tags><a class=tag href=/tags/animation/>#animation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>1</span></a>
+<span class=card__aux>46</span></div><div class=tags><a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
 <a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
 <a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
 <a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
@@ -32,45 +33,45 @@
 <a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
 <a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
 <a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
-<a class=tag href=/tags/jekyll/>#jekyll<span class=tag__count>1</span></a>
 <a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
 <a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
-<a class=tag href=/tags/markdown/>#markdown<span class=tag__count>1</span></a>
 <a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>7</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>8</span></a>
 <a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
 <a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/notion/>#notion<span class=tag__count>1</span></a>
 <a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
 <a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
 <a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
 <a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>1</span></a>
 <a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
 <a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
 <a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
 <a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-swift-57/>#swift, swift 5,7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>4</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>4</span></a>
 <a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
 <a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
 <span class=card__aux>19 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>12</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:50%></div></span><span class=archive-row__count>06</span></div><div class=archive-row><span class=archive-row__year>2020</span>
-<span class=archive-row__bar><div style=width:8%></div></span><span class=archive-row__count>01</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>13</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:46%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │
