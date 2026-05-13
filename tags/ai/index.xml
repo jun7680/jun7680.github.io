@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AI on 오깅중</title><link>https://jun7680.github.io/tags/ai/</link><description>Recent content in AI on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Wed, 13 May 2026 14:25:00 +0900</lastBuildDate><atom:link href="https://jun7680.github.io/tags/ai/index.xml" rel="self" type="application/rss+xml"/><item><title>AI가 짠 코드 PR 리뷰에서 AI한테 회신 떠넘기기</title><link>https://jun7680.github.io/p/ai-pr-review-handoff/</link><pubDate>Wed, 13 May 2026 14:25:00 +0900</pubDate><guid>https://jun7680.github.io/p/ai-pr-review-handoff/</guid><description>&lt;p&gt;PR에 코멘트를 달았다.&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;여기 &lt;code&gt;settingSnippet&lt;/code&gt; 재할당 없이 &lt;code&gt;.updateValue()&lt;/code&gt; 호출에만 쓰여서 &lt;code&gt;let&lt;/code&gt;으로 바꿔도 될 거 같아요.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;options&lt;/code&gt; 변수 재할당되는 곳이 없는 거 같은데, &lt;code&gt;let&lt;/code&gt;으로 둬도 될 것 같아요.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;답이 왔다.&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;updateValue()&lt;/code&gt;가 mutating func라 var 지정이 필요합니다. let으로 변경 시 컴파일 에러 발생합니다.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;해당 메서드가 &lt;code&gt;mutating&lt;/code&gt;으로 선언돼서 &lt;code&gt;var&lt;/code&gt;가 필요합니다. &lt;code&gt;let&lt;/code&gt;으로 바꾸면 빌드가 실패합니다.&lt;/p&gt;</description></item></channel></rss>
