@@ -1,0 +1,137 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정 — 오깅중</title><meta name=description content="mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swift-mutating-without-self-mutation/><meta property="og:type" content="article"><meta property="og:title" content="Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swift-mutating-without-self-mutation/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정"><meta property="article:published_time" content="2026-05-13T14:20:00+09:00"><meta property="article:modified_time" content="2026-05-13T14:20:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="mutating"><meta property="article:tag" content="Struct"><meta property="article:tag" content="BuilderPattern"><meta property="article:tag" content="CodeReview"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정"><meta name=twitter:description content="mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.d94012cc45520f934f29e8801829ed3a6c6a5dc3b27da3f81d167c0004f0c000.css integrity="sha256-2UASzEVSD5NPKeiAGCntOmxqXcOyfaP4HRZ8AATwwAA="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 13, 2026</span>
+<span>·</span>
+<span>4분 읽기</span></div><h1 class=article__title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</h1><p class=article__desc>mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안.</p></header><div class=article__body><p>PR 리뷰에서 이런 코드를 봤다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>public</span> <span class=kd>struct</span> <span class=nc>NotificationSettingSnippet</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kd>let</span> <span class=nv>isEnabledAll</span><span class=p>:</span> <span class=nb>Bool</span>
+</span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kd>let</span> <span class=nv>isEnabledFeatureA</span><span class=p>:</span> <span class=nb>Bool</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// ... 20개 더 ...</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kr>mutating</span> <span class=kd>func</span> <span class=nf>updateValue</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>isEnabledAll</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>?</span> <span class=p>=</span> <span class=kc>nil</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>?</span> <span class=p>=</span> <span class=kc>nil</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// ... 동일하게 22개 ...</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span> <span class=p>-&gt;</span> <span class=kc>Self</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>.</span><span class=kd>init</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>isEnabledAll</span><span class=p>:</span> <span class=n>isEnabledAll</span> <span class=p>??</span> <span class=kc>self</span><span class=p>.</span><span class=n>isEnabledAll</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=n>isEnabledFeatureA</span> <span class=p>??</span> <span class=kc>self</span><span class=p>.</span><span class=n>isEnabledFeatureA</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// ...</span>
+</span></span><span class=line><span class=cl>        <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>호출부.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>guard</span> <span class=kd>var</span> <span class=nv>settingSnippet</span> <span class=p>=</span> <span class=n>subject</span><span class=p>.</span><span class=n>value</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>useCases</span><span class=p>.</span><span class=n>updateSettings</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>snippet</span><span class=p>:</span> <span class=n>settingSnippet</span><span class=p>.</span><span class=n>updateValue</span><span class=p>(</span><span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=kc>true</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p><code>settingSnippet</code>이 재할당되지도 않는데 <code>var</code>다. <code>let</code>으로 바꾸자고 제안하니 &ldquo;<code>mutating func</code>라 <code>var</code>가 필요합니다. let으로 변경 시 컴파일 에러 발생합니다"라는 답이 왔다. 컴파일러는 정말 그렇게 시킨다. 그런데 <strong>mutating일 이유가 있는가?</strong></p><h2 id=세-가지-모순>세 가지 모순</h2><p><strong>1. self를 mutate하지 않는다.</strong> 함수 본문은 새 <code>Self</code> 인스턴스를 만들어 return할 뿐이다. self의 상태는 손대지 않는다.</p><p><strong>2. 모든 프로퍼티가 let.</strong> <code>self.isEnabledAll = ...</code> 같은 in-place 변경이 애초에 불가능하다. mutating으로 self를 변경하려면 <code>self = .init(...)</code> 패턴밖에 안 된다. 그런데 이 함수는 그것도 안 함.</p><p><strong>3. 시그니처 자체가 모순.</strong> <code>mutating</code>은 &ldquo;self를 변경한다"는 계약이고 <code>-> Self</code>는 &ldquo;새 값을 반환한다"는 계약이다. 호출자가 두 의도를 동시에 받게 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>var</span> <span class=nv>snippet</span> <span class=p>=</span> <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=n>snippet</span><span class=p>.</span><span class=n>updateValue</span><span class=p>(</span><span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>              <span class=c1>// ① 결과 무시, mutating 의존</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>new</span> <span class=p>=</span> <span class=n>snippet</span><span class=p>.</span><span class=n>updateValue</span><span class=p>(</span><span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>    <span class=c1>// ② 반환값만 사용</span>
+</span></span><span class=line><span class=cl><span class=n>snippet</span> <span class=p>=</span> <span class=n>snippet</span><span class=p>.</span><span class=n>updateValue</span><span class=p>(</span><span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>    <span class=c1>// ③ 재할당</span>
+</span></span></code></pre></div><p>세 가지 호출 패턴 중 어느 것이 의도된 사용인가? 시그니처만으론 알 수 없다. 실제 동작은 self를 안 바꾸므로 ①은 무용지물이다. 그런데 mutating이 붙어 있어 호출부는 <code>var</code>를 강제받는다. <strong>의미는 ②인데 시그니처는 ①인 척하는 셈</strong>이다.</p><h2 id=컴파일러는-무엇을-검증하지-않나>컴파일러는 무엇을 검증하지 않나</h2><p>핵심은 여기다. <code>mutating</code> 키워드는 컴파일러에게 &ldquo;이 함수는 self를 변경할 수 있다"는 권한을 요구하는 표시일 뿐, 함수 본문에서 정말로 self를 바꾸는지는 <strong>검증되지 않는다</strong>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>mutating</span> <span class=kd>func</span> <span class=nf>doNothing</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// self를 손대지 않아도 통과</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>mutating</span> <span class=kd>func</span> <span class=nf>builder</span><span class=p>()</span> <span class=p>-&gt;</span> <span class=kc>Self</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>.</span><span class=kd>init</span><span class=p>(...)</span>  <span class=c1>// 새 인스턴스 반환만 해도 통과</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>두 함수 모두 <code>mutating</code>이지만 self의 상태가 변하지 않는다. 컴파일러는 &ldquo;변경할 수 있다"는 권한만 보지 &ldquo;변경했다"는 사실은 확인하지 않는다. 그래서 의도와 시그니처가 어긋난 코드가 그대로 빌드된다.</p><h2 id=성능-측면>성능 측면</h2><p>&ldquo;mutating이 성능에 안 좋지 않나?&rdquo; — 큰 차이는 없다. mutating은 컴파일러가 self를 <code>inout</code>으로 받게 하는 힌트 정도다. 다만 이 케이스처럼 22개 프로퍼티 struct에서 <strong>mutating + 새 인스턴스 반환을 함께 하면 self 복사 + 재할당 비용이 호출마다 발생</strong>한다. 비용보다 의미적 모순이 더 큰 문제지만 비용도 작지 않다.</p><h2 id=해결>해결</h2><p>mutating 떼고 builder 스타일로.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>public</span> <span class=kd>func</span> <span class=nf>updatingValue</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>isEnabledAll</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>?</span> <span class=p>=</span> <span class=kc>nil</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// ...</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=p>-&gt;</span> <span class=kc>Self</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>.</span><span class=kd>init</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>함수명도 builder 의도가 드러나게 <code>updatingValue</code>로 바꿨다. 이제 호출부는 자연스럽게 <code>let</code>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>guard</span> <span class=kd>let</span> <span class=nv>settingSnippet</span> <span class=p>=</span> <span class=n>subject</span><span class=p>.</span><span class=n>value</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>useCases</span><span class=p>.</span><span class=n>updateSettings</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>snippet</span><span class=p>:</span> <span class=n>settingSnippet</span><span class=p>.</span><span class=n>updatingValue</span><span class=p>(</span><span class=n>isEnabledFeatureA</span><span class=p>:</span> <span class=kc>true</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p><code>var</code>/<code>let</code>의 표면이 정리되니 호출자가 의도를 한눈에 안다. &ldquo;기존 값에 변경 사항을 얹은 새 값을 만든다&rdquo; — 정확히 builder 패턴이 표현하려는 것.</p><h2 id=네이밍-컨벤션>네이밍 컨벤션</h2><p>Swift 표준 라이브러리도 같은 구분을 일관되게 한다.</p><table><thead><tr><th>in-place 변경</th><th>새 인스턴스 반환</th></tr></thead><tbody><tr><td><code>sort()</code></td><td><code>sorted()</code></td></tr><tr><td><code>reverse()</code></td><td><code>reversed()</code></td></tr><tr><td><code>append(_:)</code></td><td><code>appending(_:)</code></td></tr></tbody></table><p><code>-ed</code> / <code>-ing</code> 분사형 또는 <code>with(...)</code> 접두사는 &ldquo;결과를 반환한다"는 신호다. 도메인 struct에서도 같은 컨벤션을 따르면 호출 측이 시그니처만 보고도 의도를 잡을 수 있다.</p><h2 id=교훈>교훈</h2><p>컴파일러는 &ldquo;self를 변경한다"는 의미를 검증하지 않는다. mutating을 붙여도 본문에서 안 바꾸면 통과한다. 그래서 <strong>mutating은 함수가 self를 진짜 in-place 변경할 때만 붙여야 의미가 산다</strong>.</p><p>builder 패턴이 필요할 땐 mutating을 쓰지 않는다. 함수명을 <code>-ing</code>(<code>updatingValue</code>)이나 <code>with(...)</code> 같은 형용사 위치 단어로 두면 호출부가 자연스럽고 의도도 안 헷갈린다.</p><p>리뷰에서 <code>var</code>/<code>let</code>을 묻는 이슈가 올라오면, <strong>그 표면 밑에 시그니처와 의도의 불일치가 있지 않은지</strong> 한 번 들여다보자. 대부분의 경우 진짜 문제는 표면이 아니라 그 아래에 있다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-stats><div class=gc-stat><span class=gc-stat__label>오늘</span>
+<span class=gc-stat__value id=gc-today>—</span></div><div class=gc-stat><span class=gc-stat__label>누적</span>
+<span class=gc-stat__value id=gc-total>—</span></div></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json",t=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul"}).format(new Date);function n(e,t){fetch(e,{credentials:"omit"}).then(function(t){return t.ok?t.json():(console.warn("[visitors] HTTP",t.status,e),null)}).then(function(e){var n=document.getElementById(t);if(!n)return;n.textContent=e&&e.count?e.count:"0"}).catch(function(n){console.warn("[visitors] fetch failed:",n&&n.message,e);var s=document.getElementById(t);s&&(s.textContent="—")})}n(e,"gc-total"),n(e+"?start="+t+"&end="+t,"gc-today")})()</script></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>55</span></div><div class=tags><a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>4</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>2</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>8</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>2</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>3</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>5</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>22 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>16</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:38%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.a169c040b0093f2e5611924f06cf98c9a3c4db813da245b204d0f3bc623a9dd7.js integrity="sha256-oWnAQLAJPy5WEZJPBs+YyaPE24E9okWyBNDzvGI6ndc=" defer></script></body></html>
