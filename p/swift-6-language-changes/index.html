@@ -1,0 +1,157 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지 — 오깅중</title><meta name=description content="Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swift-6-language-changes/><meta property="og:type" content="article"><meta property="og:title" content="Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swift-6-language-changes/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등."><meta property="og:image" content="https://jun7680.github.io/p/swift-6-language-changes/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지"><meta property="article:published_time" content="2026-05-13T13:30:00+09:00"><meta property="article:modified_time" content="2026-05-13T13:30:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Swift 6"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="Sendable"><meta property="article:tag" content="TypedThrows"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지"><meta name=twitter:description content="Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등."><meta name=twitter:image content="https://jun7680.github.io/p/swift-6-language-changes/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.d94012cc45520f934f29e8801829ed3a6c6a5dc3b27da3f81d167c0004f0c000.css integrity="sha256-2UASzEVSD5NPKeiAGCntOmxqXcOyfaP4HRZ8AATwwAA="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>JAN 13, 2026</span>
+<span>·</span>
+<span>4분 읽기</span></div><h1 class=article__title>Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지</h1><p class=article__desc>Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등.</p></header><div class=article__body><p>Swift 6가 풀린 지 한참 됐는데 5.10에서 곧장 6으로 점프하면 컴파일 에러가 줄줄이 뜨는 게 정상이다. 가장 큰 이유는 <strong>strict concurrency 검사가 기본 켜진</strong> 것. 그 외에도 매일 만지는 코드에 영향이 큰 변화들이 꽤 있다. 한 번 정리해 둔다.</p><h2 id=1-strict-concurrency-강제--가장-큰-변화>1. Strict Concurrency 강제 — 가장 큰 변화</h2><p>Swift 5.x에서 <code>-strict-concurrency=complete</code>로 켜야 봤던 검사가 Swift 6에선 <strong>기본</strong>이다. 즉 data race가 가능한 코드는 컴파일 에러.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Swift 5: 경고 정도였던 코드</span>
+</span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Counter</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>value</span> <span class=p>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>bump</span><span class=p>(</span><span class=n>counter</span><span class=p>:</span> <span class=n>Counter</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Task</span> <span class=p>{</span> <span class=n>counter</span><span class=p>.</span><span class=n>value</span> <span class=o>+=</span> <span class=mi>1</span> <span class=p>}</span>   <span class=c1>// Swift 6에서 에러: Counter is not Sendable</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>해결의 정공법은 actor로 격리하거나, 변경 없는 값 타입으로 바꾸거나, <code>@MainActor</code> 같은 격리 어노테이션을 명시하는 것.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>MainActor</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>Counter</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>value</span> <span class=p>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>옛 코드를 한 번에 다 고치는 게 부담스러우면 다음 항목(migration mode)을 활용.</p><h2 id=2-migration-mode--점진-마이그레이션의-친구>2. Migration Mode — 점진 마이그레이션의 친구</h2><p><code>-language-mode 5</code>로 일부 파일/모듈만 Swift 5로 유지하면서, 점진적으로 Swift 6로 옮길 수 있다. Package.swift 또는 Xcode 빌드 설정에서 모듈 단위로 지정 가능.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Package.swift</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>target</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>name</span><span class=p>:</span> <span class=s>&#34;LegacyModule&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>swiftSettings</span><span class=p>:</span> <span class=p>[.</span><span class=n>swiftLanguageMode</span><span class=p>(.</span><span class=n>v5</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p>새로 짜는 모듈만 Swift 6로 가고, 옛 모듈은 5 유지 → 빌드는 통과. 한 모듈씩 차근차근 옮기는 게 회귀 위험 가장 적음.</p><h2 id=3-sendable-검사-강화>3. Sendable 검사 강화</h2><p>Sendable은 &ldquo;스레드 경계를 넘나들어도 안전한 타입"의 마커 프로토콜. Swift 6는 actor 경계나 <code>Task.detached</code>를 넘는 값에 대해 컴파일 타임에 Sendable인지 검사한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>Config</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>name</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>count</span><span class=p>:</span> <span class=nb>Int</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>process</span><span class=p>(</span><span class=kc>_</span> <span class=n>config</span><span class=p>:</span> <span class=n>Config</span><span class=p>)</span> <span class=n>async</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>await</span> <span class=n>Task</span><span class=p>.</span><span class=n>detached</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=bp>print</span><span class=p>(</span><span class=n>config</span><span class=p>.</span><span class=n>name</span><span class=p>)</span>   <span class=c1>// Swift 6: Config must conform to Sendable</span>
+</span></span><span class=line><span class=cl>    <span class=p>}.</span><span class=n>value</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>해결: <code>struct Config: Sendable { ... }</code>. 모든 stored property가 Sendable이면 자동 합성됨. 클래스라면 <code>final class + 모든 프로퍼티 let</code> 또는 actor로 격리.</p><h2 id=4-typed-throws--에러-타입-명시>4. Typed Throws — 에러 타입 명시</h2><p><code>throws</code> 뒤에 구체 에러 타입을 적을 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>fetchUser</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=nb>Int</span><span class=p>)</span> <span class=kr>throws</span><span class=p>(</span><span class=n>APIError</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=n>User</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// throw APIError.notFound 만 가능</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 다른 에러는 컴파일 에러</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>user</span> <span class=p>=</span> <span class=k>try</span> <span class=n>fetchUser</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=mi>42</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// error의 타입이 APIError로 추론됨 (any Error 아님)</span>
+</span></span><span class=line><span class=cl>    <span class=k>switch</span> <span class=n>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=p>.</span><span class=n>notFound</span><span class=p>:</span> <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=p>.</span><span class=n>timeout</span><span class=p>:</span> <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>옛 <code>throws</code>는 <code>throws(any Error)</code>와 동일. 새 API 설계할 땐 가능한 구체 에러 타입을 명시해서 호출자가 정확히 분기할 수 있게 하는 게 권장.</p><h2 id=5-existential-any-강제>5. Existential any 강제</h2><p>5.7에서 권장이었던 <code>any</code> 키워드가 6에선 <strong>필수</strong>다. 옛 코드의 <code>protocol Transport</code>를 그냥 타입 자리에 쓰면 에러.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Swift 5: 경고</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nv>transport</span><span class=p>:</span> <span class=n>Transport</span> <span class=p>=</span> <span class=n>CarTransport</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Swift 6: 컴파일 에러</span>
+</span></span><span class=line><span class=cl><span class=c1>// 수정</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nv>transport</span><span class=p>:</span> <span class=n>any</span> <span class=n>Transport</span> <span class=p>=</span> <span class=n>CarTransport</span><span class=p>()</span>
+</span></span></code></pre></div><p>성능 의도를 명시할 수 있는 자리에선 <code>some</code>이 우선. existential boxing 비용이 안 드는 쪽.</p><h2 id=6-countwhere-등-표준-라이브러리-추가>6. count(where:) 등 표준 라이브러리 추가</h2><p>매일 만지는 collection 함수에 작은 편의 추가가 꽤 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>numbers</span> <span class=p>=</span> <span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>evenCount</span> <span class=p>=</span> <span class=n>numbers</span><span class=p>.</span><span class=bp>count</span><span class=p>(</span><span class=k>where</span><span class=p>:</span> <span class=p>{</span> <span class=nv>$0</span><span class=p>.</span><span class=n>isMultiple</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=mi>2</span><span class=p>)</span> <span class=p>})</span>  <span class=c1>// 2</span>
+</span></span></code></pre></div><p><code>filter { ... }.count</code>보다 중간 배열을 만들지 않아 더 효율적. 비슷하게 <code>Dictionary.subscript(_:default:)</code>로 기본값 처리, <code>String.trimmingPrefix(_:)</code> / <code>trimmingSuffix(_:)</code> 등.</p><h2 id=7-noncopyable-타입--copyable>7. Noncopyable 타입 — <code>~Copyable</code></h2><p>복사할 수 없는 타입을 정의할 수 있다. 파일 핸들, 락처럼 &ldquo;복사하면 안 되는&rdquo; 리소스를 컴파일 타임에 강제.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>FileHandle</span><span class=p>:</span> <span class=o>~</span><span class=n>Copyable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>fd</span><span class=p>:</span> <span class=nb>Int32</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=kr>throws</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>fd</span> <span class=p>=</span> <span class=n>open</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>O_RDONLY</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>deinit</span> <span class=p>{</span> <span class=n>close</span><span class=p>(</span><span class=n>fd</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>h1</span> <span class=p>=</span> <span class=k>try</span> <span class=n>FileHandle</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=s>&#34;log.txt&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>h2</span> <span class=p>=</span> <span class=n>h1</span>   <span class=c1>// Swift 6: 컴파일 에러 - cannot copy noncopyable</span>
+</span></span></code></pre></div><p>소유권 모델이 들어온 첫걸음이라 모든 케이스에 쓸 일은 없지만, 리소스 관리 코드를 더 안전하게 짤 수 있다.</p><h2 id=옮기면서-가장-자주-만나는-패턴>옮기면서 가장 자주 만나는 패턴</h2><p>옛 프로젝트에 Swift 6를 켜면 거의 모든 에러가 다음 둘 중 하나로 수렴한다.</p><ol><li><strong>&ldquo;X is not Sendable&rdquo;</strong> — actor 경계를 넘는 값이 Sendable이 아님. 값 타입이면 <code>: Sendable</code> 추가, 클래스면 actor 격리나 <code>final class + Sendable</code> 검토.</li><li><strong>&ldquo;Reference to protocol &lsquo;X&rsquo; requires &lsquo;any&rsquo;&rdquo;</strong> — 프로토콜 타입을 변수/파라미터로 받는 자리. <code>any X</code> 또는 <code>some X</code>로 명시.</li></ol><p>이 둘만 정리하면 80%는 끝난다. 나머지는 typed throws나 <code>~Copyable</code> 도입 같은 <em>추가 기능</em> 영역이라 점진적으로 들이면 됨.</p><h2 id=정리>정리</h2><ul><li>Swift 6의 핵심은 <strong>strict concurrency를 컴파일 타임 보장으로 끌어올린 것</strong>. 옛 경고가 다 에러가 됐다.</li><li>한 번에 다 못 옮기면 <code>swiftLanguageMode(.v5)</code>로 모듈 단위 점진 마이그.</li><li>typed throws / <code>~Copyable</code> / <code>count(where:)</code> 같은 작은 개선이 매일 쓰는 코드에 의외로 자주 들어옴.</li><li>5.7에서 권장이었던 <code>any</code>가 6에선 필수. 옛 코드의 <code>Transport</code>를 <code>any Transport</code>로 다 손봐야.</li></ul><p>다음 단계로 strict concurrency를 본격적으로 다루는 글을 따로 정리할 예정. <code>@preconcurrency</code>, actor 격리 전략, <code>nonisolated(unsafe)</code> 우회 같은 실무 패턴은 분량이 커서 한 글에 다 들어가지 않는다.</p><p>Swift 6 마이그레이션은 한 번에 끝낼 일이 아니라 <strong>모듈 단위로 천천히 옮기는 작업</strong>이라고 생각하면 부담이 훨씬 덜하다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-stats><div class=gc-stat><span class=gc-stat__label>오늘</span>
+<span class=gc-stat__value id=gc-today>—</span></div><div class=gc-stat><span class=gc-stat__label>누적</span>
+<span class=gc-stat__value id=gc-total>—</span></div></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json",t=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul"}).format(new Date);function n(e,t){fetch(e,{credentials:"omit"}).then(function(t){return t.ok?t.json():(console.warn("[visitors] HTTP",t.status,e),null)}).then(function(e){var n=document.getElementById(t);if(!n)return;n.textContent=e&&e.count?e.count:"0"}).catch(function(n){console.warn("[visitors] fetch failed:",n&&n.message,e);var s=document.getElementById(t);s&&(s.textContent="—")})}n(e,"gc-total"),n(e+"?start="+t+"&end="+t,"gc-today")})()</script></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>58</span></div><div class=tags><a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>5</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>2</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>8</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>2</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>6</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>4</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>6</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>5</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>23 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>17</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:35%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.a169c040b0093f2e5611924f06cf98c9a3c4db813da245b204d0f3bc623a9dd7.js integrity="sha256-oWnAQLAJPy5WEZJPBs+YyaPE24E9okWyBNDzvGI6ndc=" defer></script></body></html>
