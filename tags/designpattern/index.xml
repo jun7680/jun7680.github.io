@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DesignPattern on 오깅중</title><link>https://jun7680.github.io/tags/designpattern/</link><description>Recent content in DesignPattern on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Wed, 13 May 2026 15:44:00 +0900</lastBuildDate><atom:link href="https://jun7680.github.io/tags/designpattern/index.xml" rel="self" type="application/rss+xml"/><item><title>47개 @Model 중 4개만 보존하기 — default-safe 정책 설계</title><link>https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/</link><pubDate>Wed, 13 May 2026 15:44:00 +0900</pubDate><guid>https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/</guid><description>&lt;p&gt;SwiftData 마이그레이션을 하면서 풀어야 하는 흔한 문제 하나. 로그아웃 시 데이터를 어떻게 정리할 것인가.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사용자 도메인 데이터: 다음 로그인 시 새로 받아오면 됨 → 삭제&lt;/li&gt;
+&lt;li&gt;계정 정보: 보존 (캐싱)&lt;/li&gt;
+&lt;li&gt;공지 팝업 본 적 있음 표시: 보존&lt;/li&gt;
+&lt;li&gt;실험실 토글 상태: 보존&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;총 47개 &lt;code&gt;@Model&lt;/code&gt; 중 4개만 보존, 43개는 삭제. 이걸 어떻게 표현할 것인가? 코드에 들어가는 한 줄, 한 변수의 위치가 안전성을 바꾸는 케이스다.&lt;/p&gt;</description></item></channel></rss>

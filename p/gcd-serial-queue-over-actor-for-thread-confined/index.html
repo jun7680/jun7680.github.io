@@ -1,0 +1,196 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정 — 오깅중</title><meta name=description content="actor는 mutual exclusion을 보장하지만 thread identity는 보장하지 않는다. Realm/SwiftData 같은 thread-confined 자원에는 GCD serial queue가 답인 이유."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/gcd-serial-queue-over-actor-for-thread-confined/><meta property="og:type" content="article"><meta property="og:title" content="GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/gcd-serial-queue-over-actor-for-thread-confined/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="actor는 mutual exclusion을 보장하지만 thread identity는 보장하지 않는다. Realm/SwiftData 같은 thread-confined 자원에는 GCD serial queue가 답인 이유."><meta property="og:image" content="https://jun7680.github.io/p/gcd-serial-queue-over-actor-for-thread-confined/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정"><meta property="article:published_time" content="2026-05-13T15:46:00+09:00"><meta property="article:modified_time" content="2026-05-13T15:46:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="GCD"><meta property="article:tag" content="Actor"><meta property="article:tag" content="Realm"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정"><meta name=twitter:description content="actor는 mutual exclusion을 보장하지만 thread identity는 보장하지 않는다. Realm/SwiftData 같은 thread-confined 자원에는 GCD serial queue가 답인 이유."><meta name=twitter:image content="https://jun7680.github.io/p/gcd-serial-queue-over-actor-for-thread-confined/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.7bcc0fba9c12538ddd5d129143600df757cb7fd0bfb2f8e315d5bee30cb216de.css integrity="sha256-e8wPupwSU43dXRKRQ2AN91fLf9C/svjjFdW+4wyyFt4="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
+<span>·</span>
+<span>MAY 13, 2026</span>
+<span>·</span>
+<span>4분 읽기</span></div><h1 class=article__title>GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정</h1><p class=article__desc>actor는 mutual exclusion을 보장하지만 thread identity는 보장하지 않는다. Realm/SwiftData 같은 thread-confined 자원에는 GCD serial queue가 답인 이유.</p></header><div class=article__body><p>크래시 리포트에 이런 시그니처가 떴다.</p><pre tabindex=0><code>EXC_BREAKPOINT in:
+closure #1 in static Log.saveLogData(message:)
+└─ swift_allocObject
+   └─ _xzm_xzone_malloc_freelist_outlined
+</code></pre><p>힙 corruption 패턴. 메모리 할당 단에서 깨지면서 SIGTRAP. 빈도는 낮지만 일관되게 나옴.</p><p>스택을 따라 <code>Log.saveLogData</code>로 갔다. 호출처를 grep해보니 <strong>306곳</strong>. 모든 곳에서 비동기로 떨어지는 진단 로그가 단일 라이터에 몰리는 구조였다.</p><h2 id=기존-구조의-세-가지-문제>기존 구조의 세 가지 문제</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>static</span> <span class=kd>func</span> <span class=nf>saveLogData</span><span class=p>(</span><span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Task</span> <span class=p>{</span>  <span class=c1>// ① 호출마다 Task 스폰</span>
+</span></span><span class=line><span class=cl>        <span class=n>await</span> <span class=n>LogDBWriter</span><span class=p>.</span><span class=n>shared</span><span class=p>.</span><span class=n>save</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>actor</span> <span class=n>LogDBWriter</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>var</span> <span class=nv>isWriting</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>save</span><span class=p>(</span><span class=kc>_</span> <span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=n>async</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=o>!</span><span class=n>isWriting</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>  <span class=c1>// ② 동시 도착 드롭</span>
+</span></span><span class=line><span class=cl>        <span class=n>isWriting</span> <span class=p>=</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>Task</span> <span class=p>{</span>  <span class=c1>// ③ actor 내부 이중 Task 스폰</span>
+</span></span><span class=line><span class=cl>            <span class=n>await</span> <span class=n>writeAndReset</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>writeAndReset</span><span class=p>(</span><span class=kc>_</span> <span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=n>async</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// Realm에 write</span>
+</span></span><span class=line><span class=cl>        <span class=n>realm</span><span class=p>.</span><span class=n>write</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>isWriting</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><strong>① 매 호출마다 Task 스폰 (306곳에서)</strong>
+디버깅 코드 한 줄에 Task가 하나씩. 트래픽 피크 구간에서 cooperative thread pool에 부하가 누적된다.</p><p><strong>② isWriting 플래그로 동시 도착 로그 드롭</strong>
+정작 진단이 필요한 burst 구간에서 로그 대부분이 사라진다. 진단 도구가 진단 가능 구간에서 침묵하는 모순.</p><p><strong>③ actor 내부 이중 Task 스폰</strong>
+<code>save()</code>가 이미 actor 메서드인데 안에서 또 Task. 호출 1번에 Task 2개. 거기에 Realm <code>write</code> 클로저가 또 thread를 점유. 메모리 / lifecycle이 꼬일 환경 다 갖춰짐.</p><p>세 개가 합쳐져 cooperative pool 위에서 thread-confined한 Realm engine을 두드리는 구조가 됐다. Realm C++ 엔진은 thread confinement가 빡빡해서 wrong thread access는 즉시 crash. cooperative pool은 hop이 자주 일어나니 충돌 확률이 시간 흐를수록 누적된다.</p><h2 id=후보-1-actor--asyncstream>후보 1: actor + AsyncStream</h2><p>Swift Concurrency를 좋아하는 개발자라면 자연스러운 선택.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>actor</span> <span class=n>LogDBWriter</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>stream</span><span class=p>:</span> <span class=n>AsyncStream</span><span class=p>&lt;</span><span class=nb>String</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>continuation</span><span class=p>:</span> <span class=n>AsyncStream</span><span class=p>&lt;</span><span class=nb>String</span><span class=p>&gt;.</span><span class=n>Continuation</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nv>cont</span><span class=p>:</span> <span class=n>AsyncStream</span><span class=p>&lt;</span><span class=nb>String</span><span class=p>&gt;.</span><span class=n>Continuation</span><span class=p>!</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>stream</span> <span class=p>=</span> <span class=n>AsyncStream</span><span class=p>&lt;</span><span class=nb>String</span><span class=p>&gt;(</span><span class=n>bufferingPolicy</span><span class=p>:</span> <span class=p>.</span><span class=n>bufferingNewest</span><span class=p>(</span><span class=mi>256</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>cont</span> <span class=p>=</span> <span class=nv>$0</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>continuation</span> <span class=p>=</span> <span class=n>cont</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>Task</span> <span class=p>{</span> <span class=p>[</span><span class=n>stream</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>await</span> <span class=n>message</span> <span class=k>in</span> <span class=n>stream</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>await</span> <span class=n>write</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>nonisolated</span> <span class=kd>func</span> <span class=nf>enqueue</span><span class=p>(</span><span class=kc>_</span> <span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>continuation</span><span class=p>.</span><span class=n>yield</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>write</span><span class=p>(</span><span class=kc>_</span> <span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=n>async</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>realm</span><span class=p>.</span><span class=n>write</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>장점:</p><ul><li>Swift Concurrency 정통</li><li>AsyncStream의 buffering policy로 drop 정책 명확</li><li>nonisolated enqueue로 호출처 부담 없음</li></ul><p>단점:</p><ul><li>consumer Task가 cooperative pool에서 돈다 — <strong>Realm/SwiftData의 thread confinement와 충돌</strong></li><li>thread hop이 불특정 시점에 일어남 (런타임 스케줄링에 위임)</li><li>actor가 single concurrent context는 보장하지만 single OS thread는 보장하지 않음</li></ul><p>Realm/SwiftData는 ModelContext도 thread-confined다. cooperative pool 위에 올리면 어느 순간 wrong thread access가 일어날 수 있다. crash signature가 정확히 그 패턴이었으니, 같은 패러다임으로 옮기는 건 해결이 아니라 자리 옮기기다.</p><h2 id=후보-2-gcd-시리얼-큐--전용-스레드--채택>후보 2: GCD 시리얼 큐 + 전용 스레드 (✅ 채택)</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>LogDBWriter</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>let</span> <span class=nv>shared</span> <span class=p>=</span> <span class=n>LogDBWriter</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>queue</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>label</span><span class=p>:</span> <span class=s>&#34;com.app.LogDBWriter&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>qos</span><span class=p>:</span> <span class=p>.</span><span class=n>utility</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>var</span> <span class=nv>buffer</span><span class=p>:</span> <span class=p>[</span><span class=nb>String</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>maxBuffer</span> <span class=p>=</span> <span class=mi>256</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>init</span><span class=p>()</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>enqueue</span><span class=p>(</span><span class=kc>_</span> <span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>queue</span><span class=p>.</span><span class=n>async</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>guard</span> <span class=kd>let</span> <span class=nv>self</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=c1>// 가득 차면 가장 오래된 것부터 폐기</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=kc>self</span><span class=p>.</span><span class=n>buffer</span><span class=p>.</span><span class=bp>count</span> <span class=o>&gt;=</span> <span class=kc>self</span><span class=p>.</span><span class=n>maxBuffer</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kc>self</span><span class=p>.</span><span class=n>buffer</span><span class=p>.</span><span class=n>removeFirst</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span><span class=p>.</span><span class=n>buffer</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span><span class=p>.</span><span class=n>flushIfNeeded</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>flushIfNeeded</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=o>!</span><span class=n>buffer</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>batch</span> <span class=p>=</span> <span class=n>buffer</span>
+</span></span><span class=line><span class=cl>        <span class=n>buffer</span><span class=p>.</span><span class=bp>removeAll</span><span class=p>(</span><span class=n>keepingCapacity</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>realm</span><span class=p>.</span><span class=n>write</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>batch</span><span class=p>.</span><span class=n>forEach</span> <span class=p>{</span> <span class=n>realm</span><span class=p>.</span><span class=n>add</span><span class=p>(</span><span class=n>LogEntity</span><span class=p>(</span><span class=n>message</span><span class=p>:</span> <span class=nv>$0</span><span class=p>))</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>장점:</p><ul><li><strong>DispatchQueue가 단일 OS 스레드를 보장</strong> (serial queue)</li><li>Realm/SwiftData의 thread confinement와 자연스럽게 호환</li><li>buffer + drop policy가 명시적이고 디버깅 쉬움</li><li>Task 스폰 0개</li></ul><p>단점:</p><ul><li>async/await 시대에 GCD를 쓰는 게 &ldquo;구식"으로 보일 수 있음</li><li>호출처에서 <code>await</code> 못 씀 (애초에 fire-and-forget이라 필요 없지만)</li></ul><p>핵심은 **&ldquo;actor가 단일 concurrent context는 보장하지만 단일 OS 스레드는 보장하지 않는다&rdquo;**는 사실. Realm은 후자를 요구한다. 그러니 actor가 아니라 serial DispatchQueue가 답이다.</p><h2 id=일반화-swift-concurrency가-답이-아닌-경우>일반화: Swift Concurrency가 답이 아닌 경우</h2><p>Swift Concurrency는 강력하지만 만능이 아니다. 다음 조건이 겹치면 GCD를 고려한다.</p><ul><li><strong>Thread confinement가 빡빡한 외부 라이브러리</strong> (Realm, SwiftData, SQLite WAL, OpenGL, audio I/O 등)</li><li><strong>단일 OS 스레드 보장이 필요</strong>한 경우</li><li><strong>호출처가 async context가 아닌</strong> 동기 영역에서 fire-and-forget로 떨어지는 케이스</li></ul><p>이 조건들에서 actor + AsyncStream을 쓰면 cooperative pool 위에서 hop이 일어나고, hop이 thread-confined 자원과 충돌한다. crash signature가 누적된다.</p><h2 id=교훈>교훈</h2><p>&ldquo;actor를 쓰면 모든 thread 문제가 해결된다"는 흔한 오해. actor는 <strong>mutual exclusion</strong>을 보장하지만 <strong>thread identity</strong>를 보장하지 않는다.</p><p>Realm, SwiftData, ModelContext, 일부 C++ engine은 thread identity까지 요구한다. 그 자원을 다루는 코드는 actor가 아니라 single-threaded executor 위에 올려야 안전하다. GCD serial queue가 단순하면서 정확한 선택이다.</p><p>신기술이 좋아 보여서 갈아엎기 전에, 새 도구가 기존 도구가 해결하던 보장을 모두 제공하는지 점검하라. 그게 도구 선택의 첫 단계다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
+<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
+<span class=card__aux>66</span></div><div class=tags><a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>1</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>6</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>6</span></a>
+<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>2</span></a>
+<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>10</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>2</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>5</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>10</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>5</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>5</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>28 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>22</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:27%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.a169c040b0093f2e5611924f06cf98c9a3c4db813da245b204d0f3bc623a9dd7.js integrity="sha256-oWnAQLAJPy5WEZJPBs+YyaPE24E9okWyBNDzvGI6ndc=" defer></script></body></html>
