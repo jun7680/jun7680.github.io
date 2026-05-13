@@ -16,7 +16,7 @@
 <span>·</span>
 <span>JAN 13, 2026</span>
 <span>·</span>
-<span>4분 읽기</span></div><h1 class=article__title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</h1><p class=article__desc>mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안.</p></header><div class=article__body><p>PR 리뷰에서 이런 코드를 봤다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>public</span> <span class=kd>struct</span> <span class=nc>NotificationOptions</span> <span class=p>{</span>
+<span>4분 읽기</span></div><h1 class=article__title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</h1><p class=article__desc>mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안.</p></header><div class=article__body><p>PR 리뷰에서 이런 코드를 봤다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>public</span> <span class=kd>struct</span> <span class=nc>UserPreferences</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kd>let</span> <span class=nv>isEnabledAll</span><span class=p>:</span> <span class=nb>Bool</span>
 </span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kd>let</span> <span class=nv>isEnabledFeatureA</span><span class=p>:</span> <span class=nb>Bool</span>
 </span></span><span class=line><span class=cl>    <span class=c1>// ... 20개 더 ...</span>
