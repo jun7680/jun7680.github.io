@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 12, 2026</span>
+<span>MAY 12, 2026</span>
 <span>·</span>
 <span>4분 읽기</span></div><h1 class=article__title>withAnimation, .animation, .transition 헷갈릴 때 보는 메모</h1><p class=article__desc>SwiftUI에서 상태 변화에 애니메이션 붙이려고 할 때 withAnimation, .animation modifier, .transition 셋이 어떻게 다른지. 그리고 .transition이 안 먹히는 흔한 케이스.</p></header><div class=article__body><p>SwiftUI 애니메이션 처음 만지면 <code>withAnimation</code>이랑 <code>.animation</code> modifier 둘 중에 뭘 써야 하는지가 가장 헷갈린다. 한 번 잡아두면 다 비슷한 구조라 편한데, 그 전까지는 적용했는데 애니메이션이 안 먹히는 케이스가 자꾸 나옴.</p><h2 id=withanimation--상태-변화-자체를-감싸는-것>withAnimation — 상태 변화 자체를 감싸는 것</h2><p>가장 자주 쓰는 패턴. 상태 토글을 클로저로 감싸면, 그 상태에 영향받는 모든 view가 애니메이션을 탄다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>isExpanded</span> <span class=p>=</span> <span class=kc>false</span>
 </span></span><span class=line><span class=cl>

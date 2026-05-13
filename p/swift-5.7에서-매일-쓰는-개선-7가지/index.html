@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 15, 2022</span>
+<span>JUN 15, 2022</span>
 <span>·</span>
 <span>4분 읽기</span></div><h1 class=article__title>Swift 5.7에서 매일 쓰는 개선 7가지</h1><p class=article__desc>Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지.</p></header><div class=article__body><p>WWDC 2022에서 Swift 5.7이 같이 풀렸다. 보통은 이런 마이너 버전에 큰 변화가 없는데, 5.7은 일상 코드에 영향을 주는 변경이 꽤 많아서 한 번 정리해 둔다. 다 적으면 너무 길어지니까 매일 쓰게 되는 7가지만 추렸다.</p><h2 id=1-if-let--guard-let-단축-표기>1. if let / guard let 단축 표기</h2><p>가장 환영받는 변경. 옵셔널 언래핑할 때 같은 이름을 두 번 쓰던 패턴이 사라졌다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
 </span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>user</span> <span class=p>=</span> <span class=n>user</span> <span class=p>{</span>

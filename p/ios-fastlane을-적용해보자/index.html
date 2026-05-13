@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 03, 2022</span>
+<span>MAR 03, 2022</span>
 <span>·</span>
 <span>4분 읽기</span></div><h1 class=article__title>iOS Fastlane을 적용해보자</h1><p class=article__desc>Fastlane 적용으로 원시인 탈출하기!</p></header><div class=article__body><h3 id=도입이유>도입이유</h3><p>친구랑 얘기하다 원시인 소리를 들었다&mldr;😀</p><h5 id=현-배포-절차>현 배포 절차</h5><ul><li>클린 -> Product -> Archive -> 완료 콜백 올때까지 대기 -> 업로드 <del>(대략 30분&mldr;?)</del></li></ul><h5 id=도입-후-절차>도입 후 절차</h5><ul><li>fastlane &rsquo;lane명&rsquo; 끗!</li></ul><p>자동배포라는 말만 들을때는 실수하면 어쩌지..? 세팅이 어려우면 어쩌지?? 이러한 고민이 있었지만 막상 도입 마음을 먹고 차분한 마음을 가지고 차근차근 따라하다 보니 나도 원시인 탈출을 할 수 있었다</p><h2 id=설치--업로드>설치 & 업로드</h2><p>Homebrew를 이용해 Fastlane을 설치 할건데 Homebrew가 설치되어 있지 않으면 설치를 하고 오자. -> <a href=https://brew.sh/index_ko>바로가기</a></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>brew install fastlane
 </span></span></code></pre></div><p>를 터미널에 입력해 주면 알아서 설치가 진행이 된다.</p><p>만약 설치가 안된다면 명령어 추천이 있을경우 따라하면 되고 안돼면&mldr;. 구글링을 통해 해결해보자. (화이팅)</p><p>그 다음 이제 fastlane을 적용할 프로젝트에 가서</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>fastlane init

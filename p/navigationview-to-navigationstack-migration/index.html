@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 12, 2026</span>
+<span>MAY 12, 2026</span>
 <span>·</span>
 <span>5분 읽기</span></div><h1 class=article__title>NavigationView에서 NavigationStack으로 옮긴 메모</h1><p class=article__desc>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></header><div class=article__body><p>NavigationView가 iOS 16에서 deprecated된 지 한참 됐는데, 콘솔 경고 한 줄만 무시하면서 끌고 왔다. SwiftData 마이그하면서 어차피 화면들 다시 만질 일 생긴 김에 같이 옮겼다.</p><p>단순 치환은 진짜 단순하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationView</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>List</span> <span class=p>{</span>

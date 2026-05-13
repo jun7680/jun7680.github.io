@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 12, 2026</span>
+<span>MAY 12, 2026</span>
 <span>·</span>
 <span>3분 읽기</span></div><h1 class=article__title>UICollectionView CellRegistration — 옛날 register/dequeue 그만 쓰자</h1><p class=article__desc>iOS 14에서 들어온 UICollectionView.CellRegistration. 문자열 reuse ID 안 만들어도 되고, as! 캐스팅도 사라지고, cell 등록과 설정 코드가 한 곳으로 모인다. 단독으로도 쓸 수 있다.</p></header><div class=article__body><p>iOS 14에서 들어온 API인데 의외로 잘 안 알려진 쪽. 옛날 <code>register(_:forCellWithReuseIdentifier:)</code> + <code>dequeueReusableCell(withReuseIdentifier:)</code> 패턴을 쓰지 않게 된다. 처음 보면 살짝 낯설 수 있는데, 한 번 잡아두면 옛날 패턴으로 안 돌아감.</p><p><a href=/p/uikit-diffable-datasource-memo/>DiffableDataSource</a> 자료에 같이 묶여 나오는 경우가 많아서 &ldquo;DiffableDataSource 쓸 때만 쓰는 거&rdquo; 같이 보이는데, 사실 <strong>단독으로도 그냥 쓸 수 있다</strong>. 옛날 <code>UICollectionViewDataSource</code> 그대로 가면서 cell 등록만 갈아도 ID 관리가 사라져서 깔끔해짐.</p><h2 id=옛날-패턴>옛날 패턴</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// viewDidLoad 어딘가</span>
 </span></span><span class=line><span class=cl><span class=n>collectionView</span><span class=p>.</span><span class=n>register</span><span class=p>(</span><span class=n>CustomCell</span><span class=p>.</span><span class=kc>self</span><span class=p>,</span> <span class=n>forCellWithReuseIdentifier</span><span class=p>:</span> <span class=s>&#34;cell&#34;</span><span class=p>)</span>

@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 13, 2022</span>
+<span>APR 13, 2022</span>
 <span>·</span>
 <span>3분 읽기</span></div><h1 class=article__title>UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴</h1><p class=article__desc>UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리.</p></header><div class=article__body><p>UIKit으로 토글 가능한 패널을 만들 때 가장 흔히 쓰는 건 <code>UIStackView</code> 안의 view에 <code>isHidden</code>을 적용하는 방식이다. 그런데 이걸 애니메이션 블록 안에서 토글하다 보면, <strong>버튼을 다섯 번 누르면 다섯 번 다시 눌러야 보이는</strong> 이상한 현상에 부딪힌다. 코드는 분명 한 줄인데 동작은 그렇지 않다. 처음 봤을 때는 디버그로 한참을 헤맸다.</p><h2 id=현상>현상</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>@IBAction</span> <span class=kd>func</span> <span class=nf>toggle</span><span class=p>(</span><span class=kc>_</span> <span class=n>sender</span><span class=p>:</span> <span class=nb>Any</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>UIView</span><span class=p>.</span><span class=n>animate</span><span class=p>(</span><span class=n>withDuration</span><span class=p>:</span> <span class=mf>0.25</span><span class=p>)</span> <span class=p>{</span>

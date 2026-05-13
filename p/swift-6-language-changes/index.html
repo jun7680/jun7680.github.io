@@ -14,7 +14,7 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>SWIFT</span>
 <span>·</span>
-<span>JAN 13, 2026</span>
+<span>MAY 13, 2026</span>
 <span>·</span>
 <span>4분 읽기</span></div><h1 class=article__title>Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지</h1><p class=article__desc>Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등.</p></header><div class=article__body><p>Swift 6가 풀린 지 한참 됐는데 5.10에서 곧장 6으로 점프하면 컴파일 에러가 줄줄이 뜨는 게 정상이다. 가장 큰 이유는 <strong>strict concurrency 검사가 기본 켜진</strong> 것. 그 외에도 매일 만지는 코드에 영향이 큰 변화들이 꽤 있다. 한 번 정리해 둔다.</p><h2 id=1-strict-concurrency-강제--가장-큰-변화>1. Strict Concurrency 강제 — 가장 큰 변화</h2><p>Swift 5.x에서 <code>-strict-concurrency=complete</code>로 켜야 봤던 검사가 Swift 6에선 <strong>기본</strong>이다. 즉 data race가 가능한 코드는 컴파일 에러.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Swift 5: 경고 정도였던 코드</span>
 </span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Counter</span> <span class=p>{</span>
