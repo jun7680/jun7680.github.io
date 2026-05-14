@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0e0e10"/>
+      <stop offset="100%" stop-color="#1a1a20"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .ko { font-family: 'Apple SD Gothic Neo', 'AppleGothic', 'Helvetica', 'Arial', sans-serif; }
+    .en { font-family: 'Helvetica', 'Arial', sans-serif; }
+    .mono { font-family: 'Menlo', 'Monaco', monospace; }
+  </style>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g opacity="0.05" fill="none" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="510" x2="1200" y2="510"/>
+    <line x1="80" y1="0" x2="80" y2="630"/>
+    <line x1="1120" y1="0" x2="1120" y2="630"/>
+  </g>
+  <text class="ko" x="80" y="92" font-size="22" font-weight="700" fill="#e6e6ea" letter-spacing="0.5">
+    오깅중<tspan class="en" fill="#fbbf24" dx="8">/</tspan><tspan class="mono" fill="#a8a8b3" dx="8" font-weight="500">ogging.dev</tspan>
+  </text>
+  <g transform="translate(80, 160)">
+    <rect x="0" y="0" width="110" height="38" rx="6" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+    <text class="ko" x="55" y="25" font-size="15" font-weight="700" fill="#fbbf24" text-anchor="middle" letter-spacing="1.5">SWIFT</text>
+  </g>
+  <text class="ko" x="80" y="260" font-size="76" font-weight="800" fill="#e6e6ea" letter-spacing="-2">SwiftUI 펼침/접힘 애니메이션에</text>
+<text class="ko" x="80" y="352" font-size="76" font-weight="800" fill="url(#accent)" letter-spacing="-2">대한 나의 생각</text>
+
+  <g transform="translate(0, 490)">
+    <g transform="translate(80, 0)">
+      <rect x="0" y="0" width="128" height="42" rx="21" fill="#2a2a35"/>
+      <text class="mono" x="64" y="27" font-size="17" font-weight="600" fill="#a78bfa" text-anchor="middle">#SwiftUI</text>
+    </g>
+    <g transform="translate(220, 0)">
+      <rect x="0" y="0" width="100" height="42" rx="21" fill="#2a2a35"/>
+      <text class="mono" x="50" y="27" font-size="17" font-weight="600" fill="#fbbf24" text-anchor="middle">#UIKit</text>
+    </g>
+    <g transform="translate(332, 0)">
+      <rect x="0" y="0" width="296" height="42" rx="21" fill="#2a2a35"/>
+      <text class="mono" x="148" y="27" font-size="17" font-weight="600" fill="#fb7185" text-anchor="middle">#UIHostingController</text>
+    </g>
+    <g transform="translate(640, 0)">
+      <rect x="0" y="0" width="156" height="42" rx="21" fill="#2a2a35"/>
+      <text class="mono" x="78" y="27" font-size="17" font-weight="600" fill="#4ade80" text-anchor="middle">#Animation</text>
+    </g>
+  </g>
+  <text class="mono" x="1120" y="570" font-size="16" font-weight="600" fill="#5a5a65" text-anchor="end">2026-05-14</text>
+  <rect x="1116" y="440" width="4" height="100" rx="2" fill="url(#accent)"/>
+</svg>
