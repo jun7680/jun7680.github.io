@@ -14,16 +14,16 @@
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span></button></div></div></header><main class=page><div><section><div class=section-label><span>SWIFT</span>
 <span class=section-label__rule></span>
-<span class=section-label__count>32</span></div><div class=posts><a class=post-row href=/p/swiftdata-invalidint-unique-silent-loss/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>@Model 스캐폴드 id + .unique 제약 = 조용한 데이터 손실</h3><p class=post-row__sub>SwiftData에서 sentinel default id(.invalidInt = -1)와 @Attribute(.unique)와 try?가 만나면 100건이 1건으로 줄어든다. 에러 없이. 다층 방어로 막는 법.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swiftdata-invalidint-unique-silent-loss/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swift-string-hashvalue-pk-trap/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift String.hashValue로 DB PK를 만들면 안 되는 이유</h3><p class=post-row__sub>Swift의 String.hashValue는 per-process random seed라서 앱 재시작마다 값이 바뀐다. DB PK로 박으면 lookup이 영구 실패한다. 결정적 hash로 가야 하는 이유와 마이그레이션 처리.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swift-string-hashvalue-pk-trap/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swift-6-language-changes/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지</h3><p class=post-row__sub>Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swift-6-language-changes/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swift-mutating-without-self-mutation/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</h3><p class=post-row__sub>mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swift-mutating-without-self-mutation/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/coordinator-ispush-flag-trap/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥</h3><p class=post-row__sub>푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/coordinator-ispush-flag-trap/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/uikit-swiftui-bridging/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지</h3><p class=post-row__sub>UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>7 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/uikit-swiftui-bridging/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/uikit-cell-registration/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>UICollectionView CellRegistration — 옛날 register/dequeue 그만 쓰자</h3><p class=post-row__sub>iOS 14에서 들어온 UICollectionView.CellRegistration. 문자열 reuse ID 안 만들어도 되고, as! 캐스팅도 사라지고, cell 등록과 설정 코드가 한 곳으로 모인다. 단독으로도 쓸 수 있다.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/uikit-cell-registration/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/uikit-diffable-datasource-memo/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>UICollectionViewDiffableDataSource 쓰면서 정리한 메모</h3><p class=post-row__sub>UITableView/UICollectionView 데이터 소스의 새 표준. 옛날 cellForItemAt 패턴에서 DiffableDataSource로 옮기면서 정리한 기본 사용법, snapshot 동작, 흔한 사고.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/uikit-diffable-datasource-memo/thumbnail.png) aria-hidden=true></div></a></div><nav class=pagination aria-label=페이지네이션><a href=/categories/swift/>← PREV</a>
-<span>PAGE 02 / 04</span>
+<span class=section-label__count>36</span></div><div class=posts><a class=post-row href=/p/final-class-inheritance-vs-composition/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>`final class` 상속 막혔을 때 컴포지션 써본 후기</h3><p class=post-row__sub>final 막힌 클래스를 만났을 때, 격언만 외우다 놓친 진짜 답.</p></div><div class=post-row__meta><b>MAY 14, 2026</b>
+<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/final-class-inheritance-vs-composition/thumbnail.jpg) aria-hidden=true></div></a><a class=post-row href=/p/gcd-serial-queue-over-actor-for-thread-confined/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정</h3><p class=post-row__sub>actor는 mutual exclusion을 보장하지만 thread identity는 보장하지 않는다. Realm/SwiftData 같은 thread-confined 자원에는 GCD serial queue가 답인 이유.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/gcd-serial-queue-over-actor-for-thread-confined/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swiftdata-default-safe-delete-policy/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>47개 @Model 중 4개만 보존하기 — default-safe 정책 설계</h3><p class=post-row__sub>47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swiftdata-predicate-enum-silent-zero/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>SwiftData #Predicate에서 enum 비교가 0건을 반환하는 이유</h3><p class=post-row__sub>SwiftData #Predicate가 사용자 정의 enum을 만나면 throw 없이 0건을 반환한다. SQL 번역 실패가 침묵으로 드러나는 함정. raw value 컬럼, Swift filter, PK 인코딩 세 가지 우회법.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swiftdata-predicate-enum-silent-zero/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swiftdata-invalidint-unique-silent-loss/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>@Model 스캐폴드 id + .unique 제약 = 조용한 데이터 손실</h3><p class=post-row__sub>SwiftData에서 sentinel default id(.invalidInt = -1)와 @Attribute(.unique)와 try?가 만나면 100건이 1건으로 줄어든다. 에러 없이. 다층 방어로 막는 법.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swiftdata-invalidint-unique-silent-loss/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swift-string-hashvalue-pk-trap/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift String.hashValue로 DB PK를 만들면 안 되는 이유</h3><p class=post-row__sub>Swift의 String.hashValue는 per-process random seed라서 앱 재시작마다 값이 바뀐다. DB PK로 박으면 lookup이 영구 실패한다. 결정적 hash로 가야 하는 이유와 마이그레이션 처리.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>3 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swift-string-hashvalue-pk-trap/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swift-6-language-changes/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지</h3><p class=post-row__sub>Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swift-6-language-changes/thumbnail.png) aria-hidden=true></div></a><a class=post-row href=/p/swift-mutating-without-self-mutation/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</h3><p class=post-row__sub>mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span>4 MIN</span></div><div class="post-row__preview post-row__preview--image" style=background-image:url(https://jun7680.github.io/p/swift-mutating-without-self-mutation/thumbnail.png) aria-hidden=true></div></a></div><nav class=pagination aria-label=페이지네이션><a href=/categories/swift/>← PREV</a>
+<span>PAGE 02 / 05</span>
 <a href=/categories/swift/page/3/>NEXT →</a></nav></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
 <span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
 — iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
@@ -31,22 +31,25 @@
 <a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
 <span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
 <span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><div class=card id=tags><div class=card__head><span class=card__title>TAGS</span>
-<span class=card__aux>75</span></div><div class=tags><a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
+<span class=card__aux>86</span></div><div class=tags><a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
 <a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>2</span></a>
+<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>3</span></a>
 <a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
 <a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
+<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
 <a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
 <a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
 <a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
 <a class=tag href=/tags/combine/>#combine<span class=tag__count>2</span></a>
+<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
 <a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>6</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>2</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>3</span></a>
 <a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
 <a class=tag href=/tags/debugging/>#debugging<span class=tag__count>6</span></a>
 <a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
 <a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
 <a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
 <a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
@@ -55,23 +58,28 @@
 <a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
 <a class=tag href=/tags/gcd/>#gcd<span class=tag__count>2</span></a>
 <a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
 <a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios/>#ios<span class=tag__count>3</span></a>
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
 <a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
 <a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
 <a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>10</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>11</span></a>
 <a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
 <a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
 <a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
 <a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
 <a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
 <a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
+<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
 <a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
 <a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
 <a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
@@ -83,7 +91,10 @@
 <a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>2</span></a>
 <a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
 <a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
+<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
 <a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
 <a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
 <a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
 <a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
@@ -93,22 +104,22 @@
 <a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>10</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>7</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>11</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
 <a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
 <a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>8</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>10</span></a>
 <a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
 <a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
 <a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a></div></div><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>33 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>27</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:22%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+<span class=card__aux>37 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>31</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:19%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MCP on 오깅중</title>
+    <link>http://localhost:1313/tags/mcp/</link>
+    <description>Recent content in MCP on 오깅중</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <atom:link href="http://localhost:1313/tags/mcp/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>
