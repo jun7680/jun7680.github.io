@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Simctl on 오깅중</title><link>https://jun7680.github.io/tags/simctl/</link><description>Recent content in Simctl on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Mon, 18 May 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/tags/simctl/index.xml" rel="self" type="application/rss+xml"/><item><title>xcrun simctl launch에 환경변수 안 먹던 이야기</title><link>https://jun7680.github.io/p/simctl-launch-env-vars/</link><pubDate>Mon, 18 May 2026 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/p/simctl-launch-env-vars/</guid><description>&lt;h2 id="도입"&gt;도입&lt;/h2&gt;
+&lt;p&gt;QA 시나리오 캡처 자동화를 짜다가 막혔다.&lt;/p&gt;
+&lt;p&gt;서버 응답에 따라 분기되는 화면 3종을 캡처하고 싶어서, 디버그 빌드에 환경변수
+&lt;code&gt;FORCE_LABS_ENABLED&lt;/code&gt; 로 서버 응답을 덮어쓰는 분기를 넣어뒀다. 그리고 시뮬레이터를
+이렇게 띄웠다.&lt;/p&gt;</description></item></channel></rss>
