@@ -1,0 +1,249 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>MCP 서버 비개발자 동료에게 배포하다 Windows에서 6번 죽었다 — 오깅중</title><meta name=description content="macOS에선 한 줄로 끝나는데 Windows만 함정 6개. Claude Desktop MCP 서버 배포 삽질 기록."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/mcp-windows-deploy-6-traps/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="MCP 서버 비개발자 동료에게 배포하다 Windows에서 6번 죽었다"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/mcp-windows-deploy-6-traps/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="macOS에선 한 줄로 끝나는데 Windows만 함정 6개. Claude Desktop MCP 서버 배포 삽질 기록."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MCP 서버 비개발자 동료에게 배포하다 Windows에서 6번 죽었다"><meta property="article:published_time" content="2026-05-19T10:00:00+09:00"><meta property="article:modified_time" content="2026-05-19T10:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="MCP"><meta property="article:tag" content="Claude Desktop"><meta property="article:tag" content="Windows"><meta property="article:tag" content="PowerShell"><meta property="article:tag" content="PyPI"><meta property="article:tag" content="uv"><meta property="article:tag" content="FastMCP"><meta property="article:tag" content="kakao-moment-mcp"><meta property="article:tag" content="cp949"><meta property="article:tag" content="오픈소스"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="MCP 서버 비개발자 동료에게 배포하다 Windows에서 6번 죽었다"><meta name=twitter:description content="macOS에선 한 줄로 끝나는데 Windows만 함정 6개. Claude Desktop MCP 서버 배포 삽질 기록."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.da3496fd0005a1cacb056c7658cc28e952483d7c70323aa4dac060c8b56fd806.css integrity="sha256-2jSW/QAFocrLBWx2WMwo6VJIPXxwMjqk2sBgyLVv2AY="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
+<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
+<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span>MCP</span>
+<span>·</span>
+<span>MAY 19, 2026</span>
+<span>·</span>
+<span>6분 읽기</span></div><h1 class=article__title>MCP 서버 비개발자 동료에게 배포하다 Windows에서 6번 죽었다</h1><p class=article__desc>macOS에선 한 줄로 끝나는데 Windows만 함정 6개. Claude Desktop MCP 서버 배포 삽질 기록.</p></header><div class=article__body><p>직접 만든 MCP 서버(<code>kakao-moment-mcp</code>)를 비개발자 동료에게 배포하는 작업이었다. macOS에서는 <code>uvx</code> 한 줄로 끝나는데 Windows에서 갈렸다. 내 PC도 아니라 동료 PC로 원격 디버깅을 돌리면서 6번쯤 죽었다 살아났다. 같은 길 갈 사람이 시간 덜 쓰라고 기록해둔다.</p><h2 id=0-전제>0. 전제</h2><ul><li>패키지: PyPI <code>kakao-moment-mcp</code> (Python, FastMCP)</li><li>배포 수단: <code>uvx --from kakao-moment-mcp ...</code> 한 줄, 또는 더블클릭 <code>install-windows.bat</code></li><li>타깃: Claude Desktop / Cursor / Cline / Claude Code</li></ul><h2 id=1-bat-인코딩--cp949--utf-8>1. <code>.bat</code> 인코딩 = cp949 ≠ UTF-8</h2><p>macOS에서 작성한 <code>.bat</code>을 GitHub에 올려 Windows 동료에게 받게 했더니:</p><pre tabindex=0><code>&#39;배치파일이 아닙니다.&#39;
+</code></pre><p>뜨고 한글이 다 깨졌다.</p><p>원인:</p><ul><li>한국어 Windows cmd의 기본 codepage는 <strong>cp949</strong></li><li>macOS가 만든 <code>.bat</code>은 <strong>UTF-8 + LF</strong></li><li>cmd는 <strong>CRLF</strong> 줄바꿈 필수</li></ul><h3 id=교훈--utf-8--crlf--chcp-조합>교훈 — UTF-8 + CRLF + chcp 조합</h3><p>Windows <code>.bat</code>은 UTF-8 (no BOM) + CRLF + <code>chcp 65001</code> 첫 줄 조합이 가장 호환된다. 그리고 git에 line-ending 변환이 자동으로 망치지 않도록 <code>installers/*.bat</code>을 binary로 지정해둬야 한다.</p><pre tabindex=0><code class=language-gitattributes data-lang=gitattributes>* text=auto eol=lf
+installers/*.bat binary
+</code></pre><h2 id=2-windows-gui-앱은-사용자-path-못-본다>2. Windows GUI 앱은 사용자 PATH 못 본다</h2><p><code>.bat</code>에서 <code>uvx</code> 설치 → 같은 cmd 세션에서는 잡힘 → setup 끝남 → Claude Desktop 띄움 → <strong><code>uvx not found</code></strong>. MCP 서버 spawn 실패. 로그조차 안 남는다.</p><p>원인: Claude Desktop 같은 GUI 앱은 explorer.exe의 자식 프로세스다. 새 cmd가 갱신된 PATH를 받는 것과 달리 GUI 앱은 셸 재시작 / 로그아웃 전엔 옛 PATH를 들고 다닌다.</p><pre class=mermaid>sequenceDiagram
+    participant U as 동료 PC 사용자
+    participant Bat as install.bat (cmd 세션)
+    participant Reg as Windows 사용자 PATH
+    participant Exp as explorer.exe<br>(GUI 셸)
+    participant Claude as Claude Desktop
+
+    Note over U,Claude: 실패 흐름 (uvx 이름만 적었을 때)
+    U->>Bat: install.bat 실행
+    Bat->>Reg: uv 설치, PATH에 ~/.local/bin 추가
+    Reg-->>Bat: 새 세션부터 반영
+    Bat-->>U: "설치 완료"
+    U->>Claude: 아이콘 클릭
+    Exp->>Claude: 자식 프로세스로 실행<br>(옛 PATH 상속)
+    Claude->>Claude: command="uvx" 검색
+    Claude--xU: uvx not found<br>(로그도 안 남음)
+
+    Note over U,Claude: 성공 흐름 (절대경로 fix)
+    U->>Bat: install.bat 실행
+    Bat->>Bat: where uvx → 절대경로 획득
+    Bat->>Claude: config.command = "C:\Users\...\uvx.exe"
+    U->>Claude: 재시작
+    Claude->>Claude: 절대경로 직접 실행<br>(PATH 무관)
+    Claude-->>U: MCP 서버 정상 동작
+</pre><p><code>uvx</code> 이름만 적으면 explorer.exe가 상속한 옛 PATH 때문에 못 찾는다. 절대경로로 지정해두면 PATH와 무관해진다.</p><h3 id=교훈--config의-command는-절대경로>교훈 — config의 command는 절대경로</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-jsonc data-lang=jsonc><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;command&#34;</span><span class=p>:</span> <span class=s2>&#34;C:\\Users\\xxx\\.local\\bin\\uvx.exe&#34;</span><span class=p>,</span>  <span class=c1>// 절대경로 + \\ escape
+</span></span></span><span class=line><span class=cl>  <span class=nt>&#34;args&#34;</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;kakao-moment-mcp&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h2 id=3-powershell-51--convertfrom-json--ashashtable-없음>3. PowerShell 5.1 = <code>ConvertFrom-Json -AsHashtable</code> 없음</h2><p><code>.bat</code> 안에서 PowerShell로 config JSON 머지를 자동화하려고 이렇게 짰다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$json</span> <span class=p>=</span> <span class=nb>Get-Content</span> <span class=nv>$cfg</span> <span class=n>-Raw</span> <span class=p>|</span> <span class=nb>ConvertFrom-Json</span> <span class=n>-AsHashtable</span>
+</span></span></code></pre></div><p>Windows 기본 PS 5.1에서:</p><pre tabindex=0><code>A parameter cannot be found that matches parameter name &#39;AsHashtable&#39;.
+</code></pre><p><code>-AsHashtable</code>은 PS 6.0+ 전용이다.</p><h3 id=교훈--ps-51-호환은-pscustomobject--add-member>교훈 — PS 5.1 호환은 PSCustomObject + Add-Member</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$obj</span> <span class=p>=</span> <span class=nb>Get-Content</span> <span class=nv>$cfg</span> <span class=n>-Raw</span> <span class=p>|</span> <span class=nb>ConvertFrom-Json</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=nv>$obj</span><span class=p>.</span><span class=py>PSObject</span><span class=p>.</span><span class=py>Properties</span><span class=p>.</span><span class=py>Match</span><span class=p>(</span><span class=s1>&#39;mcpServers&#39;</span><span class=p>).</span><span class=n>Count</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Add-Member</span> <span class=n>-InputObject</span> <span class=nv>$obj</span> <span class=n>-NotePropertyName</span> <span class=n>mcpServers</span> <span class=n>-NotePropertyValue</span> <span class=p>([</span><span class=no>pscustomobject</span><span class=p>]</span><span class=vm>@</span><span class=p>{})</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h2 id=4-cmd-한-줄에-powershell--따옴표-헬>4. cmd 한 줄에 PowerShell = 따옴표 헬</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-cmd data-lang=cmd><span class=line><span class=cl>powershell -NoProfile -Command <span class=s2>&#34;$cfg=&#39;</span><span class=nv>%APPDATA%</span><span class=s2>\..\config.json&#39;; ...&#34;</span>
+</span></span></code></pre></div><p>이렇게 짜면 cmd의 <code>^</code> 라인 continuation 처리 + PowerShell의 <code>"</code> 이스케이프 + JSON 안의 <code>\\</code> … 세 단계 escape가 뒤엉켜 어느 한 줄만 길어져도 깨진다.</p><h3 id=교훈--ps1-따로>교훈 — .ps1 따로</h3><p>cmd 안에 PowerShell을 길게 넣지 말자. 별도 <code>.ps1</code> 파일에 분리하고 cmd는 그것만 호출한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-cmd data-lang=cmd><span class=line><span class=cl>powershell -NoProfile -ExecutionPolicy Bypass -Command <span class=se>^
+</span></span></span><span class=line><span class=cl><span class=se> </span>   <span class=s2>&#34;irm https://raw.githubusercontent.com/.../_fix.ps1 | iex&#34;</span>
+</span></span></code></pre></div><h2 id=5-microsoft-store-버전-claude--샌드박스-config-경로>5. Microsoft Store 버전 Claude = 샌드박스 config 경로</h2><p>진짜 마지막에 발견한 함정이었다. Claude Desktop을 <strong>Microsoft Store</strong>에서 설치하면 일반 config 경로:</p><pre tabindex=0><code>%APPDATA%\Claude\claude_desktop_config.json
+</code></pre><p>가 <strong>무효</strong>다. 진짜 config는 샌드박스 안에 따로 있다.</p><pre tabindex=0><code>%LOCALAPPDATA%\Packages\Anthropic.Claude_*\LocalCache\Roaming\Claude\claude_desktop_config.json
+</code></pre><p>config를 잘 수정해서 저장하고 Claude를 재시작해도 다른 파일을 보고 있어서 무반응. 로그 디렉토리(<code>mcp-server-*.log</code>)를 봤더니 다른 MCP는 다 떴는데 우리 것만 시작 흔적이 0인 게 결정적 단서였다.</p><pre class=mermaid>flowchart TD
+    Start([Claude Desktop 설치 PC]) --> Q1{설치 경로 유형?}
+    Q1 -->|installer .exe| P1["%APPDATA%\Claude\<br>claude_desktop_config.json"]
+    Q1 -->|Microsoft Store| P2["%LOCALAPPDATA%\Packages\<br>Anthropic.Claude_*\<br>LocalCache\Roaming\Claude\<br>claude_desktop_config.json"]
+    Q1 -->|모르겠음| Scan["USERPROFILE 전체에서<br>claude_desktop_config.json 검색"]
+
+    P1 --> Merge[발견된 모든 경로에<br>mcpServers 머지]
+    P2 --> Merge
+    Scan --> Found{발견 개수}
+    Found -->|0개| Fail([수동 생성])
+    Found -->|1개 이상| Merge
+
+    Merge --> Restart[Claude Desktop 재시작]
+    Restart --> Verify{MCP 서버 인식?}
+    Verify -->|예| Done([완료])
+    Verify -->|아니오| Logs["%APPDATA%\Claude\logs\<br>mcp-server-*.log 확인"]
+</pre><p>설치 유형에 따라 갈리는 Claude Desktop config 경로. MS Store 버전은 샌드박스 안쪽에 따로 산다.</p><h3 id=교훈--후보-경로-다중-탐색>교훈 — 후보 경로 다중 탐색</h3><p>자동 등록 스크립트는 후보 경로를 <strong>여러 개</strong> 시도해야 한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$cfgCandidates</span> <span class=p>=</span> <span class=vm>@</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Join-Path</span> <span class=nv>$env:APPDATA</span> <span class=s1>&#39;Claude\claude_desktop_config.json&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nv>$env:LOCALAPPDATA</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$packages</span> <span class=p>=</span> <span class=nb>Join-Path</span> <span class=nv>$env:LOCALAPPDATA</span> <span class=s1>&#39;Packages&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Get-ChildItem</span> <span class=nv>$packages</span> <span class=n>-Filter</span> <span class=s1>&#39;Claude*&#39;</span> <span class=n>-ErrorAction</span> <span class=n>SilentlyContinue</span> <span class=p>|</span> <span class=nb>ForEach-Object</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nv>$cfgCandidates</span> <span class=p>+=</span> <span class=nb>Join-Path</span> <span class=nv>$_</span><span class=p>.</span><span class=py>FullName</span> <span class=s1>&#39;LocalCache\Roaming\Claude\claude_desktop_config.json&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>진짜 찾고 싶으면 한 줄로:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-cmd data-lang=cmd><span class=line><span class=cl>powershell -Command <span class=s2>&#34;Get-ChildItem $env:USERPROFILE -Recurse -Filter &#39;claude_desktop_config.json&#39; -ErrorAction SilentlyContinue&#34;</span>
+</span></span></code></pre></div><h2 id=6-pypi--같은-버전-재업로드-금지-yank--delete>6. PyPI = 같은 버전 재업로드 금지, yank ≠ delete</h2><p>배포 자동화 만들어놓고 신나서 0.1.1 게시 → 메타데이터에 옛 식별자가 남아 있는 걸 발견 → 수정 → 다시 게시 → <code>400 File already exists</code>.</p><h3 id=교훈--재게시-불가-yank의-의미-dryrun>교훈 — 재게시 불가, yank의 의미, dryrun</h3><ol><li><strong>재게시 불가</strong> — 같은 버전 번호 + 같은 파일 = PyPI가 영구 거부 (보안상)</li><li><strong>버전 bump</strong> 후 다시</li><li>옛 버전을 숨기려면 <strong>Yank</strong> (<code>pip install pkg==old</code>만 가능, 일반 install에선 무시) — 한국어 UI에서는 **&ldquo;제거된 릴리즈&rdquo;**라고 번역됨</li><li><strong>Delete</strong>는 위험 — 다운스트림 의존성 깨짐, 같은 버전 영구 재사용 불가</li></ol><p>오픈소스 첫 게시 전엔 dryrun + 작은 0.0.x로 메타데이터 검증을 충분히 돌리자.</p><h2 id=7-보너스-자격증명-노출--즉시-재발급>7. (보너스) 자격증명 노출 → 즉시 재발급</h2><p>디버깅 중에 동료가 config 파일 전체를 채팅에 그대로 붙여 넣었다. 거기에 <strong>Google Ads developer token + Naver API key</strong>가 그대로 들어 있었다. AI 채팅이 비공개라도 노출은 노출이다.</p><h3 id=교훈--자격증명-다루기>교훈 — 자격증명 다루기</h3><ul><li>자격증명 요청 전에 본인 화면 한 번 검열</li><li>노출 시 <strong>즉시</strong> 발급처에서 revoke + 재발급</li><li>README에 &ldquo;config 공유 시 시크릿 제거&rdquo; 경고 필수</li></ul><hr><h2 id=종합--비개발자용-mcp-패키지-배포-체크리스트>종합 — 비개발자용 MCP 패키지 배포 체크리스트</h2><ul><li><code>.bat</code>: UTF-8 + CRLF + <code>chcp 65001</code> + <code>.gitattributes binary</code></li><li>config의 <code>command</code>는 절대경로 (Windows 한정)</li><li>PowerShell 5.1 호환 (<code>-AsHashtable</code> 금지)</li><li>인라인 PS 대신 <code>.ps1</code> 파일 호스팅 + <code>irm | iex</code></li><li>Claude Desktop config 경로 후보 다중 탐색 (MS Store 샌드박스 포함)</li><li>PyPI: 메타데이터 검증 → 작은 버전 시리즈로 게시 → 운영 버전 게시</li><li>시크릿 노출 가이드 + 자동 진단(<code>doctor</code> CLI) 제공</li></ul><p><code>uvx --from &lt;pkg> &lt;pkg>-setup</code> 한 줄로 비개발자에게 줄 수 있게 만드는 건 <strong>실제로 안 쉽다</strong>. macOS / Linux는 거의 공짜로 동작하지만 Windows만 함정이 6개. 이 글이 같은 길 갈 사람의 시간을 줄여주길.</p><hr><h2 id=참고>참고</h2><ul><li>프로젝트: <a href=https://github.com/jun7680/kakao-moment-mcp>github.com/jun7680/kakao-moment-mcp</a></li><li>PyPI: <a href=https://pypi.org/project/kakao-moment-mcp/>pypi.org/project/kakao-moment-mcp/</a></li><li>사용한 도구: Claude Code (Anthropic)</li></ul><hr><blockquote><p>결론: Windows 배포만큼은 진짜 빡세다.</p></blockquote></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
+<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
+<span class=card__aux>138</span>
+<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
+<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
+<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>3</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
+<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>3</span></a>
+<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>6</span></a>
+<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>4</span></a>
+<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>6</span></a>
+<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>1</span></a>
+<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
+<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>2</span></a>
+<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
+<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
+<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios/>#ios<span class=tag__count>5</span></a>
+<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
+<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
+<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>11</span></a>
+<a class=tag href=/tags/modal/>#modal<span class=tag__count>1</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
+<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
+<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
+<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
+<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>2</span></a>
+<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
+<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
+<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
+<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>9</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>11</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>16</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
+<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>11</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
+<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
+<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
+<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
+<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%AA%A8%EB%8B%AC-%EC%88%9C%EC%84%9C%EB%8C%80%EB%A1%9C-%EB%9D%84%EC%9A%B0%EA%B8%B0/>#모달 순서대로 띄우기<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>47 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>41</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:15%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script><script type=module>
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+</script></body></html>
