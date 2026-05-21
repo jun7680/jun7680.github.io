@@ -1,6 +1,40 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on 오깅중</title><link>https://jun7680.github.io/page/</link><description>Recent content in Pages on 오깅중</description><generator>Hugo</generator><language>ko</language><lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://jun7680.github.io/page/index.xml" rel="self" type="application/rss+xml"/><item><title>Archives</title><link>https://jun7680.github.io/archives/</link><pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/archives/</guid><description/></item><item><title>About</title><link>https://jun7680.github.io/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/about/</guid><description>&lt;p&gt;iOS 개발하면서 만진 패턴, 디버깅한 자국, 새로 배운 거를 모아두는 공간입니다.&lt;/p&gt;
-&lt;h2 id="작성자"&gt;작성자&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;오깅중&lt;/strong&gt; — iOS Developer.&lt;/p&gt;
-&lt;p&gt;Swift / SwiftUI / UIKit 위주로 작업하고, 최근에는 SwiftData·Swift Concurrency 마이그레이션을 굴리는 중. 글은 회고·가이드·디버깅 메모 형태로 쌓고 있어요.&lt;/p&gt;</description></item><item><title>Search</title><link>https://jun7680.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/search/</guid><description>&lt;p&gt;이 블로그는 헤더 우측의 검색 버튼 또는 &lt;code&gt;⌘K&lt;/code&gt;로 검색을 열 수 있습니다.&lt;/p&gt;</description></item><item><title>개인정보처리방침</title><link>https://jun7680.github.io/privacy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://jun7680.github.io/privacy/</guid><description>&lt;p&gt;본 블로그(&lt;code&gt;jun7680.github.io&lt;/code&gt;)는 방문자의 개인정보를 안전하게 다루기 위해 다음과 같이 처리방침을 안내합니다.&lt;/p&gt;
-&lt;h2 id="1-수집하는-정보"&gt;1. 수집하는 정보&lt;/h2&gt;
-&lt;p&gt;본 블로그는 별도의 회원가입·로그인 기능을 제공하지 않으며, 방문자에게 개인정보를 직접 요청하지 않습니다.&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pages on 오깅중</title>
+    <link>http://localhost:1313/page/</link>
+    <description>Recent content in Pages on 오깅중</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/page/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Archives</title>
+      <link>http://localhost:1313/archives/</link>
+      <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/archives/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>About</title>
+      <link>http://localhost:1313/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/about/</guid>
+      <description>&lt;p&gt;iOS 개발하면서 만진 패턴, 디버깅한 자국, 새로 배운 거를 모아두는 공간입니다.&lt;/p&gt;&#xA;&lt;h2 id=&#34;작성자&#34;&gt;작성자&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;오깅중&lt;/strong&gt; — iOS Developer.&lt;/p&gt;&#xA;&lt;p&gt;Swift / SwiftUI / UIKit 위주로 작업하고, 최근에는 SwiftData·Swift Concurrency 마이그레이션을 굴리는 중. 글은 회고·가이드·디버깅 메모 형태로 쌓고 있어요.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Search</title>
+      <link>http://localhost:1313/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/search/</guid>
+      <description>&lt;p&gt;이 블로그는 헤더 우측의 검색 버튼 또는 &lt;code&gt;⌘K&lt;/code&gt;로 검색을 열 수 있습니다.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>개인정보처리방침</title>
+      <link>http://localhost:1313/privacy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/privacy/</guid>
+      <description>&lt;p&gt;본 블로그(&lt;code&gt;jun7680.github.io&lt;/code&gt;)는 방문자의 개인정보를 안전하게 다루기 위해 다음과 같이 처리방침을 안내합니다.&lt;/p&gt;&#xA;&lt;h2 id=&#34;1-수집하는-정보&#34;&gt;1. 수집하는 정보&lt;/h2&gt;&#xA;&lt;p&gt;본 블로그는 별도의 회원가입·로그인 기능을 제공하지 않으며, 방문자에게 개인정보를 직접 요청하지 않습니다.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
