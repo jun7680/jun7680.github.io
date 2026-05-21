@@ -16,8 +16,9 @@
 <span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
 <span class=site-tagline__bracket>]</span></div><main class=page><div><section><div class=section-label><span>SWIFTUI</span>
 <span class=section-label__rule></span>
-<span class=section-label__count>18</span></div><div class=posts><a class=post-row href=/p/swiftui-list-lazyvstack-performance/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>SwiftUI List 스크롤 끊길 때 점검하는 메모</h3><p class=post-row__sub>SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>5 MIN</span></div></a><a class=post-row href=/p/state-stateobject-observedobject-observable-ios17/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</h3><p class=post-row__sub>iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span class=section-label__count>19</span></div><div class=posts><a class=post-row href=/p/navigationview-to-navigationstack-migration/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>NavigationView에서 NavigationStack으로 옮긴 메모</h3><p class=post-row__sub>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>5 MIN</span></div></a><a class=post-row href=/p/swiftui-list-lazyvstack-performance/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>SwiftUI List 스크롤 끊길 때 점검하는 메모</h3><p class=post-row__sub>SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>5 MIN</span></div></a><a class=post-row href=/p/state-stateobject-observedobject-observable-ios17/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</h3><p class=post-row__sub>iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
 <span>5 MIN</span></div></a></div><nav class=pagination aria-label=페이지네이션><a href=/tags/swiftui/page/2/>← PREV</a>
 <span>PAGE 03 / 03</span>
 <span class="pagination__btn is-disabled">NEXT →</span></nav></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
@@ -78,7 +79,7 @@
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>8</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>9</span></a>
 <a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
 <a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
 <a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
@@ -95,8 +96,8 @@
 <a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
 <a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
 <a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
 <a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
@@ -143,7 +144,7 @@
 <a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>11</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>18</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>19</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
 <a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
@@ -174,8 +175,8 @@
 <a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>56 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>50</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=card__aux>57 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>51</span></div><div class=archive-row><span class=archive-row__year>2022</span>
 <span class=archive-row__bar><div style=width:12%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │

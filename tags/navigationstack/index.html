@@ -16,7 +16,8 @@
 <span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
 <span class=site-tagline__bracket>]</span></div><main class=page><div><section><div class=section-label><span>NAVIGATIONSTACK</span>
 <span class=section-label__rule></span>
-<span class=section-label__count>01</span></div><div class=posts><a class=post-row href=/p/navigationview-to-navigationstack-migration/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>NavigationView에서 NavigationStack으로 옮긴 메모</h3><p class=post-row__sub>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span class=section-label__count>02</span></div><div class=posts><a class=post-row href=/p/swiftui-navigationstack-duplicate-push/><div class=post-row__index>P_001</div><div class=post-row__category>SwiftUI</div><div><h3 class=post-row__title>NavigationStack에서 화면이 두 번 쌓이는 세 가지 케이스</h3><p class=post-row__sub>SwiftUI NavigationStack에서 같은 화면이 두 번씩 쌓이는 세 가지 케이스와 어떻게 정리했는지 기록</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>4 MIN</span></div></a><a class=post-row href=/p/navigationview-to-navigationstack-migration/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>NavigationView에서 NavigationStack으로 옮긴 메모</h3><p class=post-row__sub>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
 <span>5 MIN</span></div></a></div></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
 <span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
 — iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
@@ -75,7 +76,7 @@
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>8</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>9</span></a>
 <a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
 <a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
 <a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
@@ -92,8 +93,8 @@
 <a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
 <a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
 <a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
 <a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
@@ -140,7 +141,7 @@
 <a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>11</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>18</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>19</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
 <a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
@@ -171,8 +172,8 @@
 <a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>56 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>50</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=card__aux>57 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>51</span></div><div class=archive-row><span class=archive-row__year>2022</span>
 <span class=archive-row__bar><div style=width:12%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │

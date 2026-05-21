@@ -16,15 +16,17 @@
 <span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
 <span class=site-tagline__bracket>]</span></div><main class=page><div><section><div class=section-label><span>IOS17</span>
 <span class=section-label__rule></span>
-<span class=section-label__count>08</span></div><div class=posts><a class=post-row href=/p/swiftui-onchange-infinite-loop/><div class=post-row__index>P_001</div><div class=post-row__category>SwiftUI</div><div><h3 class=post-row__title>SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다</h3><p class=post-row__sub>SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
-<span>6 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</h3><p class=post-row__sub>마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>14 MIN</span></div></a><a class=post-row href=/p/state-stateobject-observedobject-observable-ios17/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</h3><p class=post-row__sub>iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>5 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)</h3><p class=post-row__sub>동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>10 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-4-combine-integration/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 4 — Combine 통합)</h3><p class=post-row__sub>SwiftData에는 Realm Results 같은 자동 Combine publisher가 없다. Just(snapshot) + NotificationCenter merge로 직접 만들고, Just 첫 emit 즉시 흐름·이벤트 누락·잦은 이벤트·스레드 격리 4함정에 가드 거는 패턴.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>12 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)</h3><p class=post-row__sub>SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
-<span>11 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</h3><p class=post-row__sub>SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기.</p></div><div class=post-row__meta><b>MAY 11, 2026</b>
-<span>12 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-1-strategy/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)</h3><p class=post-row__sub>iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다.</p></div><div class=post-row__meta><b>MAY 11, 2026</b>
-<span>13 MIN</span></div></a></div></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=section-label__count>09</span></div><div class=posts><a class=post-row href=/p/swiftui-navigationstack-duplicate-push/><div class=post-row__index>P_001</div><div class=post-row__category>SwiftUI</div><div><h3 class=post-row__title>NavigationStack에서 화면이 두 번 쌓이는 세 가지 케이스</h3><p class=post-row__sub>SwiftUI NavigationStack에서 같은 화면이 두 번씩 쌓이는 세 가지 케이스와 어떻게 정리했는지 기록</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>4 MIN</span></div></a><a class=post-row href=/p/swiftui-onchange-infinite-loop/><div class=post-row__index>P_002</div><div class=post-row__category>SwiftUI</div><div><h3 class=post-row__title>SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다</h3><p class=post-row__sub>SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>6 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</h3><p class=post-row__sub>마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>14 MIN</span></div></a><a class=post-row href=/p/state-stateobject-observedobject-observable-ios17/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</h3><p class=post-row__sub>iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>5 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)</h3><p class=post-row__sub>동기 메서드 안에 숨겨둔 Task { await }는 호출자가 sync 완료를 모르는 fire-and-forget 안티패턴이다. SwiftData 갱신 전 옛 캐시 query가 먼저 도착해 EmptyView 한 프레임이 깜빡인 흐름과 async 시그니처 전파로 정직하게 푼 패턴 정리.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>10 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-4-combine-integration/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 4 — Combine 통합)</h3><p class=post-row__sub>SwiftData에는 Realm Results 같은 자동 Combine publisher가 없다. Just(snapshot) + NotificationCenter merge로 직접 만들고, Just 첫 emit 즉시 흐름·이벤트 누락·잦은 이벤트·스레드 격리 4함정에 가드 거는 패턴.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>12 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)</h3><p class=post-row__sub>SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지.</p></div><div class=post-row__meta><b>MAY 12, 2026</b>
+<span>11 MIN</span></div></a><a class=post-row href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</h3><p class=post-row__sub>SwiftData `@Attribute(.unique)` PK를 쓰다 만난 silent failure 3종 — sentinel 기본값, hashValue 시드 랜덤, Predicate enum 비교. 결정적 해시로 막은 이야기.</p></div><div class=post-row__meta><b>MAY 11, 2026</b>
+<span>12 MIN</span></div></a></div><nav class=pagination aria-label=페이지네이션><span class="pagination__btn is-disabled">← PREV</span>
+<span>PAGE 01 / 02</span>
+<a href=/tags/ios17/page/2/>NEXT →</a></nav></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
 <span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
 — iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
 <a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
@@ -82,7 +84,7 @@
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>8</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>9</span></a>
 <a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
 <a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
 <a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
@@ -99,8 +101,8 @@
 <a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
 <a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
 <a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
 <a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
 <a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
 <a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
@@ -147,7 +149,7 @@
 <a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>11</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>18</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>19</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
 <a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
@@ -178,8 +180,8 @@
 <a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>56 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>50</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=card__aux>57 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>51</span></div><div class=archive-row><span class=archive-row__year>2022</span>
 <span class=archive-row__bar><div style=width:12%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │

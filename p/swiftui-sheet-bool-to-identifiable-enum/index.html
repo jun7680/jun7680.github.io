@@ -1,699 +1,241 @@
-<!DOCTYPE html>
-<html lang="ko" data-theme="dark">
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로 — 오깅중</title>
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글">
-<meta name="author" content="오깅중">
-<link rel="canonical" href="http://localhost:1313/p/swiftui-sheet-bool-to-identifiable-enum/">
-
-
-
-<meta name="naver-site-verification" content="d6a2cbad0afbab2751d616c4188a11743ef463bc">
-<meta name="google-adsense-account" content="ca-pub-8273127451497178">
-
-<meta property="og:type" content="article">
-<meta property="og:title" content="SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로">
-<meta property="og:site_name" content="오깅중">
-<meta property="og:url" content="http://localhost:1313/p/swiftui-sheet-bool-to-identifiable-enum/">
-<meta property="og:locale" content="ko_KR">
-<meta property="og:description" content="SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글">
-<meta property="og:image" content="http://localhost:1313/og-default.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로">
-
-<meta property="article:published_time" content="2026-05-21T13:45:26&#43;09:00">
-<meta property="article:modified_time" content="2026-05-21T13:45:26&#43;09:00">
-<meta property="article:author" content="오깅중">
-<meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="sheet"><meta property="article:tag" content="State"><meta property="article:tag" content="Modal">
-
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로">
-<meta name="twitter:description" content="SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글">
-<meta name="twitter:image" content="http://localhost:1313/og-default.png">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
-
-
-<link rel="stylesheet" href="/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css" integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE=">
-
-<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/index.xml" title="오깅중 RSS">
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin="anonymous"></script>
-
-
-
-
-</head>
-<body>
-<div class="scroll-progress"><div id="progress-bar"></div></div>
-<header class="site-header">
-  <div class="site-header__inner">
-    <a href="http://localhost:1313/" class="wordmark" aria-label="오깅중 홈">
-      <span>오깅중</span>
-      <span class="wordmark__cursor" aria-hidden="true"></span>
-      <span class="wordmark__mono">/ ogging.dev</span>
-    </a>
-    <nav class="site-nav" id="site-nav">
-      
-      
-        <a href="/" >Home</a>
-      
-        <a href="/archives/" >Archives</a>
-      
-        <a href="/tags/" >Tags</a>
-      
-        <a href="/categories/" >Categories</a>
-      
-        <a href="/about/" >About</a>
-      
-    </nav>
-    <div class="header-tools">
-      <button class="search-btn" id="search-btn" type="button" aria-label="검색 열기">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <span class="search-btn__label">검색</span>
-        <kbd>⌘K</kbd>
-      </button>
-      <button class="nav-toggle" id="nav-toggle" type="button" aria-label="메뉴 열기/닫기" aria-controls="site-nav" aria-expanded="false">
-        <span class="nav-toggle__bar"></span>
-        <span class="nav-toggle__bar"></span>
-        <span class="nav-toggle__bar"></span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="site-tagline" role="doc-subtitle">
-  <span class="site-tagline__bracket">[</span>
-  <span class="site-tagline__text">AI보다 빨리 디버깅하기</span>
-  <span class="site-tagline__bracket">]</span>
-</div>
-<main class="page">
-  <div>
-    
-
-
-<article class="article reveal-in">
-  <header class="article__header">
-    <div class="article__meta">
-      <span class="meta-cat">SwiftUI</span>
-      <span>·</span>
-      <span>MAY 21, 2026</span>
-      <span>·</span>
-      <span>5분 읽기</span>
-    </div>
-    <h1 class="article__title">SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로</h1>
-    <p class="article__desc">SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글</p>
-  </header>
-  <div class="article__body">
-    <p>처음에 SwiftUI에서 <code>.sheet</code>를 띄울 일이 두 개 정도였을 때는 별생각 없이 <code>@State private var showProfile = false</code>, <code>@State private var showSettings = false</code> 식으로 Bool 두 개 잡아서 썼다. 동작도 잘 됐고 별 문제 없었다.</p>
-<p>근데 세 번째 sheet가 추가되는 순간부터 갑자기 동작이 이상해지는 케이스가 생겼고 어느 sheet가 닫히고 다른 게 뜨는 흐름에서 race가 보이기 시작해서 결국 enum 하나로 갈아엎었다. 그 얘기다.</p>
-<h2 id="많이-실수하는-코드">많이 실수하는 코드</h2>
-<p>홈 화면에 모달이 세 개 있다고 치자. 가장 손이 빠른 코드는 보통 이렇게 나온다.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">struct</span> <span class="nc">HomeView</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">@</span><span class="n">State</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">showProfile</span> <span class="p">=</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">    <span class="p">@</span><span class="n">State</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">showSettings</span> <span class="p">=</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">    <span class="p">@</span><span class="n">State</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">showAbout</span> <span class="p">=</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">VStack</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="n">Button</span><span class="p">(</span><span class="s">&#34;프로필&#34;</span><span class="p">)</span> <span class="p">{</span> <span class="n">showProfile</span> <span class="p">=</span> <span class="kc">true</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="n">Button</span><span class="p">(</span><span class="s">&#34;설정&#34;</span><span class="p">)</span> <span class="p">{</span> <span class="n">showSettings</span> <span class="p">=</span> <span class="kc">true</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="n">Button</span><span class="p">(</span><span class="s">&#34;정보&#34;</span><span class="p">)</span> <span class="p">{</span> <span class="n">showAbout</span> <span class="p">=</span> <span class="kc">true</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">sheet</span><span class="p">(</span><span class="n">isPresented</span><span class="p">:</span> <span class="err">$</span><span class="n">showProfile</span><span class="p">)</span> <span class="p">{</span> <span class="n">ProfileView</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">sheet</span><span class="p">(</span><span class="n">isPresented</span><span class="p">:</span> <span class="err">$</span><span class="n">showSettings</span><span class="p">)</span> <span class="p">{</span> <span class="n">SettingsView</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">sheet</span><span class="p">(</span><span class="n">isPresented</span><span class="p">:</span> <span class="err">$</span><span class="n">showAbout</span><span class="p">)</span> <span class="p">{</span> <span class="n">AboutView</span><span class="p">()</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>겉으로는 깔끔하게 분리된 것처럼 보이는데 막상 돌려보면 sheet가 안 뜨거나, 닫고 다른 걸 띄우면 빈 화면이 한 번 깜빡이고 뜨는 식의 이상 동작이 종종 잡힌다.</p>
-<h2 id="왜-문제">왜 문제</h2>
-<p>크게 세 가지가 겹친다.</p>
-<p>첫째로 SwiftUI에서 같은 view에 <code>.sheet</code> modifier를 여러 개 붙이면 보통 마지막 하나만 살아남고 나머지는 무시되는 경우가 있어서 위 코드는 그 자체가 SwiftUI가 보기엔 &ldquo;이 view는 sheet가 하나&quot;인 셈인데 우리는 세 개라고 생각하고 있는 거다.</p>
-<p>둘째로 한 sheet가 닫히기 전에 다른 sheet를 띄우려고 dismiss 콜백 안에서 다른 Bool을 true로 만들면 SwiftUI가 첫 sheet의 dismiss 애니메이션과 두 번째 sheet의 present 애니메이션을 동시에 처리하다가 race가 나는데 이게 시뮬레이터에선 잘 되고 실기기에선 깨지는 식으로 재현이 까다롭다.</p>
-<p>셋째로 Bool N개는 상태 공간이 2^N이라서 &ldquo;showProfile == true &amp;&amp; showSettings == true&rdquo; 같은 의미상 불가능한 상태가 코드 차원에선 가능해진다. 우리는 머릿속에서 &ldquo;동시엔 한 개만 뜨지&rdquo; 라고 가정하지만 SwiftUI는 그런 가정을 모른다.</p>
-<p>핵심은 이거다.</p>
-<blockquote>
-<p>modal 상태는 본질적으로 &ldquo;지금 뜬 게 뭐냐&quot;라는 하나의 값인데 그걸 N개 Bool로 흩뿌리면 그 사이가 다 의미 없는 상태 공간이 된다</p>
-</blockquote>
-<h2 id="해결--identifiable-enum-한-개">해결 — Identifiable enum 한 개</h2>
-<p>값이 본질적으로 하나라면 그렇게 모델링하면 된다.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">enum</span> <span class="nc">ActiveSheet</span><span class="p">:</span> <span class="n">Identifiable</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">profile</span>
-</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">settings</span>
-</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">about</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nv">id</span><span class="p">:</span> <span class="kc">Self</span> <span class="p">{</span> <span class="kc">self</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">struct</span> <span class="nc">HomeView</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">@</span><span class="n">State</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">activeSheet</span><span class="p">:</span> <span class="n">ActiveSheet</span><span class="p">?</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">VStack</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="n">Button</span><span class="p">(</span><span class="s">&#34;프로필&#34;</span><span class="p">)</span> <span class="p">{</span> <span class="n">activeSheet</span> <span class="p">=</span> <span class="p">.</span><span class="n">profile</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="n">Button</span><span class="p">(</span><span class="s">&#34;설정&#34;</span><span class="p">)</span> <span class="p">{</span> <span class="n">activeSheet</span> <span class="p">=</span> <span class="p">.</span><span class="n">settings</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="n">Button</span><span class="p">(</span><span class="s">&#34;정보&#34;</span><span class="p">)</span> <span class="p">{</span> <span class="n">activeSheet</span> <span class="p">=</span> <span class="p">.</span><span class="n">about</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">sheet</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="err">$</span><span class="n">activeSheet</span><span class="p">)</span> <span class="p">{</span> <span class="n">sheet</span> <span class="k">in</span>
-</span></span><span class="line"><span class="cl">            <span class="k">switch</span> <span class="n">sheet</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="p">.</span><span class="n">profile</span><span class="p">:</span> <span class="n">ProfileView</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="p">.</span><span class="n">settings</span><span class="p">:</span> <span class="n">SettingsView</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="p">.</span><span class="n">about</span><span class="p">:</span> <span class="n">AboutView</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p><code>activeSheet</code>는 한 번에 하나의 케이스만 가질 수 있는 enum이라 동시에 두 sheet가 뜨는 상태가 타입 차원에서 불가능해지고, <code>.sheet(item:)</code>은 nil → non-nil로 바뀌면 띄우고 non-nil → nil이면 닫는 식으로 동작해서 view에 modifier가 하나만 붙으면 된다.</p>
-<p>대부분의 &ldquo;모달 여러 개 띄우다가 꼬임&rdquo; 케이스는 이걸로 풀린다.</p>
-<h2 id="associated-value를-쓰고-싶을-때">associated value를 쓰고 싶을 때</h2>
-<p>sheet마다 파라미터가 다르면 case에 associated value를 같이 달면 되는데 이때 <code>id</code> 설계가 약간 변수가 된다.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">enum</span> <span class="nc">ActiveSheet</span><span class="p">:</span> <span class="n">Identifiable</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">profile</span><span class="p">(</span><span class="n">userId</span><span class="p">:</span> <span class="nb">String</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">settings</span>
-</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">about</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nv">id</span><span class="p">:</span> <span class="nb">String</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">switch</span> <span class="kc">self</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="p">.</span><span class="n">profile</span><span class="p">(</span><span class="kd">let</span> <span class="nv">userId</span><span class="p">):</span> <span class="k">return</span> <span class="s">&#34;profile-</span><span class="si">\(</span><span class="n">userId</span><span class="si">)</span><span class="s">&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="p">.</span><span class="n">settings</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#34;settings&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="p">.</span><span class="n">about</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#34;about&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p><code>Identifiable</code>은 <code>id</code>만 만족하면 되니까 case별로 id 규칙을 자유롭게 줄 수 있는데 한 가지 알아둘 점은 같은 case의 파라미터만 바꿨을 때(<code>profile(&quot;A&quot;)</code> → <code>profile(&quot;B&quot;)</code>) id가 달라지면 SwiftUI가 &ldquo;다른 아이템이 들어왔다&quot;고 보고 sheet를 한 번 닫았다가 다시 띄운다는 거다.</p>
-<p>이걸 원하면 위 코드처럼 두면 되고, 같은 sheet 안에서 내용만 부드럽게 바꾸고 싶으면 id를 case 이름만으로 묶고 파라미터는 내부 state로 따로 빼면 된다.</p>
-<h2 id="회고">회고</h2>
-<p>같은 패턴은 <code>.fullScreenCover(item:)</code>, <code>.alert(...)</code>, <code>.confirmationDialog(...)</code>에도 거의 그대로 먹어서 한 번 enum 라우팅으로 가는 게 익숙해지면 모달 계열 코드가 전반적으로 차분해진다.</p>
-<p>지나고 보니 Bool 두 개 정도까지는 손이 빠른 만큼 그냥 써도 큰 문제는 없는데 세 개째가 들어오는 순간엔 거의 항상 enum으로 갈아엎는 게 답이었고 결국 &ldquo;지금 띄울 게 뭐냐&quot;라는 질문이 본질적으로 하나의 값이라는 사실을 코드에 반영해주는 일이었다.</p>
-<p>iOS 16 이전엔 <code>.sheet(item:)</code>이 enum identity로 가끔 충돌을 일으키던 시절도 있었는데 17부터는 안정적이라 요즘은 부담 없이 이쪽으로 가도 된다. Bool로 흩뿌리지 말고 한 자리에 모아두자는 게 결론이다.</p>
-
-  </div>
-</article>
-
-  </div>
-  <aside class="sidebar">
-  
-<div class="card" id="about">
-  <div class="card__head">
-    <span class="card__title">ABOUT</span>
-    <span class="card__aux">v2.0</span>
-  </div>
-  <h3 class="about__name">오깅중</h3>
-  <p class="about__role">iOS Developer · Swift</p>
-  <p class="about__bio">"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.
-</p>
-  
-  <div class="about__links">
-    
-      <a class="pill-link" href="https://github.com/jun7680" target="_blank" rel="noopener">GitHub ↗</a>
-    
-      <a class="pill-link" href="https://instagram.com/ockkkk91" target="_blank" rel="noopener">Instagram ↗</a>
-    
-      <a class="pill-link" href="mailto:dlswns9119@gmail.com" >Email ↗</a>
-    
-  </div>
-  
-</div>
-
-  
-  
-<div class="card">
-  <div class="card__head">
-    <span class="card__title">NOW</span>
-    <span class="now-aux"><span class="live-dot"></span> LIVE</span>
-  </div>
-  <div class="now-list">
-    
-      <div><span class="now-label">reading_</span> &#34;Modern Concurrency in Swift&#34;</div>
-    
-      <div><span class="now-label">building_</span> SwiftUI side project</div>
-    
-      <div><span class="now-label">listening_</span> lo-fi beats / focus</div>
-    
-  </div>
-</div>
-
-
-  
-<div class="card">
-  <div class="card__head">
-    <span class="card__title">VISITORS</span>
-  </div>
-  <div class="gc-total">
-    <span class="gc-total__label">누적 방문자</span>
-    <span class="gc-total__value" id="gc-total">—</span>
-  </div>
-  <script>
-    (function () {
-      var base = 'https://ogging.goatcounter.com/counter/TOTAL.json';
-      fetch(base, { credentials: 'omit' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (d) {
-          var el = document.getElementById('gc-total');
-          if (!el) return;
-          el.textContent = (d && d.count) ? d.count : '0';
-        })
-        .catch(function () {
-          var el = document.getElementById('gc-total');
-          if (el) el.textContent = '—';
-        });
-    })();
-  </script>
-</div>
-
-
-  
-
-<details class="card card--collapsible" id="tags">
-  <summary class="card__head card__head--toggle">
-    <span class="card__title">TAGS</span>
-    <span class="card__aux">146</span>
-    <span class="card__chevron" aria-hidden="true">▾</span>
-  </summary>
-  <div class="tags">
-    
-      <a class="tag" href="/tags/@entry/">#@entry<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/@generable/">#@generable<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/@observable/">#@observable<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/actor/">#actor<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ai/">#ai<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/animation/">#animation<span class="tag__count">3</span></a>
-    
-      <a class="tag" href="/tags/apidesign/">#apidesign<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/apple-intelligence/">#apple intelligence<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/architecture/">#architecture<span class="tag__count">4</span></a>
-    
-      <a class="tag" href="/tags/asyncawait/">#asyncawait<span class="tag__count">5</span></a>
-    
-      <a class="tag" href="/tags/attribute/">#attribute<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/bridging/">#bridging<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/builderpattern/">#builderpattern<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/cellregistration/">#cellregistration<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/claude-desktop/">#claude desktop<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/codereview/">#codereview<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/combine/">#combine<span class="tag__count">4</span></a>
-    
-      <a class="tag" href="/tags/componentdesign/">#componentdesign<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/concurrency/">#concurrency<span class="tag__count">9</span></a>
-    
-      <a class="tag" href="/tags/config/">#config<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/coordinator/">#coordinator<span class="tag__count">7</span></a>
-    
-      <a class="tag" href="/tags/cp949/">#cp949<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/dao/">#dao<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/debugging/">#debugging<span class="tag__count">9</span></a>
-    
-      <a class="tag" href="/tags/deduplication/">#deduplication<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/designpattern/">#designpattern<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/designsystem/">#designsystem<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/diffabledatasource/">#diffabledatasource<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/dispatchqueue/">#dispatchqueue<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/enum/">#enum<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/environmentvalues/">#environmentvalues<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fastlane/">#fastlane<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fastmcp/">#fastmcp<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/fcm/">#fcm<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/firebase/">#firebase<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/foreach/">#foreach<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/foundation-models/">#foundation models<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/gcd/">#gcd<span class="tag__count">3</span></a>
-    
-      <a class="tag" href="/tags/geometryreader/">#geometryreader<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/github-actions/">#github actions<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/hashable/">#hashable<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ignoressafearea/">#ignoressafearea<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/inheritance/">#inheritance<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ios/">#ios<span class="tag__count">9</span></a>
-    
-      <a class="tag" href="/tags/ios-17/">#ios 17<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/ios-26/">#ios 26<span class="tag__count">3</span></a>
-    
-      <a class="tag" href="/tags/ios-simulator/">#ios simulator<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ios13/">#ios13<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ios14/">#ios14<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ios15/">#ios15<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ios17/">#ios17<span class="tag__count">8</span></a>
-    
-      <a class="tag" href="/tags/kakao-moment-mcp/">#kakao-moment-mcp<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/layout/">#layout<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/lazyvstack/">#lazyvstack<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/liquid-glass/">#liquid glass<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/list/">#list<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/llm/">#llm<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/mainactor/">#mainactor<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/matchedgeometryeffect/">#matchedgeometryeffect<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/mcp/">#mcp<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/memory/">#memory<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/migration/">#migration<span class="tag__count">12</span></a>
-    
-      <a class="tag" href="/tags/modal/">#modal<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/modelcontainer/">#modelcontainer<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/mutating/">#mutating<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/mvi/">#mvi<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/nanteslabel/">#nanteslabel<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/navigation/">#navigation<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/navigationstack/">#navigationstack<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/notificationcenter/">#notificationcenter<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/observable/">#observable<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/observableobject/">#observableobject<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/observation/">#observation<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/onchange/">#onchange<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/ongeometrychange/">#ongeometrychange<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/onscrollgeometrychange/">#onscrollgeometrychange<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/oop/">#oop<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/optional/">#optional<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/overlay/">#overlay<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/padding/">#padding<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/performance/">#performance<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/powershell/">#powershell<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/predicate/">#predicate<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/preferencekey/">#preferencekey<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/present/">#present<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/primarykey/">#primarykey<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/processinfo/">#processinfo<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/protocol/">#protocol<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/protocolhierarchy/">#protocolhierarchy<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/publisher/">#publisher<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/pullrequest/">#pullrequest<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/pushnotification/">#pushnotification<span class="tag__count">4</span></a>
-    
-      <a class="tag" href="/tags/pypi/">#pypi<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/">#qa 자동화<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/racecondition/">#racecondition<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/realm/">#realm<span class="tag__count">7</span></a>
-    
-      <a class="tag" href="/tags/refactoring/">#refactoring<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/remoteconfig/">#remoteconfig<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/rxswift/">#rxswift<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/safearea/">#safearea<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/safeareainset/">#safeareainset<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/scrollview/">#scrollview<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/sendable/">#sendable<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/sentinel/">#sentinel<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/sheet/">#sheet<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/simctl/">#simctl<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/simctl_child/">#simctl_child<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/state/">#state<span class="tag__count">3</span></a>
-    
-      <a class="tag" href="/tags/struct/">#struct<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/swift/">#swift<span class="tag__count">14</span></a>
-    
-      <a class="tag" href="/tags/swift-5.7/">#swift 5.7<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/swift-6/">#swift 6<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/swift-macro/">#swift macro<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/swift6/">#swift6<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/swiftdata/">#swiftdata<span class="tag__count">11</span></a>
-    
-      <a class="tag" href="/tags/swiftui/">#swiftui<span class="tag__count">18</span></a>
-    
-      <a class="tag" href="/tags/task/">#task<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/transition/">#transition<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/typedthrows/">#typedthrows<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uibutton/">#uibutton<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uibutton.configuration/">#uibutton.configuration<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uicollectionview/">#uicollectionview<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/uihostingcontroller/">#uihostingcontroller<span class="tag__count">3</span></a>
-    
-      <a class="tag" href="/tags/uikit/">#uikit<span class="tag__count">15</span></a>
-    
-      <a class="tag" href="/tags/uistackview/">#uistackview<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/uiviewcontroller/">#uiviewcontroller<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uiviewrepresentable/">#uiviewrepresentable<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/unique/">#unique<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/urlsession/">#urlsession<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/uv/">#uv<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/viewlifecycle/">#viewlifecycle<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/webkit/">#webkit<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/webpage/">#webpage<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/webview/">#webview<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/windows/">#windows<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/workflow/">#workflow<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/wwdc25/">#wwdc25<span class="tag__count">2</span></a>
-    
-      <a class="tag" href="/tags/xcode-16/">#xcode 16<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/xcrun/">#xcrun<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%EB%94%94%EB%B2%84%EA%B9%85/">#디버깅<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%EB%94%94%EC%9E%90%EC%9D%B8/">#디자인<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/">#마이그레이션<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/">#오픈소스<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/">#온디바이스 llm<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%ED%98%91%EC%97%85/">#협업<span class="tag__count">1</span></a>
-    
-      <a class="tag" href="/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/">#환경변수<span class="tag__count">1</span></a>
-    
-  </div>
-</details>
-
-
-  
-
-
-
-  
-  
-    
-  
-    
-  
-  
-<div class="card" id="archive">
-  <div class="card__head">
-    <span class="card__title">ARCHIVES</span>
-    <span class="card__aux">56 posts</span>
-  </div>
-  
-    
-    <div class="archive-row">
-      <span class="archive-row__year">2026</span>
-      <span class="archive-row__bar"><div style="width: 100%"></div></span>
-      <span class="archive-row__count">50</span>
-    </div>
-  
-    
-    <div class="archive-row">
-      <span class="archive-row__year">2022</span>
-      <span class="archive-row__bar"><div style="width: 12%"></div></span>
-      <span class="archive-row__count">06</span>
-    </div>
-  
-</div>
-
-
-</aside>
-
-</main>
-<footer class="site-footer">
-  <div class="site-footer__inner">
-    <div class="footer-block">
-      <pre class="footer-ascii">  ┌─────────────────┐
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로 — 오깅중</title><meta name=description content="SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글"><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-sheet-bool-to-identifiable-enum/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-sheet-bool-to-identifiable-enum/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글"><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로"><meta property="article:published_time" content="2026-05-21T13:45:26+09:00"><meta property="article:modified_time" content="2026-05-21T13:45:26+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="sheet"><meta property="article:tag" content="State"><meta property="article:tag" content="Modal"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로"><meta name=twitter:description content="SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글"><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
+<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
+<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>SwiftUI</span>
+<span>·</span>
+<span>MAY 21, 2026</span>
+<span>·</span>
+<span>5분 읽기</span></div><h1 class=article__title>SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로</h1><p class=article__desc>SwiftUI에서 modal 여러 개를 각각 @State Bool로 관리하다가 깨진 경험과 Identifiable enum 한 개로 묶어 푼 패턴을 정리한 글</p></header><div class=article__body><p>처음에 SwiftUI에서 <code>.sheet</code>를 띄울 일이 두 개 정도였을 때는 별생각 없이 <code>@State private var showProfile = false</code>, <code>@State private var showSettings = false</code> 식으로 Bool 두 개 잡아서 썼다. 동작도 잘 됐고 별 문제 없었다.</p><p>근데 세 번째 sheet가 추가되는 순간부터 갑자기 동작이 이상해지는 케이스가 생겼고 어느 sheet가 닫히고 다른 게 뜨는 흐름에서 race가 보이기 시작해서 결국 enum 하나로 갈아엎었다. 그 얘기다.</p><h2 id=많이-실수하는-코드>많이 실수하는 코드</h2><p>홈 화면에 모달이 세 개 있다고 치자. 가장 손이 빠른 코드는 보통 이렇게 나온다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>HomeView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>showProfile</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>showSettings</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>showAbout</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>VStack</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;프로필&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>showProfile</span> <span class=p>=</span> <span class=kc>true</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;설정&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>showSettings</span> <span class=p>=</span> <span class=kc>true</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;정보&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>showAbout</span> <span class=p>=</span> <span class=kc>true</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sheet</span><span class=p>(</span><span class=n>isPresented</span><span class=p>:</span> <span class=err>$</span><span class=n>showProfile</span><span class=p>)</span> <span class=p>{</span> <span class=n>ProfileView</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sheet</span><span class=p>(</span><span class=n>isPresented</span><span class=p>:</span> <span class=err>$</span><span class=n>showSettings</span><span class=p>)</span> <span class=p>{</span> <span class=n>SettingsView</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sheet</span><span class=p>(</span><span class=n>isPresented</span><span class=p>:</span> <span class=err>$</span><span class=n>showAbout</span><span class=p>)</span> <span class=p>{</span> <span class=n>AboutView</span><span class=p>()</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>겉으로는 깔끔하게 분리된 것처럼 보이는데 막상 돌려보면 sheet가 안 뜨거나, 닫고 다른 걸 띄우면 빈 화면이 한 번 깜빡이고 뜨는 식의 이상 동작이 종종 잡힌다.</p><h2 id=왜-문제>왜 문제</h2><p>크게 세 가지가 겹친다.</p><p>첫째로 SwiftUI에서 같은 view에 <code>.sheet</code> modifier를 여러 개 붙이면 보통 마지막 하나만 살아남고 나머지는 무시되는 경우가 있어서 위 코드는 그 자체가 SwiftUI가 보기엔 &ldquo;이 view는 sheet가 하나"인 셈인데 우리는 세 개라고 생각하고 있는 거다.</p><p>둘째로 한 sheet가 닫히기 전에 다른 sheet를 띄우려고 dismiss 콜백 안에서 다른 Bool을 true로 만들면 SwiftUI가 첫 sheet의 dismiss 애니메이션과 두 번째 sheet의 present 애니메이션을 동시에 처리하다가 race가 나는데 이게 시뮬레이터에선 잘 되고 실기기에선 깨지는 식으로 재현이 까다롭다.</p><p>셋째로 Bool N개는 상태 공간이 2^N이라서 &ldquo;showProfile == true && showSettings == true&rdquo; 같은 의미상 불가능한 상태가 코드 차원에선 가능해진다. 우리는 머릿속에서 &ldquo;동시엔 한 개만 뜨지&rdquo; 라고 가정하지만 SwiftUI는 그런 가정을 모른다.</p><p>핵심은 이거다.</p><blockquote><p>modal 상태는 본질적으로 &ldquo;지금 뜬 게 뭐냐"라는 하나의 값인데 그걸 N개 Bool로 흩뿌리면 그 사이가 다 의미 없는 상태 공간이 된다</p></blockquote><h2 id=해결--identifiable-enum-한-개>해결 — Identifiable enum 한 개</h2><p>값이 본질적으로 하나라면 그렇게 모델링하면 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>ActiveSheet</span><span class=p>:</span> <span class=n>Identifiable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>profile</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>settings</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>about</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>id</span><span class=p>:</span> <span class=kc>Self</span> <span class=p>{</span> <span class=kc>self</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>HomeView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>activeSheet</span><span class=p>:</span> <span class=n>ActiveSheet</span><span class=p>?</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>VStack</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;프로필&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>activeSheet</span> <span class=p>=</span> <span class=p>.</span><span class=n>profile</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;설정&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>activeSheet</span> <span class=p>=</span> <span class=p>.</span><span class=n>settings</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;정보&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>activeSheet</span> <span class=p>=</span> <span class=p>.</span><span class=n>about</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>sheet</span><span class=p>(</span><span class=n>item</span><span class=p>:</span> <span class=err>$</span><span class=n>activeSheet</span><span class=p>)</span> <span class=p>{</span> <span class=n>sheet</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=k>switch</span> <span class=n>sheet</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>case</span> <span class=p>.</span><span class=n>profile</span><span class=p>:</span> <span class=n>ProfileView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>case</span> <span class=p>.</span><span class=n>settings</span><span class=p>:</span> <span class=n>SettingsView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>case</span> <span class=p>.</span><span class=n>about</span><span class=p>:</span> <span class=n>AboutView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>activeSheet</code>는 한 번에 하나의 케이스만 가질 수 있는 enum이라 동시에 두 sheet가 뜨는 상태가 타입 차원에서 불가능해지고, <code>.sheet(item:)</code>은 nil → non-nil로 바뀌면 띄우고 non-nil → nil이면 닫는 식으로 동작해서 view에 modifier가 하나만 붙으면 된다.</p><p>대부분의 &ldquo;모달 여러 개 띄우다가 꼬임&rdquo; 케이스는 이걸로 풀린다.</p><h2 id=associated-value를-쓰고-싶을-때>associated value를 쓰고 싶을 때</h2><p>sheet마다 파라미터가 다르면 case에 associated value를 같이 달면 되는데 이때 <code>id</code> 설계가 약간 변수가 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>ActiveSheet</span><span class=p>:</span> <span class=n>Identifiable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>profile</span><span class=p>(</span><span class=n>userId</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>settings</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>about</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>id</span><span class=p>:</span> <span class=nb>String</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>switch</span> <span class=kc>self</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>profile</span><span class=p>(</span><span class=kd>let</span> <span class=nv>userId</span><span class=p>):</span> <span class=k>return</span> <span class=s>&#34;profile-</span><span class=si>\(</span><span class=n>userId</span><span class=si>)</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>settings</span><span class=p>:</span> <span class=k>return</span> <span class=s>&#34;settings&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>about</span><span class=p>:</span> <span class=k>return</span> <span class=s>&#34;about&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>Identifiable</code>은 <code>id</code>만 만족하면 되니까 case별로 id 규칙을 자유롭게 줄 수 있는데 한 가지 알아둘 점은 같은 case의 파라미터만 바꿨을 때(<code>profile("A")</code> → <code>profile("B")</code>) id가 달라지면 SwiftUI가 &ldquo;다른 아이템이 들어왔다"고 보고 sheet를 한 번 닫았다가 다시 띄운다는 거다.</p><p>이걸 원하면 위 코드처럼 두면 되고, 같은 sheet 안에서 내용만 부드럽게 바꾸고 싶으면 id를 case 이름만으로 묶고 파라미터는 내부 state로 따로 빼면 된다.</p><h2 id=회고>회고</h2><p>같은 패턴은 <code>.fullScreenCover(item:)</code>, <code>.alert(...)</code>, <code>.confirmationDialog(...)</code>에도 거의 그대로 먹어서 한 번 enum 라우팅으로 가는 게 익숙해지면 모달 계열 코드가 전반적으로 차분해진다.</p><p>지나고 보니 Bool 두 개 정도까지는 손이 빠른 만큼 그냥 써도 큰 문제는 없는데 세 개째가 들어오는 순간엔 거의 항상 enum으로 갈아엎는 게 답이었고 결국 &ldquo;지금 띄울 게 뭐냐"라는 질문이 본질적으로 하나의 값이라는 사실을 코드에 반영해주는 일이었다.</p><p>iOS 16 이전엔 <code>.sheet(item:)</code>이 enum identity로 가끔 충돌을 일으키던 시절도 있었는데 17부터는 안정적이라 요즘은 부담 없이 이쪽으로 가도 된다. Bool로 흩뿌리지 말고 한 자리에 모아두자는 게 결론이다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
+<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
+<span class=card__aux>146</span>
+<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
+<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
+<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
+<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
+<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
+<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>9</span></a>
+<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>7</span></a>
+<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>9</span></a>
+<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
+<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
+<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
+<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
+<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
+<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios/>#ios<span class=tag__count>9</span></a>
+<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
+<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
+<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>9</span></a>
+<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
+<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
+<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
+<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
+<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
+<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>4</span></a>
+<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>2</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
+<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
+<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
+<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>14</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>11</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>19</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
+<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>15</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
+<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
+<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
+<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
+<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>57 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>51</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:12%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │
-  └─────────────────┘</pre>
-      <p style="font-size: 13px; color: var(--ink-2); margin: 0; max-width: 40ch;">
-        iOS, Swift, 그리고 가끔 다른 것들. <br/>
-"Don't worry if it doesn't work right."
-
-      </p>
-    </div>
-    <div class="footer-block">
-      <h4>NAVIGATE</h4>
-      <ul>
-        
-          <li><a href="/">Home</a></li>
-        
-          <li><a href="/archives/">Archives</a></li>
-        
-          <li><a href="/tags/">Tags</a></li>
-        
-          <li><a href="/categories/">Categories</a></li>
-        
-          <li><a href="/about/">About</a></li>
-        
-      </ul>
-    </div>
-    <div class="footer-block">
-      <h4>ELSEWHERE</h4>
-      <ul>
-        
-          <li><a href="https://github.com/jun7680" target="_blank" rel="noopener">GitHub ↗</a></li>
-        
-          <li><a href="https://instagram.com/ockkkk91" target="_blank" rel="noopener">Instagram ↗</a></li>
-        
-          <li><a href="mailto:dlswns9119@gmail.com" >Email ↗</a></li>
-        
-        <li><a href="http://localhost:1313/index.xml">RSS ↗</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-baseline">
-    <span>© 2020–2026 오깅중</span>
-    <span class="footer-legal">
-      
-        <a href="/about/">About</a>
-      
-        <a href="/privacy/">Privacy</a>
-      
-    </span>
-    <span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span>
-  </div>
-</footer>
-
-<div class="palette-backdrop" id="palette-backdrop" hidden data-index-url="http://localhost:1313/index.json">
-  <div class="palette" role="dialog" aria-modal="true" aria-label="검색">
-    <div class="palette__input">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="palette-input" type="text" placeholder="포스트 검색…" autocomplete="off" />
-      <kbd>ESC</kbd>
-    </div>
-    <div class="palette__list" id="palette-list"></div>
-    <div class="palette__empty" id="palette-empty" hidden>검색 결과가 없습니다.</div>
-  </div>
-</div>
-
-
-<script src="/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js" integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82&#43;Xs4UGAbWHcR0=" defer></script>
-
-</body>
-</html>
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
