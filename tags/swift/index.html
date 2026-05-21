@@ -16,14 +16,14 @@
 <span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
 <span class=site-tagline__bracket>]</span></div><main class=page><div><section><div class=section-label><span>SWIFT</span>
 <span class=section-label__rule></span>
-<span class=section-label__count>10</span></div><div class=posts><a class=post-row href=/p/gcd-still-needed-with-swift-concurrency/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들</h3><p class=post-row__sub>Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백</p></div><div class=post-row__meta><b>MAY 20, 2026</b>
-<span>8 MIN</span></div></a><a class=post-row href=/p/foundation-models-3lines-on-device-llm/><div class=post-row__index>P_002</div><div class=post-row__category>iOS</div><div><h3 class=post-row__title>Foundation Models, Swift 3줄로 온디바이스 LLM 호출하기</h3><p class=post-row__sub>iOS 26 Foundation Models 프레임워크 덕분에 OpenAI API 키도, 비용 청구서도 없이 Swift 3줄로 온디바이스 LLM을 호출할 수 있다. 첫인상을 정리해본다.</p></div><div class=post-row__meta><b>MAY 18, 2026</b>
-<span>6 MIN</span></div></a><a class=post-row href=/p/client-work-before-server-spec/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>서버 스펙 안 나왔을 때 클라 먼저 작업하는 법</h3><p class=post-row__sub>백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게.</p></div><div class=post-row__meta><b>MAY 14, 2026</b>
-<span>5 MIN</span></div></a><a class=post-row href=/p/swift-protocol-optional-property-trap/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift 프로토콜에 옵셔널 property 넣을 뻔한 이야기</h3><p class=post-row__sub>옵셔널 요구사항을 만들고 싶어지면 멈춰라. 십중팔구 프로토콜이 두 개여야 한다.</p></div><div class=post-row__meta><b>MAY 14, 2026</b>
-<span>4 MIN</span></div></a><a class=post-row href=/p/final-class-inheritance-vs-composition/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>`final class` 상속 막혔을 때 컴포지션 써본 후기</h3><p class=post-row__sub>final 막힌 클래스를 만났을 때, 격언만 외우다 놓친 진짜 답.</p></div><div class=post-row__meta><b>MAY 14, 2026</b>
-<span>4 MIN</span></div></a><a class=post-row href=/p/gcd-serial-queue-over-actor-for-thread-confined/><div class=post-row__index>P_006</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정</h3><p class=post-row__sub>actor는 mutual exclusion을 보장하지만 thread identity는 보장하지 않는다. Realm/SwiftData 같은 thread-confined 자원에는 GCD serial queue가 답인 이유.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>4 MIN</span></div></a><a class=post-row href=/p/swift-6-language-changes/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift 6에서 매일 만나는 변화 7가지 — strict concurrency부터 typed throws까지</h3><p class=post-row__sub>Swift 6에서 매일 실무 코드를 만질 때 부딪히는 변경 7가지 정리. strict concurrency 모드, Sendable 강제, typed throws, existential any 강화, migration mode 등.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
-<span>4 MIN</span></div></a><a class=post-row href=/p/swift-mutating-without-self-mutation/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</h3><p class=post-row__sub>mutating 키워드는 self 변경 의도를 표현하는 계약이다. 컴파일러는 그 의미를 검증하지 않아서, self를 안 바꾸는 함수에도 mutating이 붙어 통과한다. PR 리뷰에서 만난 실제 사례와 builder 패턴 대안.</p></div><div class=post-row__meta><b>MAY 13, 2026</b>
+<span class=section-label__count>14</span></div><div class=posts><a class=post-row href=/p/ios-push-dedupe-two-layer/><div class=post-row__index>P_001</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>iOS 푸시 알림 중복 진입을 막는 2층 dedupe 패턴</h3><p class=post-row__sub>같은 iOS 푸시가 notification tap, cold launch, pending route 경로로 중복 처리되는 문제를 fingerprint dedupe와 envelope id 소비 추적으로 막은 사례.</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>6 MIN</span></div></a><a class=post-row href=/p/rxswift-to-async-await-migration/><div class=post-row__index>P_002</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>RxSwift 코드베이스에서 async/await로 점진 마이그레이션하는 방법</h3><p class=post-row__sub>RxSwift 의존이 큰 iOS 프로젝트에서 신규 코드부터 Swift Concurrency로 옮기는 단계별 전략. Repository async 미러, UseCase 공존, 호출자 화면 단위 전환까지.</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>6 MIN</span></div></a><a class=post-row href=/p/coordinator-push-routing-async/><div class=post-row__index>P_003</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>iOS Coordinator에서 푸시 진입을 단일 라우터로 정리한 기록</h3><p class=post-row__sub>UIKit MVVM Coordinator 앱에서 list ViewModel이 푸시를 직접 구독하던 구조를 AppNavigationRouter와 async/await 기반 단일 진입점으로 정리한 사례.</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>7 MIN</span></div></a><a class=post-row href=/p/mainactor-class-fetch-trap/><div class=post-row__index>P_004</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정</h3><p class=post-row__sub>UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법.</p></div><div class=post-row__meta><b>MAY 21, 2026</b>
+<span>6 MIN</span></div></a><a class=post-row href=/p/gcd-still-needed-with-swift-concurrency/><div class=post-row__index>P_005</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들</h3><p class=post-row__sub>Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백</p></div><div class=post-row__meta><b>MAY 20, 2026</b>
+<span>8 MIN</span></div></a><a class=post-row href=/p/foundation-models-3lines-on-device-llm/><div class=post-row__index>P_006</div><div class=post-row__category>iOS</div><div><h3 class=post-row__title>Foundation Models, Swift 3줄로 온디바이스 LLM 호출하기</h3><p class=post-row__sub>iOS 26 Foundation Models 프레임워크 덕분에 OpenAI API 키도, 비용 청구서도 없이 Swift 3줄로 온디바이스 LLM을 호출할 수 있다. 첫인상을 정리해본다.</p></div><div class=post-row__meta><b>MAY 18, 2026</b>
+<span>6 MIN</span></div></a><a class=post-row href=/p/client-work-before-server-spec/><div class=post-row__index>P_007</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>서버 스펙 안 나왔을 때 클라 먼저 작업하는 법</h3><p class=post-row__sub>백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게.</p></div><div class=post-row__meta><b>MAY 14, 2026</b>
+<span>5 MIN</span></div></a><a class=post-row href=/p/swift-protocol-optional-property-trap/><div class=post-row__index>P_008</div><div class=post-row__category>Swift</div><div><h3 class=post-row__title>Swift 프로토콜에 옵셔널 property 넣을 뻔한 이야기</h3><p class=post-row__sub>옵셔널 요구사항을 만들고 싶어지면 멈춰라. 십중팔구 프로토콜이 두 개여야 한다.</p></div><div class=post-row__meta><b>MAY 14, 2026</b>
 <span>4 MIN</span></div></a></div><nav class=pagination aria-label=페이지네이션><span class="pagination__btn is-disabled">← PREV</span>
 <span>PAGE 01 / 02</span>
 <a href=/tags/swift/page/2/>NEXT →</a></nav></section></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
@@ -33,7 +33,7 @@
 <a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
 <span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
 <span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>142</span>
+<span class=card__aux>145</span>
 <span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
 <a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
 <a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
@@ -43,7 +43,7 @@
 <a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
 <a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
 <a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>2</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
 <a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
 <a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
 <a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
@@ -52,12 +52,13 @@
 <a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
 <a class=tag href=/tags/combine/>#combine<span class=tag__count>3</span></a>
 <a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>7</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>9</span></a>
 <a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>4</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>7</span></a>
 <a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
 <a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>6</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>9</span></a>
+<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
 <a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
 <a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
 <a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
@@ -76,7 +77,7 @@
 <a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
 <a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>5</span></a>
+<a class=tag href=/tags/ios/>#ios<span class=tag__count>9</span></a>
 <a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
 <a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
 <a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
@@ -90,9 +91,11 @@
 <a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
 <a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
 <a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
 <a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
 <a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>11</span></a>
+<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
 <a class=tag href=/tags/modal/>#modal<span class=tag__count>1</span></a>
 <a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
 <a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
@@ -121,14 +124,14 @@
 <a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
 <a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
 <a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>2</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>4</span></a>
 <a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
 <a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>2</span></a>
 <a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
 <a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
 <a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
 <a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
 <a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
 <a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
@@ -138,7 +141,7 @@
 <a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
 <a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
 <a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>10</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>14</span></a>
 <a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
@@ -152,7 +155,7 @@
 <a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
 <a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>12</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>15</span></a>
 <a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
 <a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
@@ -176,9 +179,9 @@
 <a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>49 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>43</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:14%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+<span class=card__aux>54 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>48</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:12%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
   │  status: typing │

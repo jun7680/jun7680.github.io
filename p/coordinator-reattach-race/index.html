@@ -1,0 +1,314 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Coordinator re-attach 때 생기는 deinit race window 막기 — 오깅중</title><meta name=description content="UIKit Coordinator를 재부착하는 순간 old coordinator deinit과 외부 push/deeplink 이벤트가 겹치며 생기는 race window를 막는 방법."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/coordinator-reattach-race/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Coordinator re-attach 때 생기는 deinit race window 막기"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/coordinator-reattach-race/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIKit Coordinator를 재부착하는 순간 old coordinator deinit과 외부 push/deeplink 이벤트가 겹치며 생기는 race window를 막는 방법."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Coordinator re-attach 때 생기는 deinit race window 막기"><meta property="article:published_time" content="2026-05-21T09:48:00+09:00"><meta property="article:modified_time" content="2026-05-21T09:48:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="Memory"><meta property="article:tag" content="RaceCondition"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Coordinator re-attach 때 생기는 deinit race window 막기"><meta name=twitter:description content="UIKit Coordinator를 재부착하는 순간 old coordinator deinit과 외부 push/deeplink 이벤트가 겹치며 생기는 race window를 막는 방법."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
+<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
+<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
+<span>·</span>
+<span>MAY 21, 2026</span>
+<span>·</span>
+<span>7분 읽기</span></div><h1 class=article__title>Coordinator re-attach 때 생기는 deinit race window 막기</h1><p class=article__desc>UIKit Coordinator를 재부착하는 순간 old coordinator deinit과 외부 push/deeplink 이벤트가 겹치며 생기는 race window를 막는 방법.</p></header><div class=article__body><p>Coordinator 패턴을 쓰다 보면 특정 list coordinator를 다시 붙이는 코드가 생긴다. 푸시로 특정 탭에 진입하거나, 기존 stack을 정리한 뒤 새 list를 만들어야 하는 경우가 그렇다.</p><p>문제는 이 re-attach 타이밍에 외부 이벤트가 같이 들어올 때였다. 이게 생각보다 미묘했다.</p><p>old coordinator의 강참조를 끊는 바로 그 순간, push/deeplink 이벤트가 old coordinator로 들어가면 이상한 일이 벌어진다. 같은 detail이 두 번 push되거나, 이미 정리 중인 viewController를 만져서 크래시가 난다.</p><p>이 글은 그 race window를 막으면서 정리해둔 내용이다.</p><h2 id=문제가-된-코드는-이런-모양이었다>문제가 된 코드는 이런 모양이었다</h2><p>기존 list를 지우고 새 list를 붙이는 코드가 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ItemListTabCoordinator</span><span class=p>:</span> <span class=n>BaseCoordinator</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>var</span> <span class=nv>listCoordinators</span><span class=p>:</span> <span class=p>[</span><span class=n>ItemListCoordinator</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>attachList</span><span class=p>(</span><span class=k>for</span> <span class=n>context</span><span class=p>:</span> <span class=n>ListContext</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>listCoordinators</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=p>==</span> <span class=kc>false</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=p>(</span><span class=n>viewController</span> <span class=k>as</span><span class=p>?</span> <span class=n>ItemListTabViewController</span><span class=p>)?.</span><span class=n>clearList</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>childCoordinators</span><span class=p>.</span><span class=bp>removeAll</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nv>$0</span> <span class=k>is</span> <span class=n>ItemListCoordinator</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>listCoordinators</span><span class=p>.</span><span class=bp>removeAll</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>newCoordinator</span> <span class=p>=</span> <span class=n>ItemListCoordinator</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>        <span class=n>listCoordinators</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>newCoordinator</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>childCoordinators</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>newCoordinator</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>newCoordinator</span><span class=p>.</span><span class=n>build</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=n>context</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>코드만 보면 평범하다. 기존 list 정리하고 새 list 붙인다. 근데 외부 이벤트가 있는 앱에서는 이게 race를 만들 수 있었다.</p><h2 id=race-window는-removeall-근처에서-열린다>race window는 removeAll 근처에서 열린다</h2><p><code>listCoordinators.removeAll()</code>은 old coordinator의 강참조를 끊는다. 그 순간 참조가 0이 되면 <code>deinit</code>이 시작된다.</p><p>문제는 같은 메인 runloop 안에서 외부 이벤트가 sync로 전달될 수 있다는 점이었다. 즉, &ldquo;지웠으니까 끝"이 아니었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>pushSubject</span><span class=p>.</span><span class=n>send</span><span class=p>(</span><span class=n>envelope</span><span class=p>)</span>
+</span></span></code></pre></div><p>Combine이나 Rx 계열 subject의 <code>send</code>/<code>onNext</code>는 보통 현재 call stack에서 구독자를 바로 호출한다. 만약 old coordinator가 아직 구독자로 남아 있거나, 라우터 어딘가에서 old coordinator reference를 들고 있으면 이런 흐름이 가능했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>frame N:
+</span></span><span class=line><span class=cl>  old coordinator removeAll()
+</span></span><span class=line><span class=cl>  old coordinator deinit 시작
+</span></span><span class=line><span class=cl>  new coordinator append 전/후 어딘가
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>frame N + 아주 조금:
+</span></span><span class=line><span class=cl>  pushSubject.send(envelope)
+</span></span><span class=line><span class=cl>  oldCoordinator.consumeRouteAction(...)
+</span></span><span class=line><span class=cl>  oldCoordinator.viewController 접근
+</span></span></code></pre></div><p>증상은 하나로 고정되지 않았다.</p><ul><li>old coordinator가 detail을 한 번 더 push한다</li><li>새 coordinator도 같은 detail을 push해서 화면이 두 개 쌓인다</li><li>old coordinator의 viewController가 이미 정리돼 있어서 crash가 난다</li><li>attach가 끝나기 전에 route가 들어와서 조용히 실패한다</li></ul><p>타이밍 버그라 재현도 애매하다. 그런데 한 번 로그를 박아보면 거의 같은 timestamp에 <code>deinit</code>과 <code>consume</code>이 찍힌다. 그때부터는 아&mldr; 이거구나 싶다.</p><h2 id=임시-방어-강참조-해제를-한-틱-늦춘다>임시 방어: 강참조 해제를 한 틱 늦춘다</h2><p>가장 빠른 방어는 old coordinator를 바로 해제하지 않고 다음 runloop tick까지 잡아두는 쪽이었다. 엄청 우아한 해결은 아니지만 급할 땐 효과가 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>attachList</span><span class=p>(</span><span class=k>for</span> <span class=n>context</span><span class=p>:</span> <span class=n>ListContext</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>listCoordinators</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=p>==</span> <span class=kc>false</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>oldCoordinators</span> <span class=p>=</span> <span class=n>listCoordinators</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>listCoordinators</span><span class=p>.</span><span class=bp>removeAll</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>childCoordinators</span><span class=p>.</span><span class=bp>removeAll</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nv>$0</span> <span class=k>is</span> <span class=n>ItemListCoordinator</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>DispatchQueue</span><span class=p>.</span><span class=n>main</span><span class=p>.</span><span class=n>async</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=kc>_</span> <span class=p>=</span> <span class=n>oldCoordinators</span>
+</span></span><span class=line><span class=cl>            <span class=p>(</span><span class=kc>self</span><span class=p>?.</span><span class=n>viewController</span> <span class=k>as</span><span class=p>?</span> <span class=n>ItemListTabViewController</span><span class=p>)?.</span><span class=n>clearList</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>newCoordinator</span> <span class=p>=</span> <span class=n>ItemListCoordinator</span><span class=p>(...)</span>
+</span></span><span class=line><span class=cl>    <span class=n>listCoordinators</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>newCoordinator</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>childCoordinators</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>newCoordinator</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>newCoordinator</span><span class=p>.</span><span class=n>build</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=n>context</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이렇게 하면 old coordinator의 실제 해제가 다음 main queue turn으로 밀린다. 같은 frame에서 sync로 들어오는 이벤트가 있다면, 적어도 deinit 중인 객체를 건드리는 상황은 줄어든다.</p><p>다만 이건 임시 방어에 가깝다. &ldquo;왜 한 틱 미루는지"를 모르는 사람이 보면 지워버리기 쉽고, 외부 이벤트 라우팅 구조 자체가 좋아진 건 아니다.</p><p>그래도 급한 crash를 막는 용도로는 효과가 있었다.</p><h2 id=더-좋은-해결-외부-이벤트를-list에서-떼어낸다>더 좋은 해결: 외부 이벤트를 list에서 떼어낸다</h2><p>좀 더 근본적으로는 list coordinator가 push/deeplink 같은 외부 이벤트를 직접 받지 않게 빼는 쪽이 맞아 보였다.</p><p>Before는 이런 식이었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ItemListCoordinator</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(...)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>AppRouteManager</span><span class=p>.</span><span class=n>shared</span><span class=p>.</span><span class=n>eventSubject</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>sink</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=n>envelope</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=kc>self</span><span class=p>?.</span><span class=n>consume</span><span class=p>(</span><span class=n>envelope</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>store</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>&amp;</span><span class=n>cancellables</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이 구조에서는 list coordinator가 사라지는 순간에도 외부 이벤트와 lifecycle이 얽힌다. 이게 제일 찜찜했다.</p><p>After는 라우터 단일 진입점으로 옮겼다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>AppNavigationRouter</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>consume</span><span class=p>(</span><span class=n>envelope</span><span class=p>:</span> <span class=n>RouteEnvelope</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>host</span><span class=p>.</span><span class=n>selectTab</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>page</span><span class=p>)</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>Task</span> <span class=p>{</span> <span class=p>@</span><span class=n>MainActor</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=k>guard</span> <span class=kd>let</span> <span class=nv>nav</span> <span class=p>=</span> <span class=kc>self</span><span class=p>?.</span><span class=n>host</span><span class=p>.</span><span class=n>ensureServiceListAttached</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>route</span><span class=p>)</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=k>return</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=k>guard</span> <span class=kd>let</span> <span class=nv>detail</span> <span class=p>=</span> <span class=n>await</span> <span class=kc>self</span><span class=p>?.</span><span class=n>detailStore</span><span class=p>.</span><span class=n>resolveDetail</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>                    <span class=k>for</span><span class=p>:</span> <span class=n>route</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=n>navigationController</span><span class=p>:</span> <span class=n>nav</span>
+</span></span><span class=line><span class=cl>                <span class=p>)</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=k>return</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=kc>self</span><span class=p>?.</span><span class=n>host</span><span class=p>.</span><span class=n>pushDetail</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>                    <span class=n>detail</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=n>navigationController</span><span class=p>:</span> <span class=n>nav</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=n>page</span><span class=p>:</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>                <span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이제 list coordinator는 외부 push 이벤트를 모른다. 라우터가 host에게 &ldquo;list가 붙어 있는지 확인해줘"라고 요청하고, attach가 끝난 navigation controller에 detail을 push한다.</p><p>여기서 전제는 <code>ensureServiceListAttached</code>가 동기적으로 attach 완료를 보장해야 한다는 점이었다. 이름만 ensure면 안 되고, 진짜 ensure여야 했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>ensureServiceListAttached</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=n>UINavigationController</span><span class=p>?</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=kd>let</span> <span class=nv>nav</span> <span class=p>=</span> <span class=n>currentListNavigationController</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>nav</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>attachList</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>route</span><span class=p>.</span><span class=n>context</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>currentListNavigationController</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이 함수가 &ldquo;나중에 붙을 예정&rdquo; 상태로 반환하면 race가 다시 열린다. 이름 그대로 ensure라면 반환 시점에는 list와 navigation이 준비되어 있어야 했다.</p><h2 id=lifecycle-state를-명시하는-방법도-있다>lifecycle state를 명시하는 방법도 있다</h2><p>모든 외부 이벤트를 한 번에 정리하기 어렵다면 coordinator에 lifecycle state를 두는 것도 방법이었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ItemListCoordinator</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>enum</span> <span class=nc>State</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=n>attaching</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=n>attached</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=n>detaching</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span><span class=p>(</span><span class=kr>set</span><span class=p>)</span> <span class=kd>var</span> <span class=nv>state</span><span class=p>:</span> <span class=n>State</span> <span class=p>=</span> <span class=p>.</span><span class=n>attaching</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>build</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=n>ListContext</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// viewController 구성</span>
+</span></span><span class=line><span class=cl>        <span class=n>state</span> <span class=p>=</span> <span class=p>.</span><span class=n>attached</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>consume</span><span class=p>(</span><span class=n>action</span><span class=p>:</span> <span class=n>DeepLinkAction</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=n>state</span> <span class=p>==</span> <span class=p>.</span><span class=n>attached</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1>// 외부 이벤트 처리</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>detach</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>state</span> <span class=p>=</span> <span class=p>.</span><span class=n>detaching</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 정리</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이 방식의 장점은 의도가 코드에 남는다는 점이었다. detaching 상태에서는 이벤트를 받지 않는다. attaching 상태에서도 detail push를 하지 않는다. 적어도 상태가 말로 보인다.</p><p>단점은 모든 coordinator에 이 상태 전이를 제대로 심어야 한다는 거였다. 한두 곳만 고치면 오히려 &ldquo;어디는 state 보고 어디는 안 보는&rdquo; 애매한 구조가 된다.</p><h2 id=디버깅은-timestamp부터-찍었다>디버깅은 timestamp부터 찍었다</h2><p>race는 감으로 잡기 어렵다. 그래서 먼저 deinit과 이벤트 소비 시점에 로그를 박았다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>deinit</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;[</span><span class=si>\(</span><span class=n>type</span><span class=si>(</span><span class=n>of</span><span class=p>:</span> <span class=kc>self</span><span class=si>))</span><span class=s>] deinit:&#34;</span><span class=p>,</span> <span class=n>Date</span><span class=p>().</span><span class=n>timeIntervalSince1970</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>consume</span><span class=p>(</span><span class=n>action</span><span class=p>:</span> <span class=n>DeepLinkAction</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;[</span><span class=si>\(</span><span class=n>type</span><span class=si>(</span><span class=n>of</span><span class=p>:</span> <span class=kc>self</span><span class=si>))</span><span class=s>] consume:&#34;</span><span class=p>,</span> <span class=n>Date</span><span class=p>().</span><span class=n>timeIntervalSince1970</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>둘이 거의 같은 timestamp에 찍히면 race 가능성이 높다. 여기에 <code>Thread.callStackSymbols</code>를 잠깐 붙이면 old coordinator로 누가 이벤트를 보냈는지도 찾을 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=bp>print</span><span class=p>(</span><span class=n>Thread</span><span class=p>.</span><span class=n>callStackSymbols</span><span class=p>.</span><span class=n>joined</span><span class=p>(</span><span class=n>separator</span><span class=p>:</span> <span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>))</span>
+</span></span></code></pre></div><p>이런 로그는 오래 남기면 시끄럽지만, race 잡을 때는 꽤 도움이 됐다.</p><h2 id=정리>정리</h2><p>Coordinator re-attach 버그는 &ldquo;removeAll 했는데 왜 아직 이벤트가 들어오지?&ldquo;에서 시작했다. 다시 보면 lifecycle과 외부 이벤트가 같은 frame에서 겹칠 수 있다는 얘기였다.</p><p>이번엔 대충 이렇게 정리했다.</p><ul><li>coordinator 강참조를 끊는 순간 외부 sync 이벤트가 들어올 수 있다</li><li>급한 방어로는 old coordinator 해제를 <code>DispatchQueue.main.async</code>로 한 틱 미룰 수 있다</li><li>근본적으로는 push/deeplink를 list coordinator가 직접 구독하지 않게 빼는 게 나았다</li><li><code>ensureServiceListAttached</code>는 반환 시점에 attach가 끝나 있어야 했다</li><li>필요하면 <code>attaching / attached / detaching</code> state로 이벤트 수신 가능 상태를 보이게 둔다</li><li>race 의심 시 <code>deinit</code>과 <code>consume</code> timestamp를 같이 찍어본다</li></ul><p>Coordinator 패턴은 화면 흐름을 잘 나눠주지만, 외부 이벤트까지 각 coordinator가 직접 받기 시작하면 lifecycle이 금방 복잡해진다. 푸시나 딥링크는 최대한 위쪽의 단일 라우터에서 잡고, 화면 coordinator는 화면 안쪽 흐름에 집중시키는 편이 훨씬 마음이 편했다.</p><p>관련 검색어: iOS Coordinator deinit race, UIKit Coordinator lifecycle, Swift EXC_BAD_ACCESS Coordinator, push notification duplicate screen, Coordinator reattach.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
+<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
+<span class=card__aux>145</span>
+<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
+<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
+<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
+<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
+<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>3</span></a>
+<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>9</span></a>
+<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>7</span></a>
+<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>9</span></a>
+<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
+<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
+<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
+<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
+<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
+<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios/>#ios<span class=tag__count>9</span></a>
+<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
+<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
+<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>7</span></a>
+<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
+<a class=tag href=/tags/modal/>#modal<span class=tag__count>1</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
+<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
+<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
+<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
+<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>4</span></a>
+<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>2</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
+<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
+<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
+<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>1</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>14</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>11</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>16</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
+<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>15</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
+<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
+<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
+<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
+<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%AA%A8%EB%8B%AC-%EC%88%9C%EC%84%9C%EB%8C%80%EB%A1%9C-%EB%9D%84%EC%9A%B0%EA%B8%B0/>#모달 순서대로 띄우기<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>54 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>48</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:12%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
