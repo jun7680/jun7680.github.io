@@ -1,0 +1,266 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>실기기에서만 깨진 콜드스타트 푸시 race condition 디버깅 기록 — 오깅중</title><meta name=description content="시뮬레이터에서는 멀쩡했지만 실기기 콜드스타트 푸시에서만 상세 화면이 열리지 않던 문제를 네 단계로 추적한 기록."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/ios-cold-start-push-race-debugging/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="실기기에서만 깨진 콜드스타트 푸시 race condition 디버깅 기록"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/ios-cold-start-push-race-debugging/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="시뮬레이터에서는 멀쩡했지만 실기기 콜드스타트 푸시에서만 상세 화면이 열리지 않던 문제를 네 단계로 추적한 기록."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="실기기에서만 깨진 콜드스타트 푸시 race condition 디버깅 기록"><meta property="article:published_time" content="2026-05-22T09:30:00+09:00"><meta property="article:modified_time" content="2026-05-22T09:30:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Swift"><meta property="article:tag" content="PushNotification"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="RaceCondition"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="실기기에서만 깨진 콜드스타트 푸시 race condition 디버깅 기록"><meta name=twitter:description content="시뮬레이터에서는 멀쩡했지만 실기기 콜드스타트 푸시에서만 상세 화면이 열리지 않던 문제를 네 단계로 추적한 기록."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__cursor aria-hidden=true></span>
+<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/categories/>Categories</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class=search-btn__label>검색</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
+<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
+<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
+<span>·</span>
+<span>MAY 22, 2026</span>
+<span>·</span>
+<span>7분 읽기</span></div><h1 class=article__title>실기기에서만 깨진 콜드스타트 푸시 race condition 디버깅 기록</h1><p class=article__desc>시뮬레이터에서는 멀쩡했지만 실기기 콜드스타트 푸시에서만 상세 화면이 열리지 않던 문제를 네 단계로 추적한 기록.</p></header><div class=article__body><p>푸시 알림을 탭해서 앱을 콜드스타트로 열었더니 리스트는 빈 화면이고, 상세는 끝까지 안 떴다.</p><p>조금 기다리면 리스트 데이터는 뒤늦게 채워졌다. 그런데 푸시가 가리키던 상세 화면은 다시 살아나지 않았다. 더 얄미운 건 시뮬레이터에서는 멀쩡했다는 점이다. 실기기 + 콜드스타트 + 특정 상세 진입. 이 세 조건이 겹칠 때만 깨졌다.</p><p>전형적인 race condition이었다. 한 번 고치면 끝날 줄 알았는데, 실제로는 네 번 잡았다. 네 번 다 &ldquo;이제 됐겠지?&rdquo; 했고, 네 번 다 틀렸다. 하하.</p><h2 id=첫-번째-원인-시작-직후-로컬-저장소를-너무-믿음>첫 번째 원인: 시작 직후 로컬 저장소를 너무 믿음</h2><p>푸시 진입 코드를 보니 상세 화면을 만들기 전에 로컬 저장소에서 컨테이너 정보를 먼저 읽고 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>containerRemoteID</span> <span class=p>=</span> <span class=n>loadContainerFromType</span><span class=p>(.</span><span class=n>all</span><span class=p>)?.</span><span class=n>remoteID</span>
+</span></span><span class=line><span class=cl>    <span class=p>??</span> <span class=n>ContainerType</span><span class=p>.</span><span class=n>all</span><span class=p>.</span><span class=n>reservedId</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>loadSpecificItem</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>remoteContainerID</span><span class=p>:</span> <span class=n>containerRemoteID</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>remoteItemID</span><span class=p>:</span> <span class=n>itemID</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p>문제는 콜드스타트였다. 앱이 막 켜진 순간에는 SwiftData 부트스트랩이 아직 끝나지 않을 수 있다. 그러면 로컬 row가 없고, 코드는 <code>reservedId</code>로 떨어진다. 그 값으로 서버에 단건 조회를 던지니 대상 데이터를 못 찾는다.</p><p>다른 도메인은 멀쩡했다. 이유는 단순했다. 거기는 <code>itemID</code>만 가지고 바로 Coordinator를 만들고, 상세 ViewModel이 내부에서 필요한 데이터를 가져왔다. 특정 상세만 진입 단계에서 fetch 책임까지 들고 있었다.</p><p>그래서 패턴을 맞췄다. 푸시 진입 단계는 id 검증과 화면 생성까지만 한다. 단건 fetch는 상세 ViewModel이 자기 책임으로 처리한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>guard</span> <span class=n>itemID</span><span class=p>.</span><span class=n>isValid</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=kc>nil</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>return</span> <span class=n>await</span> <span class=n>makeItemDetail</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>itemID</span><span class=p>:</span> <span class=n>itemID</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>pushKind</span><span class=p>:</span> <span class=n>pushKind</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>navigationController</span><span class=p>:</span> <span class=n>navigationController</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p>이렇게 바꾸니 첫 번째 문제는 사라졌다. 하지만 진짜 시작은 여기부터였다.</p><h2 id=두-번째-원인-아래-레이어에도-같은-의존성이-남아-있음>두 번째 원인: 아래 레이어에도 같은 의존성이 남아 있음</h2><p>fetch 책임을 ViewModel로 옮겼는데도 특정 케이스가 계속 실패했다.</p><p>Operator 안쪽을 보니 다시 컨테이너의 remote id를 보고 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>queryID</span> <span class=p>=</span> <span class=n>container</span><span class=p>.</span><span class=n>type</span><span class=p>.</span><span class=n>remoteQueryID</span><span class=p>(</span><span class=n>remoteID</span><span class=p>:</span> <span class=n>container</span><span class=p>.</span><span class=n>remoteID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>result</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>specificItem</span><span class=p>(</span><span class=n>queryID</span><span class=p>:</span> <span class=n>queryID</span><span class=p>,</span> <span class=n>itemID</span><span class=p>:</span> <span class=n>itemID</span><span class=p>)</span>
+</span></span></code></pre></div><p>레이어만 옮겼을 뿐, &ldquo;로컬 컨테이너 정보가 이미 준비되어 있다"는 가정은 그대로 남아 있었다. 콜드스타트에서는 transient container가 fallback 값을 들고 있고, 그 값으로 queryID를 만들면 서버가 기대하는 값과 달라진다.</p><p>처음에는 enum의 기본 queryID를 쓰면 되겠다고 생각했다. 그런데 일부 상세 타입에서 또 깨졌다. 기존 로직이 특정 remote id 매핑에 우연히 기대고 있었기 때문이다.</p><p>최종적으로는 호출 측에서 푸시 payload의 정적 식별자를 그대로 내려보냈다. 푸시 payload는 이미 서버가 이해하는 route 식별자를 갖고 있었다. 클라이언트가 시작 직후 로컬 저장소를 다시 뒤져서 재구성할 이유가 없었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>pushQueryID</span> <span class=p>=</span> <span class=k>switch</span> <span class=n>pushKind</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>reviewRequest</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;review-request&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>reviewWaiting</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;review-waiting&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>unknown</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;all&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>try</span> <span class=n>await</span> <span class=n>loadSpecificItem</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>itemID</span><span class=p>:</span> <span class=n>itemID</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>pushOverrideQueryID</span><span class=p>:</span> <span class=n>pushQueryID</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p>Operator는 override가 있으면 그대로 사용하게 했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>queryID</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>pushOverrideQueryID</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>queryID</span> <span class=p>=</span> <span class=n>pushOverrideQueryID</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>queryID</span> <span class=p>=</span> <span class=n>container</span><span class=p>.</span><span class=n>type</span><span class=p>.</span><span class=n>remoteQueryID</span><span class=p>(</span><span class=n>remoteID</span><span class=p>:</span> <span class=n>container</span><span class=p>.</span><span class=n>remoteID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>여기까지 하고 나니 일반 상세와 특수 상세가 같이 통과했다.</p><h2 id=세-번째-원인-특수-상세는-다른-경로를-타고-있음>세 번째 원인: 특수 상세는 다른 경로를 타고 있음</h2><p>빌드해서 다시 찍어보니 특수 상세에서는 방금 고친 Operator의 breakpoint가 안 잡혔다. 다른 경로였다.</p><p>상세 ViewModel 안에 타입별 분기가 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>switch</span> <span class=n>detailKind</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>reviewWaiting</span><span class=p>,</span> <span class=p>.</span><span class=n>reviewRequest</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>loadReviewItem</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>receipt</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>loadReceiptItem</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>default</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>fetchItemForPush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>특수 상세는 별도 API를 타고 있었다. 더 문제는 그 API의 베이스 로직이었다. 시작하자마자 로컬 본문 entity가 있는지 먼저 확인했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>guard</span> <span class=kd>let</span> <span class=nv>cachedBody</span> <span class=p>=</span> <span class=n>BodyDAO</span><span class=p>.</span><span class=n>read</span><span class=p>(</span><span class=n>itemID</span><span class=p>:</span> <span class=n>itemID</span><span class=p>)</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>.</span><span class=n>failure</span><span class=p>(.</span><span class=n>dataNotFound</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>콜드스타트 푸시에서는 아직 로컬 본문이 없을 수 있다. 그러면 네트워크 요청까지 가기도 전에 실패한다. 화면에는 &ldquo;데이터를 찾을 수 없습니다&rdquo; 류의 alert만 남는다.</p><p>이 분기에도 푸시 콜드스타트 가드를 추가했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>case</span> <span class=p>.</span><span class=n>reviewWaiting</span><span class=p>,</span> <span class=p>.</span><span class=n>reviewRequest</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>rowID</span> <span class=p>==</span> <span class=kc>nil</span><span class=p>,</span> <span class=kd>let</span> <span class=nv>pushKind</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>fetchItemForPush</span><span class=p>(</span><span class=n>pushKind</span><span class=p>:</span> <span class=n>pushKind</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>loadReviewItem</span><span class=p>()</span>
+</span></span></code></pre></div><p>이미 <code>fetchItemForPush</code>가 응답 타입별 분기를 갖고 있어서, 별도 fetch 함수를 더 늘리지 않아도 됐다. 이런 순간은 좋다. 새 추상화 안 만든 날은 마음이 편하다.</p><h2 id=네-번째-원인-화면은-떴는데-액션-후-닫히지-않음>네 번째 원인: 화면은 떴는데 액션 후 닫히지 않음</h2><p>이제 상세 화면까지는 도달했다. 그런데 상세 안에서 액션을 마치고 돌아가야 하는 순간, 화면이 그대로 남았다.</p><p>콜백은 이런 구조였다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>detachAction</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>controllable</span><span class=p>?.</span><span class=n>shutdownAction</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>?.</span><span class=n>detailDelegate</span><span class=p>?.</span><span class=n>detachDetail</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>셀 탭으로 들어온 사용자는 정상 동작했다. 리스트 Coordinator가 부모로 있고, 그 부모가 <code>detailDelegate</code>로 들어가기 때문이다.</p><p>푸시 진입은 다르다. 라우터가 상세 Coordinator를 직접 만들고 navigation stack에 push한다. 부모 Coordinator가 없다. 그러니 delegate도 nil이다.</p><p>Coordinator의 <code>shutdown()</code>도 비슷했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdown</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>sceneFinishDelegate</span><span class=p>?.</span><span class=n>finish</span><span class=p>(</span><span class=n>to</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>sceneFinishDelegate</code>가 없으면 아무 일도 안 한다. optional chaining이 조용히 실패를 숨기고 있었다.</p><p>fallback을 추가했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdown</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=kd>let</span> <span class=nv>sceneFinishDelegate</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>sceneFinishDelegate</span><span class=p>.</span><span class=n>finish</span><span class=p>(</span><span class=n>to</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>navigationController</span><span class=p>.</span><span class=n>popViewController</span><span class=p>(</span><span class=n>animated</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>액션 콜백도 delegate가 없으면 coordinator의 <code>shutdown()</code>으로 빠지게 했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>detachAction</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>controllable</span><span class=p>?.</span><span class=n>shutdownAction</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=kd>let</span> <span class=nv>delegate</span> <span class=p>=</span> <span class=kc>self</span><span class=p>?.</span><span class=n>detailDelegate</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>delegate</span><span class=p>.</span><span class=n>detachDetail</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span><span class=p>?.</span><span class=n>controllable</span><span class=p>?.</span><span class=n>shutdown</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>이제 푸시로 들어온 상세도 액션을 마친 뒤 정상적으로 navigation stack에서 빠졌다.</p><h2 id=이번에-다시-배운-것>이번에 다시 배운 것</h2><p>시뮬레이터와 실기기의 차이는 race condition을 꽤 잘 숨긴다. 디스크 I/O, CPU 여유, 로컬 저장소 부트스트랩 타이밍이 다르다. 시뮬레이터에서는 race window가 닫혀 있어서 한 번도 안 보이던 버그가 실기기에서는 매번 보일 수 있다.</p><p>또 하나. 한 레이어만 self-contained하게 고쳐서는 부족했다. 이번 호출 체인에는 같은 가정이 네 군데에 있었다.</p><ul><li>진입 단계가 로컬 컨테이너 DB를 먼저 읽음</li><li>Operator가 컨테이너 remote id로 queryID를 다시 만듦</li><li>특수 상세 경로가 로컬 본문 entity를 먼저 요구함</li><li>Coordinator가 부모 delegate 존재를 전제함</li></ul><p>각각은 작은 코드였다. 그런데 콜드스타트 푸시처럼 시간에 민감한 경로에서는 작은 가정들이 전부 race 지점이 된다.</p><p>다음부터는 이런 증상을 만나면 한 함수만 보지 말고, 푸시 payload가 들어온 순간부터 화면이 닫히는 순간까지 호출 체인을 한 번에 훑어야겠다. &ldquo;이번엔 진짜 마지막 수정"이라는 말은 당분간 금지다.</p><h2 id=점검-체크리스트>점검 체크리스트</h2><ul><li>콜드스타트 + 푸시 + 실기기 조합이 QA 시나리오에 들어가 있는가</li><li>푸시 payload가 서버 식별자를 이미 담고 있다면, 시작 직후 클라이언트가 다시 로컬 DB에서 재구성하지 않는가</li><li>같은 종류의 상세 진입이 한 가지 패턴으로 통일되어 있는가</li><li>외부 진입으로 열린 Coordinator가 부모 없이도 자기 화면을 닫을 수 있는가</li><li>delegate nil이 &ldquo;아무 일도 안 함"으로 끝나지 않고 의도된 fallback을 타는가</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
+<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
+— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
+<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
+<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
+<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
+<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
+<span class=card__aux>148</span>
+<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
+<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
+<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
+<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
+<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
+<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
+<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
+<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
+<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
+<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>9</span></a>
+<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
+<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
+<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
+<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>10</span></a>
+<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
+<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
+<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
+<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
+<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
+<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
+<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
+<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
+<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
+<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
+<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
+<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
+<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
+<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
+<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>9</span></a>
+<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
+<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
+<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
+<a class=tag href=/tags/list/>#list<span class=tag__count>1</span></a>
+<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
+<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
+<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
+<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
+<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
+<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
+<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
+<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
+<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observable/>#observable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
+<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
+<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
+<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
+<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
+<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
+<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
+<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
+<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
+<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
+<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
+<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
+<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
+<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
+<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
+<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
+<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
+<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
+<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
+<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
+<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
+<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
+<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
+<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
+<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
+<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
+<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
+<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
+<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
+<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
+<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift/>#swift<span class=tag__count>16</span></a>
+<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
+<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>12</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>19</span></a>
+<a class=tag href=/tags/task/>#task<span class=tag__count>1</span></a>
+<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
+<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
+<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
+<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
+<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
+<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
+<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
+<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
+<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
+<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
+<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
+<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
+<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
+<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
+<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
+<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
+<span class=card__aux>59 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>53</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=archive-row__bar><div style=width:11%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
+  │  오깅중 / og_   │
+  │  ████████░░ 80% │
+  │  status: typing │
+  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
+<span class=footer-legal><a href=/about/>About</a>
+<a href=/privacy/>Privacy</a>
+</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
