@@ -1,40 +1,64 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정 — 오깅중</title><meta name=description content="푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/coordinator-external-entry-no-parent/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/coordinator-external-entry-no-parent/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정"><meta property="article:published_time" content="2026-05-22T09:40:00+09:00"><meta property="article:modified_time" content="2026-05-22T09:40:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="MVVMC"><meta property="article:tag" content="PushNotification"><meta property="article:tag" content="DeepLink"><meta property="article:tag" content="UIKit"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정"><meta name=twitter:description content="푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정 — 오깅중</title><meta name=description content="푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/coordinator-external-entry-no-parent/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/coordinator-external-entry-no-parent/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정"><meta property="article:published_time" content="2026-05-22T09:40:00+09:00"><meta property="article:modified_time" content="2026-05-22T09:40:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="MVVMC"><meta property="article:tag" content="PushNotification"><meta property="article:tag" content="DeepLink"><meta property="article:tag" content="UIKit"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정"><meta name=twitter:description content="푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 22, 2026</span>
-<span>·</span>
-<span>5분 읽기</span></div><h1 class=article__title>Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정</h1><p class=article__desc>푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록.</p></header><div class=article__body><p>MVVM+C 구조에서 상세 화면을 열고 닫는 흐름은 보통 부모 Coordinator가 관리한다.</p><p>리스트에서 셀을 탭하면 리스트 Coordinator가 상세 Coordinator를 만들고, 상세가 끝났다는 delegate 콜백을 받는다. 너무 익숙한 구조다. 그래서 오히려 의심을 안 했다.</p><p>문제는 푸시 알림으로 상세 화면을 바로 열었을 때였다. 상세 안에서 액션을 마치면 리스트로 돌아가야 하는데, 화면이 그대로 멈췄다. 모달은 닫혔는데 detail VC가 navigation stack에 남아 있었다.</p><p>원인은 한 줄이었다.</p><h2 id=delegate가-nil이었다>delegate가 nil이었다</h2><p>상세 ViewModel의 종료 콜백은 이런 모양이었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>detachAction</span><span class=p>()</span> <span class=p>{</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260522</span></nav><pre class=file-header>//  coordinator-external-entry-no-parent.swift
+//  ogging.dev / Swift
+//  MAY 22, 2026 · 5 min read
+//  #ios, #swift, #coordinator, #mvvmc, #pushnotification, #deeplink, #uikit</pre><header class=article__header><h1 class=article__title>Coordinator 패턴에서 부모 없는 외부 진입이 만드는 delegate nil 함정</h1><p class=article__desc>푸시나 딥링크로 상세 화면을 직접 열 때 부모 Coordinator가 없어 delegate nil로 종료 흐름이 멈춘 문제와 fallback 처리 기록.</p><div class=article__meta><span>MAY 22, 2026 · 5 MIN READ</span><div class=article__tags><span>#ios</span><span>#swift</span><span>#coordinator</span><span>#mvvmc</span></div></div></header><div class=article__body><p>MVVM+C 구조에서 상세 화면을 열고 닫는 흐름은 보통 부모 Coordinator가 관리한다.</p><p>리스트에서 셀을 탭하면 리스트 Coordinator가 상세 Coordinator를 만들고, 상세가 끝났다는 delegate 콜백을 받는다. 너무 익숙한 구조다. 그래서 오히려 의심을 안 했다.</p><p>문제는 푸시 알림으로 상세 화면을 바로 열었을 때였다. 상세 안에서 액션을 마치면 리스트로 돌아가야 하는데, 화면이 그대로 멈췄다. 모달은 닫혔는데 detail VC가 navigation stack에 남아 있었다.</p><p>원인은 한 줄이었다.</p><h2 id=delegate가-nil이었다>delegate가 nil이었다</h2><p>상세 ViewModel의 종료 콜백은 이런 모양이었다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>detachAction</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>controllable</span><span class=p>?.</span><span class=n>shutdownAction</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>?.</span><span class=n>detailDelegate</span><span class=p>?.</span><span class=n>detachDetail</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>셀 탭 진입에서는 잘 된다. 부모 Coordinator가 자기 자신을 <code>detailDelegate</code>로 넣기 때문이다.</p><p>그런데 푸시 진입에서는 부모가 없다. 라우터가 상세 Coordinator를 직접 만들고 navigation controller에 push만 한다. 그러면 <code>detailDelegate</code>는 nil이다.</p><p>문제는 여기서 optional chaining이 너무 조용하다는 점이다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kc>self</span><span class=p>?.</span><span class=n>detailDelegate</span><span class=p>?.</span><span class=n>detachDetail</span><span class=p>()</span>
-</span></span></code></pre></div><p>delegate가 없으면 그냥 아무 일도 안 한다. 에러도 없고, 로그도 없고, 화면만 안 닫힌다. 디버깅하는 입장에서는 제일 찝찝한 실패다.</p><h2 id=coordinator도-부모를-전제하고-있었다>Coordinator도 부모를 전제하고 있었다</h2><p>ViewModel 콜백만의 문제가 아니었다. Coordinator의 종료 함수도 비슷했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdown</span><span class=p>()</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>셀 탭 진입에서는 잘 된다. 부모 Coordinator가 자기 자신을 <code>detailDelegate</code>로 넣기 때문이다.</p><p>그런데 푸시 진입에서는 부모가 없다. 라우터가 상세 Coordinator를 직접 만들고 navigation controller에 push만 한다. 그러면 <code>detailDelegate</code>는 nil이다.</p><p>문제는 여기서 optional chaining이 너무 조용하다는 점이다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kc>self</span><span class=p>?.</span><span class=n>detailDelegate</span><span class=p>?.</span><span class=n>detachDetail</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>delegate가 없으면 그냥 아무 일도 안 한다. 에러도 없고, 로그도 없고, 화면만 안 닫힌다. 디버깅하는 입장에서는 제일 찝찝한 실패다.</p><h2 id=coordinator도-부모를-전제하고-있었다>Coordinator도 부모를 전제하고 있었다</h2><p>ViewModel 콜백만의 문제가 아니었다. Coordinator의 종료 함수도 비슷했다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdown</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>sceneFinishDelegate</span><span class=p>?.</span><span class=n>finish</span><span class=p>(</span><span class=n>to</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이 코드도 앱 내부 진입에서는 자연스럽다. 부모가 child coordinator를 정리해야 하니까, 종료를 부모에게 위임한다.</p><p>하지만 외부 진입에서는 얘기가 달라진다.</p><ul><li>푸시 알림</li><li>딥링크</li><li>유니버설 링크</li><li>위젯 진입</li></ul><p>이런 경로는 시스템에서 시작된다. 화면은 같은 상세 화면이지만, 생성 경로에는 부모 리스트가 없을 수 있다. 그러면 종료 책임을 위임할 대상도 없다.</p><p>즉, &ldquo;모든 상세 화면은 부모 Coordinator가 만든다"는 가정은 앱 내부 플로우에서만 맞았다.</p><h2 id=가장-작은-해결-delegate-우선-없으면-직접-pop>가장 작은 해결: delegate 우선, 없으면 직접 pop</h2><p>처음에는 라우터가 delegate를 주입하도록 바꾸는 방법도 생각했다. 구조적으로는 그럴듯하다. 외부 진입용 host 프로토콜을 넓히고, 라우터가 상세 종료까지 관리하게 만들 수 있다.</p><p>그런데 이번 문제의 핵심은 더 단순했다.</p><p>외부 진입으로 열린 Coordinator는 부모가 없어도 자기 화면 하나는 닫을 수 있어야 한다.</p><p>그래서 <code>shutdown()</code>에 fallback을 뒀다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdown</span><span class=p>()</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>이 코드도 앱 내부 진입에서는 자연스럽다. 부모가 child coordinator를 정리해야 하니까, 종료를 부모에게 위임한다.</p><p>하지만 외부 진입에서는 얘기가 달라진다.</p><ul><li>푸시 알림</li><li>딥링크</li><li>유니버설 링크</li><li>위젯 진입</li></ul><p>이런 경로는 시스템에서 시작된다. 화면은 같은 상세 화면이지만, 생성 경로에는 부모 리스트가 없을 수 있다. 그러면 종료 책임을 위임할 대상도 없다.</p><p>즉, &ldquo;모든 상세 화면은 부모 Coordinator가 만든다"는 가정은 앱 내부 플로우에서만 맞았다.</p><h2 id=가장-작은-해결-delegate-우선-없으면-직접-pop>가장 작은 해결: delegate 우선, 없으면 직접 pop</h2><p>처음에는 라우터가 delegate를 주입하도록 바꾸는 방법도 생각했다. 구조적으로는 그럴듯하다. 외부 진입용 host 프로토콜을 넓히고, 라우터가 상세 종료까지 관리하게 만들 수 있다.</p><p>그런데 이번 문제의 핵심은 더 단순했다.</p><p>외부 진입으로 열린 Coordinator는 부모가 없어도 자기 화면 하나는 닫을 수 있어야 한다.</p><p>그래서 <code>shutdown()</code>에 fallback을 뒀다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdown</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=kd>let</span> <span class=nv>sceneFinishDelegate</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>sceneFinishDelegate</span><span class=p>.</span><span class=n>finish</span><span class=p>(</span><span class=n>to</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>navigationController</span><span class=p>.</span><span class=n>popViewController</span><span class=p>(</span><span class=n>animated</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>그리고 ViewModel 콜백도 delegate가 없으면 coordinator 종료로 빠지게 했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>detachAction</span><span class=p>()</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>그리고 ViewModel 콜백도 delegate가 없으면 coordinator 종료로 빠지게 했다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>detachAction</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>controllable</span><span class=p>?.</span><span class=n>shutdownAction</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=kd>let</span> <span class=nv>delegate</span> <span class=p>=</span> <span class=kc>self</span><span class=p>?.</span><span class=n>detailDelegate</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=n>delegate</span><span class=p>.</span><span class=n>detachDetail</span><span class=p>()</span>
@@ -43,188 +67,13 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이렇게 하면 내부 진입은 기존처럼 부모 Coordinator가 정리한다. 외부 진입은 자기 navigation stack에서 직접 빠진다. 책임이 크게 흔들리지 않으면서도 멈춤은 사라졌다.</p><h2 id=왜-라우터-주입보다-fallback을-택했나>왜 라우터 주입보다 fallback을 택했나</h2><p>라우터에서 delegate를 세팅하는 방식도 가능하다. 다만 그러려면 외부 진입 host가 상세 종료까지 알아야 한다.</p><p>내 경우에는 그게 오히려 의존성을 넓히는 느낌이었다. 라우터의 역할은 &ldquo;어떤 화면으로 보낼지"에 가깝고, 상세 화면 내부 액션 이후의 종료 정책까지 알 필요는 없었다.</p><p>반대로 <code>shutdown()</code> fallback은 Coordinator 자신의 책임 안에 있다.</p><ul><li>부모가 있으면 부모에게 종료를 알림</li><li>부모가 없으면 자신이 push한 화면을 pop</li></ul><p>이 규칙은 푸시뿐 아니라 딥링크, 유니버설 링크에도 그대로 적용된다. 그래서 더 작고 오래 가는 수정이라고 봤다.</p><h2 id=optional-delegate는-실패를-숨기기-쉽다>optional delegate는 실패를 숨기기 쉽다</h2><p>이번에 다시 느낀 건 <code>weak var delegate</code>와 optional chaining 조합의 위험함이다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>delegate</span><span class=p>?.</span><span class=n>didFinish</span><span class=p>()</span>
-</span></span></code></pre></div><p>이 한 줄은 깔끔하다. 그런데 delegate가 반드시 있어야 하는 흐름이라면, nil일 때 조용히 끝나는 게 버그를 숨긴다.</p><p>특히 외부 진입에서는 nil이 비정상이 아니라 정상 상태일 수 있다. 그러면 둘 중 하나는 해야 한다.</p><ul><li>nil일 때의 fallback을 명시한다</li><li>nil이면 안 되는 경로라면 로그나 assertion으로 드러낸다</li></ul><p>아무 일도 안 하는 상태가 제일 안 좋았다. 사용자 입장에서는 화면이 멈춘 것처럼 보이고, 개발자 입장에서는 콜백이 호출됐는지조차 흐려진다.</p><h2 id=정리>정리</h2><p>Coordinator 패턴에서 부모 Coordinator는 편한 가정이다. 하지만 모든 진입이 앱 내부에서 시작되지는 않는다.</p><p>외부 진입으로 상세 화면을 직접 열 수 있다면, 그 상세 Coordinator는 부모 없이도 최소한 자기 종료는 처리할 수 있어야 한다. 내 기준은 이제 이렇다.</p><ul><li>내부 진입: 부모 delegate로 종료 위임</li><li>외부 진입: delegate가 없으면 직접 pop</li><li>delegate nil이 의미 있는 상태라면 코드에 fallback을 남김</li></ul><p>작은 fallback 하나였지만, 콜드스타트 푸시에서 사용자가 빠져나오지 못하던 문제를 끝냈다. 다음에 detail 화면을 만들 때는 &ldquo;이 화면이 딥링크로 바로 열리면 닫힐 수 있나?&ldquo;부터 먼저 보려고 한다.</p><h2 id=점검-체크리스트>점검 체크리스트</h2><ul><li>외부 진입 가능한 detail 화면을 식별했는가</li><li>각 detail Coordinator의 <code>shutdown()</code>이 부모 없이도 dismiss 가능한가</li><li>delegate 기반 종료 콜백에 fallback이 있는가</li><li>delegate nil이 의도된 상태인지, 버그인지 구분되어 있는가</li><li>optional chaining으로 종료 실패가 조용히 묻히지 않는가</li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>이렇게 하면 내부 진입은 기존처럼 부모 Coordinator가 정리한다. 외부 진입은 자기 navigation stack에서 직접 빠진다. 책임이 크게 흔들리지 않으면서도 멈춤은 사라졌다.</p><h2 id=왜-라우터-주입보다-fallback을-택했나>왜 라우터 주입보다 fallback을 택했나</h2><p>라우터에서 delegate를 세팅하는 방식도 가능하다. 다만 그러려면 외부 진입 host가 상세 종료까지 알아야 한다.</p><p>내 경우에는 그게 오히려 의존성을 넓히는 느낌이었다. 라우터의 역할은 &ldquo;어떤 화면으로 보낼지"에 가깝고, 상세 화면 내부 액션 이후의 종료 정책까지 알 필요는 없었다.</p><p>반대로 <code>shutdown()</code> fallback은 Coordinator 자신의 책임 안에 있다.</p><ul><li>부모가 있으면 부모에게 종료를 알림</li><li>부모가 없으면 자신이 push한 화면을 pop</li></ul><p>이 규칙은 푸시뿐 아니라 딥링크, 유니버설 링크에도 그대로 적용된다. 그래서 더 작고 오래 가는 수정이라고 봤다.</p><h2 id=optional-delegate는-실패를-숨기기-쉽다>optional delegate는 실패를 숨기기 쉽다</h2><p>이번에 다시 느낀 건 <code>weak var delegate</code>와 optional chaining 조합의 위험함이다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>delegate</span><span class=p>?.</span><span class=n>didFinish</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>이 한 줄은 깔끔하다. 그런데 delegate가 반드시 있어야 하는 흐름이라면, nil일 때 조용히 끝나는 게 버그를 숨긴다.</p><p>특히 외부 진입에서는 nil이 비정상이 아니라 정상 상태일 수 있다. 그러면 둘 중 하나는 해야 한다.</p><ul><li>nil일 때의 fallback을 명시한다</li><li>nil이면 안 되는 경로라면 로그나 assertion으로 드러낸다</li></ul><p>아무 일도 안 하는 상태가 제일 안 좋았다. 사용자 입장에서는 화면이 멈춘 것처럼 보이고, 개발자 입장에서는 콜백이 호출됐는지조차 흐려진다.</p><h2 id=정리>정리</h2><p>Coordinator 패턴에서 부모 Coordinator는 편한 가정이다. 하지만 모든 진입이 앱 내부에서 시작되지는 않는다.</p><p>외부 진입으로 상세 화면을 직접 열 수 있다면, 그 상세 Coordinator는 부모 없이도 최소한 자기 종료는 처리할 수 있어야 한다. 내 기준은 이제 이렇다.</p><ul><li>내부 진입: 부모 delegate로 종료 위임</li><li>외부 진입: delegate가 없으면 직접 pop</li><li>delegate nil이 의미 있는 상태라면 코드에 fallback을 남김</li></ul><p>작은 fallback 하나였지만, 콜드스타트 푸시에서 사용자가 빠져나오지 못하던 문제를 끝냈다. 다음에 detail 화면을 만들 때는 &ldquo;이 화면이 딥링크로 바로 열리면 닫힐 수 있나?&ldquo;부터 먼저 보려고 한다.</p><h2 id=점검-체크리스트>점검 체크리스트</h2><ul><li>외부 진입 가능한 detail 화면을 식별했는가</li><li>각 detail Coordinator의 <code>shutdown()</code>이 부모 없이도 dismiss 가능한가</li><li>delegate 기반 종료 콜백에 fallback이 있는가</li><li>delegate nil이 의도된 상태인지, 버그인지 구분되어 있는가</li><li>optional chaining으로 종료 실패가 조용히 묻히지 않는가</li></ul></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/ios-cold-start-push-race-debugging/><span>← PREVIOUS FILE</span>
+<strong>실기기에서만 깨진 콜드스타트 푸시 race condition 디버깅 기록</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/closed-range-date-crash/><span>NEXT FILE →</span>
+<strong>Swift ClosedRange&lt;Date> 한 줄 때문에 한 달간 헤맨 이야기</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#delegate가-nil이었다>delegate가 nil이었다</a></li><li><a href=#coordinator도-부모를-전제하고-있었다>Coordinator도 부모를 전제하고 있었다</a></li><li><a href=#가장-작은-해결-delegate-우선-없으면-직접-pop>가장 작은 해결: delegate 우선, 없으면 직접 pop</a></li><li><a href=#왜-라우터-주입보다-fallback을-택했나>왜 라우터 주입보다 fallback을 택했나</a></li><li><a href=#optional-delegate는-실패를-숨기기-쉽다>optional delegate는 실패를 숨기기 쉽다</a></li><li><a href=#정리>정리</a></li><li><a href=#점검-체크리스트>점검 체크리스트</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

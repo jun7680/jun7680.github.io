@@ -1,24 +1,36 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다 — 오깅중</title><meta name=description content="SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글"><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-onchange-infinite-loop/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-onchange-infinite-loop/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글"><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다"><meta property="article:published_time" content="2026-05-21T13:33:28+09:00"><meta property="article:modified_time" content="2026-05-21T13:33:28+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="onChange"><meta property="article:tag" content="State"><meta property="article:tag" content="iOS17"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다"><meta name=twitter:description content="SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글"><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다 — 오깅중</title><meta name=description content="SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글"><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-onchange-infinite-loop/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-onchange-infinite-loop/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글"><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다"><meta property="article:published_time" content="2026-05-21T13:33:28+09:00"><meta property="article:modified_time" content="2026-05-21T13:33:28+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="onChange"><meta property="article:tag" content="State"><meta property="article:tag" content="iOS17"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다"><meta name=twitter:description content="SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글"><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>SwiftUI</span>
-<span>·</span>
-<span>MAY 21, 2026</span>
-<span>·</span>
-<span>6분 읽기</span></div><h1 class=article__title>SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다</h1><p class=article__desc>SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글</p></header><div class=article__body><p>SwiftUI <code>onChange</code>를 처음 봤을 때 그냥 &ldquo;값 바뀌면 호출되는 이벤트 핸들러"라고 생각했다. UIKit <code>addTarget(_:action:for: .editingChanged)</code> 같은 거라고 본 거다.</p><p>근데 그렇게 쓰다 보면 어느 순간 콘솔이 미친 듯이 찍히고 운 나쁘면 CPU 한 코어가 그대로 먹힌다. 원인은 거의 매번 같은데 <code>onChange</code> 안에서 감시 중인 state를 다시 건드렸기 때문이다.</p><p>이 글은 그걸 한 번 제대로 정리해두려고 쓴다.</p><h2 id=많이-실수하는-코드>많이 실수하는 코드</h2><p>검색 화면에서 사용자가 친 공백을 자동으로 다듬어 주고 싶었다고 치자. 처음엔 다들 이런 식으로 짠다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swiftui"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFTUI</span>
+<span>/</span>
+<span>P_260521</span></nav><pre class=file-header>//  swiftui-onchange-infinite-loop.swift
+//  ogging.dev / SwiftUI
+//  MAY 21, 2026 · 6 min read
+//  #swiftui, #onchange, #state, #ios17</pre><header class=article__header><h1 class=article__title>SwiftUI onChange 안에서 state 다시 set하면 무한 루프 돈다</h1><p class=article__desc>SwiftUI onChange 안에서 감시 중인 state를 다시 set하면 어떻게 무한 호출이 도는지 어떤 식으로 끊었는지 정리한 글</p><div class=article__meta><span>MAY 21, 2026 · 6 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#onchange</span><span>#state</span><span>#ios17</span></div></div></header><div class=article__body><p>SwiftUI <code>onChange</code>를 처음 봤을 때 그냥 &ldquo;값 바뀌면 호출되는 이벤트 핸들러"라고 생각했다. UIKit <code>addTarget(_:action:for: .editingChanged)</code> 같은 거라고 본 거다.</p><p>근데 그렇게 쓰다 보면 어느 순간 콘솔이 미친 듯이 찍히고 운 나쁘면 CPU 한 코어가 그대로 먹힌다. 원인은 거의 매번 같은데 <code>onChange</code> 안에서 감시 중인 state를 다시 건드렸기 때문이다.</p><p>이 글은 그걸 한 번 제대로 정리해두려고 쓴다.</p><h2 id=많이-실수하는-코드>많이 실수하는 코드</h2><p>검색 화면에서 사용자가 친 공백을 자동으로 다듬어 주고 싶었다고 치자. 처음엔 다들 이런 식으로 짠다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>query</span><span class=p>:</span> <span class=nb>String</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
@@ -31,12 +43,28 @@
 </span></span><span class=line><span class=cl>            <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>겉으로는 &ldquo;공백 들어왔을 때만 한 번 다듬는다&rdquo; 정도로 보이는데 실제로 돌려보면 입력하다가 갑자기 무거워지고 운 나쁘면 콘솔 로그가 무한히 흐른다.</p><h2 id=왜-문제>왜 문제</h2><p><code>onChange</code>는 이름이 핸들러처럼 생겼지만 SwiftUI 입장에서 보면 그냥 <strong>state 변경 흐름의 일부</strong>다.</p><p><code>query</code>가 바뀌면 SwiftUI가 body를 다시 평가하고 그 과정에서 <code>onChange</code> 클로저가 호출되는데 그 안에서 또 <code>query = cleaned</code>를 하니까 그것도 state 변경이라서 SwiftUI는 또 그걸 처리한다. <code>if query != cleaned</code> 가드를 넣어둬도 입력값이 계속 변하면 가드가 안 먹는 케이스가 충분히 생긴다.</p><p>핵심은 이거다.</p><blockquote><p><code>onChange</code>에서 감시 중인 state를 다시 set하면 그 set이 또 <code>onChange</code>를 부른다</p></blockquote><p>UIKit 핸들러는 &ldquo;이벤트가 발생했다"는 사실에 매달려 있는 반면 SwiftUI <code>onChange</code>는 &ldquo;이 값이 어떤 값이다"라는 상태에 매달려 있다. 같은 자리에서 같은 값을 다시 쓰는 행위가 UIKit에선 그냥 setter 호출이지만 SwiftUI에선 잠재적인 트리거가 되는 거다.</p><h2 id=해결책-1--가드-한-줄짜리-임시-처방>해결책 1 — 가드 한 줄짜리 임시 처방</h2><p>당장 멈춰야 할 때 제일 쉬운 건 그냥 가드 한 줄.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>query</span><span class=p>)</span> <span class=p>{</span> <span class=kc>_</span><span class=p>,</span> <span class=n>newValue</span> <span class=k>in</span>
+</span></span></code></pre></td></tr></table></div></div><p>겉으로는 &ldquo;공백 들어왔을 때만 한 번 다듬는다&rdquo; 정도로 보이는데 실제로 돌려보면 입력하다가 갑자기 무거워지고 운 나쁘면 콘솔 로그가 무한히 흐른다.</p><h2 id=왜-문제>왜 문제</h2><p><code>onChange</code>는 이름이 핸들러처럼 생겼지만 SwiftUI 입장에서 보면 그냥 <strong>state 변경 흐름의 일부</strong>다.</p><p><code>query</code>가 바뀌면 SwiftUI가 body를 다시 평가하고 그 과정에서 <code>onChange</code> 클로저가 호출되는데 그 안에서 또 <code>query = cleaned</code>를 하니까 그것도 state 변경이라서 SwiftUI는 또 그걸 처리한다. <code>if query != cleaned</code> 가드를 넣어둬도 입력값이 계속 변하면 가드가 안 먹는 케이스가 충분히 생긴다.</p><p>핵심은 이거다.</p><blockquote><p><code>onChange</code>에서 감시 중인 state를 다시 set하면 그 set이 또 <code>onChange</code>를 부른다</p></blockquote><p>UIKit 핸들러는 &ldquo;이벤트가 발생했다"는 사실에 매달려 있는 반면 SwiftUI <code>onChange</code>는 &ldquo;이 값이 어떤 값이다"라는 상태에 매달려 있다. 같은 자리에서 같은 값을 다시 쓰는 행위가 UIKit에선 그냥 setter 호출이지만 SwiftUI에선 잠재적인 트리거가 되는 거다.</p><h2 id=해결책-1--가드-한-줄짜리-임시-처방>해결책 1 — 가드 한 줄짜리 임시 처방</h2><p>당장 멈춰야 할 때 제일 쉬운 건 그냥 가드 한 줄.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>query</span><span class=p>)</span> <span class=p>{</span> <span class=kc>_</span><span class=p>,</span> <span class=n>newValue</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>cleaned</span> <span class=p>=</span> <span class=n>newValue</span><span class=p>.</span><span class=n>trimmingCharacters</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>.</span><span class=n>whitespacesAndNewlines</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=n>cleaned</span> <span class=o>!=</span> <span class=n>newValue</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=n>query</span> <span class=p>=</span> <span class=n>cleaned</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>cleaned == newValue</code>면 다듬을 게 없다는 뜻이니까 set 자체를 건너뛰면서 루프는 일단 멈춘다.</p><p>다만 이건 진짜 임시 처방인데 입력값이랑 표시값을 같은 state로 들고 있는 구조 자체가 안 좋아서 다음 사람이 이 코드를 보면 &ldquo;왜 onChange에서 자기 자신을 다시 set하지&rdquo; 부터 헷갈리고 옆에 분기가 한 줄만 더 붙어도 다시 무너진다.</p><h2 id=해결책-2--입력-state와-파생-state-분리>해결책 2 — 입력 state와 파생 state 분리</h2><p>좀 더 구조적으로 풀려면 입력 그대로의 값과 정규화된 값을 분리하는 쪽이 낫다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>cleaned == newValue</code>면 다듬을 게 없다는 뜻이니까 set 자체를 건너뛰면서 루프는 일단 멈춘다.</p><p>다만 이건 진짜 임시 처방인데 입력값이랑 표시값을 같은 state로 들고 있는 구조 자체가 안 좋아서 다음 사람이 이 코드를 보면 &ldquo;왜 onChange에서 자기 자신을 다시 set하지&rdquo; 부터 헷갈리고 옆에 분기가 한 줄만 더 붙어도 다시 무너진다.</p><h2 id=해결책-2--입력-state와-파생-state-분리>해결책 2 — 입력 state와 파생 state 분리</h2><p>좀 더 구조적으로 풀려면 입력 그대로의 값과 정규화된 값을 분리하는 쪽이 낫다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>rawInput</span><span class=p>:</span> <span class=nb>String</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>normalizedQuery</span><span class=p>:</span> <span class=nb>String</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
 </span></span><span class=line><span class=cl>
@@ -47,7 +75,23 @@
 </span></span><span class=line><span class=cl>            <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>onChange</code>가 보는 건 <code>rawInput</code>인데 안에서 set하는 건 <code>normalizedQuery</code>라서 둘이 다른 state라 자기 자신을 다시 부를 일이 없다.</p><p>사용자가 보는 입력은 그대로 두면서 (한글 조합 중에 공백 다듬어서 커서 튀는 사고도 같이 사라진다) 검색 로직은 <code>normalizedQuery</code>만 보면 되니까 흐름이 깔끔해진다. 대부분의 &ldquo;onChange 안에서 같은 state 만지고 있네&rdquo; 케이스는 이쪽으로 풀면 답이 나온다.</p><h2 id=해결책-3--비동기debounce가-얽힐-때는-taskid>해결책 3 — 비동기·debounce가 얽힐 때는 <code>.task(id:)</code></h2><p>검색 키워드처럼 입력이 바뀔 때마다 네트워크 요청이 따라가야 하면 얘기가 더 복잡해진다.</p><p><code>onChange</code>에서 직접 <code>Task</code>를 띄우면 debounce용 타이머 state도 들어오고 진행 중 task 핸들도 들어오고 취소 처리도 같이 들어와서 <code>onChange</code>가 보게 되는 state가 한꺼번에 늘어나는데 그러다 보면 또 어디선가 자기 자신을 건드리고 있게 된다.</p><p>이 자리에는 <code>.task(id:)</code>가 시맨틱이 가장 잘 맞는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>onChange</code>가 보는 건 <code>rawInput</code>인데 안에서 set하는 건 <code>normalizedQuery</code>라서 둘이 다른 state라 자기 자신을 다시 부를 일이 없다.</p><p>사용자가 보는 입력은 그대로 두면서 (한글 조합 중에 공백 다듬어서 커서 튀는 사고도 같이 사라진다) 검색 로직은 <code>normalizedQuery</code>만 보면 되니까 흐름이 깔끔해진다. 대부분의 &ldquo;onChange 안에서 같은 state 만지고 있네&rdquo; 케이스는 이쪽으로 풀면 답이 나온다.</p><h2 id=해결책-3--비동기debounce가-얽힐-때는-taskid>해결책 3 — 비동기·debounce가 얽힐 때는 <code>.task(id:)</code></h2><p>검색 키워드처럼 입력이 바뀔 때마다 네트워크 요청이 따라가야 하면 얘기가 더 복잡해진다.</p><p><code>onChange</code>에서 직접 <code>Task</code>를 띄우면 debounce용 타이머 state도 들어오고 진행 중 task 핸들도 들어오고 취소 처리도 같이 들어와서 <code>onChange</code>가 보게 되는 state가 한꺼번에 늘어나는데 그러다 보면 또 어디선가 자기 자신을 건드리고 있게 된다.</p><p>이 자리에는 <code>.task(id:)</code>가 시맨틱이 가장 잘 맞는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>rawInput</span><span class=p>:</span> <span class=nb>String</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>results</span><span class=p>:</span> <span class=p>[</span><span class=nb>String</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
 </span></span><span class=line><span class=cl>
@@ -63,7 +107,21 @@
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>search</span><span class=p>(</span><span class=kc>_</span> <span class=n>q</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=p>[</span><span class=nb>String</span><span class=p>]</span> <span class=p>{</span> <span class=cm>/* ... */</span> <span class=p>[]</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>rawInput</code>이 바뀔 때마다 이전 task는 자동으로 취소되고 새 task가 뜨는 구조다. debounce용 sleep도 task 취소가 그대로 먹히니까 따로 타이머를 들고 다닐 필요 없고 <code>Task.isCancelled</code> 한 번만 봐주면 끝.</p><p><code>onChange</code>로 같은 동작을 짜려고 하면 코드가 두 배는 늘어나는데 <code>.task(id:)</code>는 SwiftUI가 화면 생명주기랑 task 생명주기를 알아서 묶어주니까 손이 한참 줄어든다.</p><h2 id=ios-17-onchange-시그니처-짧게>iOS 17 onChange 시그니처 짧게</h2><p>위에 코드는 다 새 시그니처(<code>(oldValue, newValue) in</code>)로 썼는데 iOS 16 끌고 가는 프로젝트면 시그니처가 다르다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 16 이하</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>rawInput</code>이 바뀔 때마다 이전 task는 자동으로 취소되고 새 task가 뜨는 구조다. debounce용 sleep도 task 취소가 그대로 먹히니까 따로 타이머를 들고 다닐 필요 없고 <code>Task.isCancelled</code> 한 번만 봐주면 끝.</p><p><code>onChange</code>로 같은 동작을 짜려고 하면 코드가 두 배는 늘어나는데 <code>.task(id:)</code>는 SwiftUI가 화면 생명주기랑 task 생명주기를 알아서 묶어주니까 손이 한참 줄어든다.</p><h2 id=ios-17-onchange-시그니처-짧게>iOS 17 onChange 시그니처 짧게</h2><p>위에 코드는 다 새 시그니처(<code>(oldValue, newValue) in</code>)로 썼는데 iOS 16 끌고 가는 프로젝트면 시그니처가 다르다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 16 이하</span>
 </span></span><span class=line><span class=cl><span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>query</span><span class=p>)</span> <span class=p>{</span> <span class=n>newValue</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=c1>// oldValue 못 받음</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
@@ -77,187 +135,11 @@
 </span></span><span class=line><span class=cl><span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>query</span><span class=p>,</span> <span class=n>initial</span><span class=p>:</span> <span class=kc>true</span><span class=p>)</span> <span class=p>{</span> <span class=n>oldValue</span><span class=p>,</span> <span class=n>newValue</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=c1>// ...</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>initial: true</code>는 첫 진입 때 한 번 더 부르는 옵션이라 편하긴 한데 안 그래도 자기 자신 set 위험이 있는 클로저면 이걸 켜는 순간 더 빨리 터지니까 켤 거면 그 안의 set 동선을 먼저 정리하고 켜는 게 안전하다.</p><h2 id=회고>회고</h2><p><code>onChange</code>는 진짜 &ldquo;이름이 너무 핸들러 같이 생긴 게&rdquo; 문제의 절반인 것 같다. 이름만 보고 UIKit <code>addTarget</code> 비슷한 거라고 생각하면 안에서 자기 자신을 막 만지게 되는데 SwiftUI는 &ldquo;이벤트 발생"이 아니라 &ldquo;값이 어떤 값이다"를 보고 동작하는 시스템이라서 <code>onChange</code>도 그 흐름 안에 같이 들어가 있다.</p><p>요즘은 글을 쓸 때 &ldquo;이거 onChange로 풀어도 되나"를 한 번 더 생각하는데 안에서 같은 state를 만질 것 같으면 거의 매번 답은 셋 중 하나다.</p><ul><li>그냥 가드 (임시)</li><li>입력/파생 state 분리 (대부분 정답)</li><li><code>.task(id:)</code>로 옮기기 (비동기 얽힐 때)</li></ul><p><code>onChange</code>는 &ldquo;다른 곳에 부수 효과만 흘리는&rdquo; 자리에만 쓰고 안에서 자기 state는 안 만지는 게 가장 안전하다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p><code>initial: true</code>는 첫 진입 때 한 번 더 부르는 옵션이라 편하긴 한데 안 그래도 자기 자신 set 위험이 있는 클로저면 이걸 켜는 순간 더 빨리 터지니까 켤 거면 그 안의 set 동선을 먼저 정리하고 켜는 게 안전하다.</p><h2 id=회고>회고</h2><p><code>onChange</code>는 진짜 &ldquo;이름이 너무 핸들러 같이 생긴 게&rdquo; 문제의 절반인 것 같다. 이름만 보고 UIKit <code>addTarget</code> 비슷한 거라고 생각하면 안에서 자기 자신을 막 만지게 되는데 SwiftUI는 &ldquo;이벤트 발생"이 아니라 &ldquo;값이 어떤 값이다"를 보고 동작하는 시스템이라서 <code>onChange</code>도 그 흐름 안에 같이 들어가 있다.</p><p>요즘은 글을 쓸 때 &ldquo;이거 onChange로 풀어도 되나"를 한 번 더 생각하는데 안에서 같은 state를 만질 것 같으면 거의 매번 답은 셋 중 하나다.</p><ul><li>그냥 가드 (임시)</li><li>입력/파생 state 분리 (대부분 정답)</li><li><code>.task(id:)</code>로 옮기기 (비동기 얽힐 때)</li></ul><p><code>onChange</code>는 &ldquo;다른 곳에 부수 효과만 흘리는&rdquo; 자리에만 쓰고 안에서 자기 state는 안 만지는 게 가장 안전하다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/uikit-present-modal-queue/><span>← PREVIOUS FILE</span>
+<strong>UIKit 모달 여러 개가 동시에 present 될 때 큐로 줄 세운 기록</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/swiftui-sheet-bool-to-identifiable-enum/><span>NEXT FILE →</span>
+<strong>SwiftUI 모달 세 개째부터는 Bool 말고 enum 라우팅으로</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#많이-실수하는-코드>많이 실수하는 코드</a></li><li><a href=#왜-문제>왜 문제</a></li><li><a href=#해결책-1--가드-한-줄짜리-임시-처방>해결책 1 — 가드 한 줄짜리 임시 처방</a></li><li><a href=#해결책-2--입력-state와-파생-state-분리>해결책 2 — 입력 state와 파생 state 분리</a></li><li><a href=#해결책-3--비동기debounce가-얽힐-때는-taskid>해결책 3 — 비동기·debounce가 얽힐 때는 <code>.task(id:)</code></a></li><li><a href=#ios-17-onchange-시그니처-짧게>iOS 17 onChange 시그니처 짧게</a></li><li><a href=#회고>회고</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

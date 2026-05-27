@@ -1,24 +1,39 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴) — 오깅중</title><meta name=description content="SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)"><meta property="article:published_time" content="2026-05-12T08:50:00+09:00"><meta property="article:modified_time" content="2026-05-12T08:50:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Realm"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Migration"><meta property="article:tag" content="DAO"><meta property="article:tag" content="Swift6"><meta property="article:tag" content="Concurrency"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)"><meta name=twitter:description content="SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴) — 오깅중</title><meta name=description content="SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)"><meta property="article:published_time" content="2026-05-12T08:50:00+09:00"><meta property="article:modified_time" content="2026-05-12T08:50:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Realm"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Migration"><meta property="article:tag" content="DAO"><meta property="article:tag" content="Swift6"><meta property="article:tag" content="Concurrency"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)"><meta name=twitter:description content="SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-3-dao-pattern/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 12, 2026</span>
-<span>·</span>
-<span>11분 읽기</span></div><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)</h1><p class=article__desc>SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지.</p></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — SwiftData DAO를 <code>class</code> 인스턴스로 만들면 <code>ModelContext</code>를 어디서 들고 있을지 결정이 도메인 곳곳으로 분산되고, 결국 같은 row를 다른 컨텍스트로 건드리는 race가 생긴다. <strong>DAO는 <code>enum</code> + <code>static</code> 메서드, <code>ModelContext</code> 접근은 단일 진입점</strong>(<code>AppStore.shared.mainContext</code>)으로 강제한다. <code>autosaveEnabled = false</code>로 두고 DAO에서 명시적 <code>save()</code> + 변경 알림을 직접 발사한다. Realm 시절 <code>try! Realm()</code> + <code>.filter</code> + <code>.add(update: .modified)</code> 3종 세트가 어떻게 enum DAO로 1:1 매핑되는지까지 정리한다. 총 6편 시리즈의 <strong>3편(DAO 패턴 편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p>이전 편 → <a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정 3가지</a></p><p><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2</a>에서 SwiftData <code>@Attribute(.unique)</code> PK가 silent로 무너지는 3가지를 막아놨다. 이제 entity 자체는 안전한데, 다음 문제는 &ldquo;이걸 누가 어떻게 다룰지"다. Realm 시절엔 <code>try! Realm()</code> 한 줄로 어디서든 인스턴스를 받아 썼는데, SwiftData에선 그 자리를 <code>ModelContext</code>가 차지한다. 그리고 이 <code>ModelContext</code>를 어디서 만들고 누가 들고 있을지 결정하는 순간, DAO 설계가 통째로 갈린다.</p><p>이 글에선 DAO를 <code>class</code> 인스턴스로 짰을 때 뭐가 깨지는지 먼저 보고, <strong><code>enum</code> + <code>static</code> 메서드 + 단일 진입점</strong>으로 옮긴 패턴을 정리한다. 그다음 Realm 코드를 1:1로 어떻게 옮기는지, 함정은 어디 숨어 있는지까지.</p><hr><h2 id=안티패턴--dao를-class-인스턴스로-만들기>안티패턴 — DAO를 <code>class</code> 인스턴스로 만들기</h2><p>흔히 보는 패턴부터.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// class 인스턴스</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260512</span></nav><pre class=file-header>//  realm-to-swiftdata-migration-part-3-dao-pattern.swift
+//  ogging.dev / Swift
+//  MAY 12, 2026 · 11 min read
+//  #swiftdata, #realm, #ios17, #migration, #dao, #swift6, #concurrency</pre><header class=article__header><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 3 — DAO 패턴)</h1><p class=article__desc>SwiftData DAO를 `class` 인스턴스로 만들면 ModelContext 라이프사이클이 흩어진다. `enum` + `static` + 단일 진입점으로 정리한 패턴과, Realm 변환 규칙·hidden state 함정까지.</p><div class=article__meta><span>MAY 12, 2026 · 11 MIN READ</span><div class=article__tags><span>#swiftdata</span><span>#realm</span><span>#ios17</span><span>#migration</span></div></div></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — SwiftData DAO를 <code>class</code> 인스턴스로 만들면 <code>ModelContext</code>를 어디서 들고 있을지 결정이 도메인 곳곳으로 분산되고, 결국 같은 row를 다른 컨텍스트로 건드리는 race가 생긴다. <strong>DAO는 <code>enum</code> + <code>static</code> 메서드, <code>ModelContext</code> 접근은 단일 진입점</strong>(<code>AppStore.shared.mainContext</code>)으로 강제한다. <code>autosaveEnabled = false</code>로 두고 DAO에서 명시적 <code>save()</code> + 변경 알림을 직접 발사한다. Realm 시절 <code>try! Realm()</code> + <code>.filter</code> + <code>.add(update: .modified)</code> 3종 세트가 어떻게 enum DAO로 1:1 매핑되는지까지 정리한다. 총 6편 시리즈의 <strong>3편(DAO 패턴 편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p>이전 편 → <a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정 3가지</a></p><p><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2</a>에서 SwiftData <code>@Attribute(.unique)</code> PK가 silent로 무너지는 3가지를 막아놨다. 이제 entity 자체는 안전한데, 다음 문제는 &ldquo;이걸 누가 어떻게 다룰지"다. Realm 시절엔 <code>try! Realm()</code> 한 줄로 어디서든 인스턴스를 받아 썼는데, SwiftData에선 그 자리를 <code>ModelContext</code>가 차지한다. 그리고 이 <code>ModelContext</code>를 어디서 만들고 누가 들고 있을지 결정하는 순간, DAO 설계가 통째로 갈린다.</p><p>이 글에선 DAO를 <code>class</code> 인스턴스로 짰을 때 뭐가 깨지는지 먼저 보고, <strong><code>enum</code> + <code>static</code> 메서드 + 단일 진입점</strong>으로 옮긴 패턴을 정리한다. 그다음 Realm 코드를 1:1로 어떻게 옮기는지, 함정은 어디 숨어 있는지까지.</p><hr><h2 id=안티패턴--dao를-class-인스턴스로-만들기>안티패턴 — DAO를 <code>class</code> 인스턴스로 만들기</h2><p>흔히 보는 패턴부터.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// class 인스턴스</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>NoteDAO</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>context</span><span class=p>:</span> <span class=n>ModelContext</span>
 </span></span><span class=line><span class=cl>
@@ -34,7 +49,7 @@
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>NoteRepository</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>noteDAO</span> <span class=p>=</span> <span class=n>NoteDAO</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=p>???)</span>   <span class=c1>// 문제 시작</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>처음엔 그냥 <code>class</code>로 짰다. 잘 굴러가는 듯 보이는데 도메인이 늘어나면 이상해지더라. 위 코드의 <code>context: ???</code> 한 줄, 거기에 답해야 할 게 사실은 4개다.</p><ol><li><strong><code>ModelContext</code> 결정 시점이 분산</strong> — DI Container, Repository, ViewModel 어디서든 <code>init(context:)</code>를 호출할 수 있다. 호출자마다 다른 컨텍스트를 들고 들어오면 thread/scope 일관성이 깨진다</li><li><strong>인스턴스 보관 책임 모호</strong> — 누가 strong reference를 들고 있을지 결정해야 한다. ViewModel? Repository? DI graph? 도메인마다 다르게 되면 lifetime이 들쭉날쭉</li><li><strong>race condition 위험</strong> — 한 컨텍스트로 만든 entity를 다른 컨텍스트가 fetch하면 access 충돌. 같은 row를 두 컨텍스트가 동시에 건드리는 시나리오가 생긴다</li><li><strong>테스트 격리 어려움</strong> — 인스턴스 lifetime = 의존성 주입 형태. mock 흐름이 도메인마다 달라져서 테스트 setup이 통일이 안 됨</li></ol><pre class=mermaid>flowchart LR
+</span></span></code></pre></td></tr></table></div></div><p>처음엔 그냥 <code>class</code>로 짰다. 잘 굴러가는 듯 보이는데 도메인이 늘어나면 이상해지더라. 위 코드의 <code>context: ???</code> 한 줄, 거기에 답해야 할 게 사실은 4개다.</p><ol><li><strong><code>ModelContext</code> 결정 시점이 분산</strong> — DI Container, Repository, ViewModel 어디서든 <code>init(context:)</code>를 호출할 수 있다. 호출자마다 다른 컨텍스트를 들고 들어오면 thread/scope 일관성이 깨진다</li><li><strong>인스턴스 보관 책임 모호</strong> — 누가 strong reference를 들고 있을지 결정해야 한다. ViewModel? Repository? DI graph? 도메인마다 다르게 되면 lifetime이 들쭉날쭉</li><li><strong>race condition 위험</strong> — 한 컨텍스트로 만든 entity를 다른 컨텍스트가 fetch하면 access 충돌. 같은 row를 두 컨텍스트가 동시에 건드리는 시나리오가 생긴다</li><li><strong>테스트 격리 어려움</strong> — 인스턴스 lifetime = 의존성 주입 형태. mock 흐름이 도메인마다 달라져서 테스트 setup이 통일이 안 됨</li></ol><pre class=mermaid>flowchart LR
     subgraph ANTI["안티패턴 — class 인스턴스"]
         direction TB
         A_Repo[NoteRepository]:::caller
@@ -72,7 +87,48 @@
     classDef bad fill:#9b2c2c,stroke:#feb2b2,stroke-width:2px,color:#fff5f5
     classDef dao_ok fill:#22543d,stroke:#68d391,stroke-width:2px,color:#f0fff4
     classDef ctx fill:#276749,stroke:#9ae6b4,stroke-width:2px,color:#f0fff4
-</pre><blockquote><p><em>그림 1. 안티패턴은 호출자마다 다른 <code>ModelContext</code>를 들고 있는 <code>class</code> 인스턴스가 같은 row를 동시에 건드린다. 권장 패턴은 모든 호출자가 <code>enum DAO</code>의 static 메서드만 부르고, 진짜 <code>ModelContext</code>는 <code>AppStore.shared.mainContext</code> 하나로 수렴한다.</em></p></blockquote><p>이 패턴이 깨지는 순간 어디서 사고가 났는지 추적이 진짜 어렵다. &ldquo;어떤 컨텍스트로 fetch했더라"부터 거꾸로 따라 올라가야 하니까&mldr; 그 시간이면 enum으로 갈아엎는 게 빠르다.</p><hr><h2 id=권장-패턴--enum--static-메서드>권장 패턴 — <code>enum</code> + <code>static</code> 메서드</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// enum + static</span>
+</pre><blockquote><p><em>그림 1. 안티패턴은 호출자마다 다른 <code>ModelContext</code>를 들고 있는 <code>class</code> 인스턴스가 같은 row를 동시에 건드린다. 권장 패턴은 모든 호출자가 <code>enum DAO</code>의 static 메서드만 부르고, 진짜 <code>ModelContext</code>는 <code>AppStore.shared.mainContext</code> 하나로 수렴한다.</em></p></blockquote><p>이 패턴이 깨지는 순간 어디서 사고가 났는지 추적이 진짜 어렵다. &ldquo;어떤 컨텍스트로 fetch했더라"부터 거꾸로 따라 올라가야 하니까&mldr; 그 시간이면 enum으로 갈아엎는 게 빠르다.</p><hr><h2 id=권장-패턴--enum--static-메서드>권장 패턴 — <code>enum</code> + <code>static</code> 메서드</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// enum + static</span>
 </span></span><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>NoteDAO</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=c1>/// 단일 진입점에서 ModelContext 접근</span>
 </span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>static</span> <span class=kd>var</span> <span class=nv>context</span><span class=p>:</span> <span class=n>ModelContext</span> <span class=p>{</span>
@@ -113,7 +169,29 @@
 </span></span><span class=line><span class=cl>        <span class=n>NotificationCenter</span><span class=p>.</span><span class=k>default</span><span class=p>.</span><span class=n>post</span><span class=p>(</span><span class=n>name</span><span class=p>:</span> <span class=p>.</span><span class=n>noteDidChange</span><span class=p>,</span> <span class=n>object</span><span class=p>:</span> <span class=kc>nil</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>try? context.fetch(...)</code>의 <code>try?</code>는 의도된 swallow다. fetch 실패 시 빈 배열 폴백으로 가는 게 호출자 입장에서 다루기 편해서 그렇게 둔 건데, 로깅이 필요한 자리면 <code>do/catch</code>로 감싸도 된다.</p><p>솔직히 enum DAO 첫 인상은 <code>static</code>이 너무 많아서 어색했음. 그런데 며칠 굴려보니 호출 형태가 항상 똑같아서 머리가 편해지더라.</p><p>이 패턴의 장점:</p><ul><li><strong><code>enum</code>은 인스턴스 생성 불가</strong> — Swift 컴파일러가 강제. 실수로 인스턴스 만드는 코드가 안 들어감</li><li><strong>호출은 항상 <code>NoteDAO.read(...)</code></strong> — 의존성 0, 어디서든 같은 형태</li><li><strong><code>ModelContext</code> 진입점이 단 하나</strong> — <code>context</code> computed property 한 곳만 보면 됨. 누가 어디서 컨텍스트를 만드는지 고민할 필요 없음</li><li><strong>테스트 격리</strong> — <code>AppStore.shared</code>의 in-memory 변종을 테스트 setup에서 주입하면 DAO 호출 코드는 한 줄도 안 바꿔도 됨</li></ul><hr><h2 id=modelcontext-접근-진입점>ModelContext 접근 진입점</h2><p><code>AppStore.shared.mainContext</code>를 단일 진입점으로 둔다. 부트스트랩은 앱 시작 1회.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>AppStore</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>try? context.fetch(...)</code>의 <code>try?</code>는 의도된 swallow다. fetch 실패 시 빈 배열 폴백으로 가는 게 호출자 입장에서 다루기 편해서 그렇게 둔 건데, 로깅이 필요한 자리면 <code>do/catch</code>로 감싸도 된다.</p><p>솔직히 enum DAO 첫 인상은 <code>static</code>이 너무 많아서 어색했음. 그런데 며칠 굴려보니 호출 형태가 항상 똑같아서 머리가 편해지더라.</p><p>이 패턴의 장점:</p><ul><li><strong><code>enum</code>은 인스턴스 생성 불가</strong> — Swift 컴파일러가 강제. 실수로 인스턴스 만드는 코드가 안 들어감</li><li><strong>호출은 항상 <code>NoteDAO.read(...)</code></strong> — 의존성 0, 어디서든 같은 형태</li><li><strong><code>ModelContext</code> 진입점이 단 하나</strong> — <code>context</code> computed property 한 곳만 보면 됨. 누가 어디서 컨텍스트를 만드는지 고민할 필요 없음</li><li><strong>테스트 격리</strong> — <code>AppStore.shared</code>의 in-memory 변종을 테스트 setup에서 주입하면 DAO 호출 코드는 한 줄도 안 바꿔도 됨</li></ul><hr><h2 id=modelcontext-접근-진입점>ModelContext 접근 진입점</h2><p><code>AppStore.shared.mainContext</code>를 단일 진입점으로 둔다. 부트스트랩은 앱 시작 1회.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>AppStore</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>let</span> <span class=nv>shared</span> <span class=p>=</span> <span class=n>AppStore</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>container</span><span class=p>:</span> <span class=n>ModelContainer</span>
@@ -135,7 +213,23 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>포인트는 <code>autosaveEnabled = false</code>다. autosave가 켜져 있으면 변경 알림 발사 타이밍이 컨텍스트 내부 스케줄에 묶여서 예측이 안 된다. 구독자(Combine pipeline, NotificationCenter listener)가 &ldquo;지금 본 데이터가 커밋된 상태인지&rdquo; 보장이 안 되는 식. autosave 켜놓고 알림 타이밍 디버깅하다 한참 멍 때리는 일이 생기기 좋다 ㅋㅋㅋ</p><p><code>autosaveEnabled = false</code> + DAO에서 명시적 <code>save()</code> + <code>NotificationCenter.post</code>를 같은 메서드 안에 묶어두면, 알림이 발사되는 시점은 항상 &ldquo;save가 이미 끝난 직후&rdquo; 한 곳으로 고정된다.</p><hr><h2 id=realm--swiftdata-dao-변환-패턴>Realm → SwiftData DAO 변환 패턴</h2><p>기존 Realm 코드.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Realm 시절</span>
+</span></span></code></pre></td></tr></table></div></div><p>포인트는 <code>autosaveEnabled = false</code>다. autosave가 켜져 있으면 변경 알림 발사 타이밍이 컨텍스트 내부 스케줄에 묶여서 예측이 안 된다. 구독자(Combine pipeline, NotificationCenter listener)가 &ldquo;지금 본 데이터가 커밋된 상태인지&rdquo; 보장이 안 되는 식. autosave 켜놓고 알림 타이밍 디버깅하다 한참 멍 때리는 일이 생기기 좋다 ㅋㅋㅋ</p><p><code>autosaveEnabled = false</code> + DAO에서 명시적 <code>save()</code> + <code>NotificationCenter.post</code>를 같은 메서드 안에 묶어두면, 알림이 발사되는 시점은 항상 &ldquo;save가 이미 끝난 직후&rdquo; 한 곳으로 고정된다.</p><hr><h2 id=realm--swiftdata-dao-변환-패턴>Realm → SwiftData DAO 변환 패턴</h2><p>기존 Realm 코드.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// Realm 시절</span>
 </span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>NoteFactory</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>readNote</span><span class=p>(</span><span class=n>folderID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>realm</span> <span class=p>=</span> <span class=k>try</span><span class=p>!</span> <span class=n>Realm</span><span class=p>()</span>   <span class=c1>// 매번 인스턴스</span>
@@ -151,7 +245,39 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>변환 자체는 어렵지 않은데&mldr; <code>try! Realm()</code> 한 줄을 어디까지 걷어낼지 결정하는 게 진짜 일이었다. Realm은 인스턴스를 가볍게 받아 써도 큰 문제가 없는 API라 호출 코드 곳곳에 흩뿌려져 있다. 이걸 다 단일 진입점 한 곳으로 모으는 게 변환의 절반.</p><p>SwiftData enum DAO로 변환.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// SwiftData 변환 후</span>
+</span></span></code></pre></td></tr></table></div></div><p>변환 자체는 어렵지 않은데&mldr; <code>try! Realm()</code> 한 줄을 어디까지 걷어낼지 결정하는 게 진짜 일이었다. Realm은 인스턴스를 가볍게 받아 써도 큰 문제가 없는 API라 호출 코드 곳곳에 흩뿌려져 있다. 이걸 다 단일 진입점 한 곳으로 모으는 게 변환의 절반.</p><p>SwiftData enum DAO로 변환.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// SwiftData 변환 후</span>
 </span></span><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>NoteDAO</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>func</span> <span class=nf>readNote</span><span class=p>(</span><span class=n>folderID</span><span class=p>:</span> <span class=nb>Int</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=p>[</span><span class=n>NoteEntity</span><span class=p>]</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=c1>// Realm의 .filter chain → #Predicate</span>
@@ -183,7 +309,7 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2</a>에서 정리한 lookup → insert/update upsert 패턴이 여기 그대로 들어간다. PK가 결정적 해시로 안정화돼 있으니 lookup 키는 안전하다.</p><pre class=mermaid>sequenceDiagram
+</span></span></code></pre></td></tr></table></div></div><p><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2</a>에서 정리한 lookup → insert/update upsert 패턴이 여기 그대로 들어간다. PK가 결정적 해시로 안정화돼 있으니 lookup 키는 안전하다.</p><pre class=mermaid>sequenceDiagram
     participant Caller as Caller<br>(ViewModel · Repository)
     participant DAO as NoteDAO<br>(enum · static)
     participant Ctx as ModelContext<br>(autosaveEnabled = false)
@@ -210,195 +336,24 @@
     DAO-->>Sub: 최신 스냅샷
 
     Note over Caller,Sub: save와 알림이 한 트랜잭션<br>구독자는 항상 커밋된 상태만 본다
-</pre><blockquote><p><em>그림 2. <code>autosaveEnabled = false</code> 상태에서 <code>insert</code> 여러 번 호출 → <code>try? context.save()</code> 한 번 → <code>NotificationCenter.post(...)</code>가 모두 한 메서드 안에 묶인다. 구독자는 항상 커밋된 스냅샷만 본다.</em></p></blockquote><p>표로 정리하면 결국 이 4줄로 줄어든다. 처음 마이그레이션 시작할 땐 더 복잡할 줄 알았는데&mldr;</p><table><thead><tr><th>Realm</th><th>SwiftData enum DAO</th></tr></thead><tbody><tr><td><code>try! Realm()</code> 매번 호출</td><td><code>context</code> computed property 단일 진입점</td></tr><tr><td><code>realm.objects(T.self).filter(...)</code></td><td><code>FetchDescriptor&lt;T>(predicate: #Predicate { ... })</code></td></tr><tr><td><code>realm.write { realm.add(_, update: .modified) }</code></td><td>명시적 upsert (lookup → insert/update) + <code>context.save()</code></td></tr><tr><td>Object 변경 → 자동 알림</td><td><code>NotificationCenter.post</code> 명시 발사 (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 참고</a>)</td></tr></tbody></table><hr><h2 id=dao-네이밍-컨벤션>DAO 네이밍 컨벤션</h2><p>호출자 학습 비용을 0에 수렴시키려면 메서드 prefix를 고정한다.</p><table><thead><tr><th>동작</th><th>메서드 prefix</th><th>예시</th></tr></thead><tbody><tr><td>추가/upsert</td><td><code>insert</code></td><td><code>insertNote(_:)</code></td></tr><tr><td>조회 (스냅샷)</td><td><code>read</code>, <code>load</code></td><td><code>readNote(folderID:)</code>, <code>loadNote()</code></td></tr><tr><td>수정</td><td><code>update</code></td><td><code>updateNote(_:)</code></td></tr><tr><td>삭제</td><td><code>delete</code></td><td><code>deleteNote(rowID:)</code></td></tr><tr><td>변경 알림 구독</td><td><code>subscribe</code></td><td><code>subscribeForDataSource(folderID:)</code> (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 참고</a>)</td></tr></tbody></table><p><code>subscribe</code> prefix는 다음 편(<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a>)에서 본격적으로 다룬다. 이 표에서는 자리만 잡아둔다.</p><hr><h2 id=함정--static으로-위장한-hidden-state>함정 — <code>static</code>으로 위장한 hidden state</h2><p><code>enum</code> + <code>static</code>이라 해도 <code>static var</code> 같은 mutable 전역 state가 끼면 의미가 무너진다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// enum의 의미 사라짐</span>
+</pre><blockquote><p><em>그림 2. <code>autosaveEnabled = false</code> 상태에서 <code>insert</code> 여러 번 호출 → <code>try? context.save()</code> 한 번 → <code>NotificationCenter.post(...)</code>가 모두 한 메서드 안에 묶인다. 구독자는 항상 커밋된 스냅샷만 본다.</em></p></blockquote><p>표로 정리하면 결국 이 4줄로 줄어든다. 처음 마이그레이션 시작할 땐 더 복잡할 줄 알았는데&mldr;</p><table><thead><tr><th>Realm</th><th>SwiftData enum DAO</th></tr></thead><tbody><tr><td><code>try! Realm()</code> 매번 호출</td><td><code>context</code> computed property 단일 진입점</td></tr><tr><td><code>realm.objects(T.self).filter(...)</code></td><td><code>FetchDescriptor&lt;T>(predicate: #Predicate { ... })</code></td></tr><tr><td><code>realm.write { realm.add(_, update: .modified) }</code></td><td>명시적 upsert (lookup → insert/update) + <code>context.save()</code></td></tr><tr><td>Object 변경 → 자동 알림</td><td><code>NotificationCenter.post</code> 명시 발사 (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 참고</a>)</td></tr></tbody></table><hr><h2 id=dao-네이밍-컨벤션>DAO 네이밍 컨벤션</h2><p>호출자 학습 비용을 0에 수렴시키려면 메서드 prefix를 고정한다.</p><table><thead><tr><th>동작</th><th>메서드 prefix</th><th>예시</th></tr></thead><tbody><tr><td>추가/upsert</td><td><code>insert</code></td><td><code>insertNote(_:)</code></td></tr><tr><td>조회 (스냅샷)</td><td><code>read</code>, <code>load</code></td><td><code>readNote(folderID:)</code>, <code>loadNote()</code></td></tr><tr><td>수정</td><td><code>update</code></td><td><code>updateNote(_:)</code></td></tr><tr><td>삭제</td><td><code>delete</code></td><td><code>deleteNote(rowID:)</code></td></tr><tr><td>변경 알림 구독</td><td><code>subscribe</code></td><td><code>subscribeForDataSource(folderID:)</code> (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 참고</a>)</td></tr></tbody></table><p><code>subscribe</code> prefix는 다음 편(<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a>)에서 본격적으로 다룬다. 이 표에서는 자리만 잡아둔다.</p><hr><h2 id=함정--static으로-위장한-hidden-state>함정 — <code>static</code>으로 위장한 hidden state</h2><p><code>enum</code> + <code>static</code>이라 해도 <code>static var</code> 같은 mutable 전역 state가 끼면 의미가 무너진다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// enum의 의미 사라짐</span>
 </span></span><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>NoteDAO</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>var</span> <span class=nv>lastFetchedAt</span><span class=p>:</span> <span class=n>Date</span><span class=p>?</span>   <span class=c1>// hidden state</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>var</span> <span class=nv>pendingUpserts</span><span class=p>:</span> <span class=p>[</span><span class=n>NoteEntity</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>   <span class=c1>// hidden state</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>static var</code> 박아놓고 enum이라고 우기는 격임 ㅋㅋㅋ — 이게 한 번 들어가는 순간 &ldquo;DAO는 stateless"라는 전제가 깨지고, 호출 순서가 결과를 바꾸기 시작한다. 결국 <code>class</code> 인스턴스 DAO에서 봤던 추적 난이도가 다른 모습으로 돌아온다.</p><p>DAO 안에 hidden state는 두지 않는다. 캐시 한 줄만 추가하자&mldr; 하면서 시작하는데, 그 한 줄이 결국 도메인 전체를 잡아먹는다. 캐시·큐·인덱스가 진짜로 필요하면 별도 명시적 서비스(<code>NoteCache</code>, <code>NoteUpsertQueue</code> 같은)로 분리하고, DAO는 fetch/save만 책임지게 둔다.</p><hr><h2 id=체크리스트>체크리스트</h2><p>비슷한 작업 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> DAO가 <code>enum</code>으로 선언됐는가 (<code>class</code> 아님)</li><li><input disabled type=checkbox> 모든 메서드가 <code>static</code>인가</li><li><input disabled type=checkbox> <code>ModelContext</code> 접근 진입점이 단일한가 (<code>AppStore.shared.mainContext</code> 한 곳)</li><li><input disabled type=checkbox> <code>autosaveEnabled</code>가 의도된 값인가 (보통 <code>false</code>로 두고 DAO에서 명시 save)</li><li><input disabled type=checkbox> upsert가 lookup → insert/update로 분리됐는가 (Part 2 참조)</li><li><input disabled type=checkbox> 변경 알림 발사(<code>NotificationCenter</code>)가 <code>save()</code> 직후, 같은 메서드 안에 있는가</li><li><input disabled type=checkbox> DAO에 <code>static var</code> mutable state가 없는가</li></ul><hr><h2 id=회고>회고</h2><p>Part 2가 &ldquo;SwiftData 매크로 경계에서 silent failure"를 주제로 했다면, Part 3는 한 단계 위 — <strong>라이프사이클 경계</strong>에서 사고가 어떻게 생기는지에 가깝다. <code>class</code> 인스턴스 DAO는 컴파일도 잘 되고 멀쩡히 굴러간다. 그런데 도메인이 늘어나면 컨텍스트 정합성이 슬슬 어긋나기 시작한다. 그게 silent failure처럼 보이는 이유는 사고 시점과 원인 시점이 다르기 때문이다. 컨텍스트는 한참 전에 결정됐고, 깨지는 건 한참 뒤니까.</p><p><code>enum</code> + <code>static</code> + 단일 진입점 패턴은 솔직히 화려한 게 없다. 그냥 &ldquo;결정해야 하는 자리를 줄인다"가 전부다. <code>ModelContext</code>를 어디서 만들지, 누가 들고 있을지, 인스턴스 lifetime을 누가 책임질지&mldr; 이 결정들을 컴파일러가 강제로 막아주니까 호출 코드가 단순해진다. 단순해지면 사고도 단순한 자리에서 난다.</p><p>다음 편 → <a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a>에서는 이 enum DAO가 발사하는 <code>NotificationCenter</code> 알림을 Combine pipeline으로 어떻게 잇는지, 여러 알림 소스를 merge할 때 뭐가 깨지는지 다룬다. <code>subscribeForDataSource(folderID:)</code>가 그 자리에서 본격적으로 등장한다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></li><li>Part 3 — DAO 패턴 (이 글)</li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/>Part 6 — View 다중 mount 디버깅</a></li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p><code>static var</code> 박아놓고 enum이라고 우기는 격임 ㅋㅋㅋ — 이게 한 번 들어가는 순간 &ldquo;DAO는 stateless"라는 전제가 깨지고, 호출 순서가 결과를 바꾸기 시작한다. 결국 <code>class</code> 인스턴스 DAO에서 봤던 추적 난이도가 다른 모습으로 돌아온다.</p><p>DAO 안에 hidden state는 두지 않는다. 캐시 한 줄만 추가하자&mldr; 하면서 시작하는데, 그 한 줄이 결국 도메인 전체를 잡아먹는다. 캐시·큐·인덱스가 진짜로 필요하면 별도 명시적 서비스(<code>NoteCache</code>, <code>NoteUpsertQueue</code> 같은)로 분리하고, DAO는 fetch/save만 책임지게 둔다.</p><hr><h2 id=체크리스트>체크리스트</h2><p>비슷한 작업 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> DAO가 <code>enum</code>으로 선언됐는가 (<code>class</code> 아님)</li><li><input disabled type=checkbox> 모든 메서드가 <code>static</code>인가</li><li><input disabled type=checkbox> <code>ModelContext</code> 접근 진입점이 단일한가 (<code>AppStore.shared.mainContext</code> 한 곳)</li><li><input disabled type=checkbox> <code>autosaveEnabled</code>가 의도된 값인가 (보통 <code>false</code>로 두고 DAO에서 명시 save)</li><li><input disabled type=checkbox> upsert가 lookup → insert/update로 분리됐는가 (Part 2 참조)</li><li><input disabled type=checkbox> 변경 알림 발사(<code>NotificationCenter</code>)가 <code>save()</code> 직후, 같은 메서드 안에 있는가</li><li><input disabled type=checkbox> DAO에 <code>static var</code> mutable state가 없는가</li></ul><hr><h2 id=회고>회고</h2><p>Part 2가 &ldquo;SwiftData 매크로 경계에서 silent failure"를 주제로 했다면, Part 3는 한 단계 위 — <strong>라이프사이클 경계</strong>에서 사고가 어떻게 생기는지에 가깝다. <code>class</code> 인스턴스 DAO는 컴파일도 잘 되고 멀쩡히 굴러간다. 그런데 도메인이 늘어나면 컨텍스트 정합성이 슬슬 어긋나기 시작한다. 그게 silent failure처럼 보이는 이유는 사고 시점과 원인 시점이 다르기 때문이다. 컨텍스트는 한참 전에 결정됐고, 깨지는 건 한참 뒤니까.</p><p><code>enum</code> + <code>static</code> + 단일 진입점 패턴은 솔직히 화려한 게 없다. 그냥 &ldquo;결정해야 하는 자리를 줄인다"가 전부다. <code>ModelContext</code>를 어디서 만들지, 누가 들고 있을지, 인스턴스 lifetime을 누가 책임질지&mldr; 이 결정들을 컴파일러가 강제로 막아주니까 호출 코드가 단순해진다. 단순해지면 사고도 단순한 자리에서 난다.</p><p>다음 편 → <a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a>에서는 이 enum DAO가 발사하는 <code>NotificationCenter</code> 알림을 Combine pipeline으로 어떻게 잇는지, 여러 알림 소스를 merge할 때 뭐가 깨지는지 다룬다. <code>subscribeForDataSource(folderID:)</code>가 그 자리에서 본격적으로 등장한다.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li><a href=/p/realm-to-swiftdata-migration-part-1-strategy/>Part 1 — 전략</a></li><li><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></li><li>Part 3 — DAO 패턴 (이 글)</li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/>Part 6 — View 다중 mount 디버깅</a></li></ul></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><span>← PREVIOUS FILE</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/realm-to-swiftdata-migration-part-4-combine-integration/><span>NEXT FILE →</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 4 — Combine 통합)</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#시작하며>시작하며</a></li><li><a href=#안티패턴--dao를-class-인스턴스로-만들기>안티패턴 — DAO를 <code>class</code> 인스턴스로 만들기</a></li><li><a href=#권장-패턴--enum--static-메서드>권장 패턴 — <code>enum</code> + <code>static</code> 메서드</a></li><li><a href=#modelcontext-접근-진입점>ModelContext 접근 진입점</a></li><li><a href=#realm--swiftdata-dao-변환-패턴>Realm → SwiftData DAO 변환 패턴</a></li><li><a href=#dao-네이밍-컨벤션>DAO 네이밍 컨벤션</a></li><li><a href=#함정--static으로-위장한-hidden-state>함정 — <code>static</code>으로 위장한 hidden state</a></li><li><a href=#체크리스트>체크리스트</a></li><li><a href=#회고>회고</a></li><li><a href=#시리즈-목차>시리즈 목차</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script><script type=module>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script><script type=module>
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
   mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
 </script></body></html>

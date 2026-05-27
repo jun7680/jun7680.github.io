@@ -1,38 +1,62 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴 — 오깅중</title><meta name=description content="UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리."><meta property="og:image" content="https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴"><meta property="article:published_time" content="2022-04-13T00:00:00Z"><meta property="article:modified_time" content="2022-04-13T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="UIStackView"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="Animation"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴"><meta name=twitter:description content="UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리."><meta name=twitter:image content="https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴 — 오깅중</title><meta name=description content="UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리."><meta property="og:image" content="https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴"><meta property="article:published_time" content="2022-04-13T00:00:00Z"><meta property="article:modified_time" content="2022-04-13T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="UIStackView"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="Animation"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴"><meta name=twitter:description content="UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리."><meta name=twitter:image content="https://jun7680.github.io/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>APR 13, 2022</span>
-<span>·</span>
-<span>3분 읽기</span></div><h1 class=article__title>UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴</h1><p class=article__desc>UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리.</p></header><div class=article__body><p>UIKit으로 토글 가능한 패널을 만들 때 가장 흔히 쓰는 건 <code>UIStackView</code> 안의 view에 <code>isHidden</code>을 적용하는 방식이다. 그런데 이걸 애니메이션 블록 안에서 토글하다 보면, <strong>버튼을 다섯 번 누르면 다섯 번 다시 눌러야 보이는</strong> 이상한 현상에 부딪힌다. 코드는 분명 한 줄인데 동작은 그렇지 않다. 처음 봤을 때는 디버그로 한참을 헤맸다.</p><h2 id=현상>현상</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>@IBAction</span> <span class=kd>func</span> <span class=nf>toggle</span><span class=p>(</span><span class=kc>_</span> <span class=n>sender</span><span class=p>:</span> <span class=nb>Any</span><span class=p>)</span> <span class=p>{</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_220413</span></nav><pre class=file-header>//  .swift
+//  ogging.dev / Swift
+//  APR 13, 2022 · 3 min read
+//  #uistackview, #uikit, #animation</pre><header class=article__header><h1 class=article__title>UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴</h1><p class=article__desc>UIStackView 안의 view에 isHidden을 애니메이션으로 토글할 때 누른 횟수만큼 다시 눌러야 보이는 현상의 원인과, 의도대로 동작시키는 안전한 패턴 정리.</p><div class=article__meta><span>APR 13, 2022 · 3 MIN READ</span><div class=article__tags><span>#uistackview</span><span>#uikit</span><span>#animation</span></div></div></header><div class=article__body><p>UIKit으로 토글 가능한 패널을 만들 때 가장 흔히 쓰는 건 <code>UIStackView</code> 안의 view에 <code>isHidden</code>을 적용하는 방식이다. 그런데 이걸 애니메이션 블록 안에서 토글하다 보면, <strong>버튼을 다섯 번 누르면 다섯 번 다시 눌러야 보이는</strong> 이상한 현상에 부딪힌다. 코드는 분명 한 줄인데 동작은 그렇지 않다. 처음 봤을 때는 디버그로 한참을 헤맸다.</p><h2 id=현상>현상</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>@IBAction</span> <span class=kd>func</span> <span class=nf>toggle</span><span class=p>(</span><span class=kc>_</span> <span class=n>sender</span><span class=p>:</span> <span class=nb>Any</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>UIView</span><span class=p>.</span><span class=n>animate</span><span class=p>(</span><span class=n>withDuration</span><span class=p>:</span> <span class=mf>0.25</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kc>self</span><span class=p>.</span><span class=n>targetView</span><span class=p>.</span><span class=n>isHidden</span><span class=p>.</span><span class=n>toggle</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>겉보기엔 멀쩡한 코드. 그런데 토글 버튼을 빠르게 여러 번 누르면 화면이 점점 어색해지고, 어느 시점부터는 버튼을 눌러도 view가 안 보인다. show/hide가 1:1로 대응되지 않고 <strong>카운터가 쌓이는</strong> 느낌.</p><h2 id=원인>원인</h2><p><code>UIView.animate(...)</code> 블록 안에서 <code>isHidden</code>을 set 하면 UIKit이 이걸 &ldquo;애니메이션 가능한 속성 변경"으로 큐에 넣는다. <code>isHidden</code>은 <code>Bool</code> 한 값이지만, 내부적으로는 이 변경이 hide/show 트랜잭션 형태로 누적된다. 같은 값으로 다시 set 해도 트랜잭션이 별도로 쌓여서, 결과적으로 호출 횟수만큼 큐가 채워지는 거다.</p><p>StackOverflow의 <a href=https://stackoverflow.com/questions/33240635/hidden-property-cannot-be-changed-within-an-animation-block>예전 글</a>에 같은 현상이 정리돼 있는데, 핵심은 &ldquo;<strong>같은 값으로 isHidden을 반복해서 set 하지 마라</strong>&ldquo;는 것. 즉 <code>false → false</code> 같은 무의미한 set도 큐에는 의미 있는 이벤트로 들어간다.</p><p><code>toggle()</code> 자체는 값을 뒤집기만 하니까 큐가 안 쌓일 것 같지만, <strong>animate 블록과 빠른 사용자 입력이 겹치면</strong> 동일 값 set이 일어나는 타이밍이 생긴다. 결과적으로 누적.</p><h2 id=해결-값이-바뀔-때만-set>해결: &ldquo;값이 바뀔 때만 set&rdquo;</h2><p>해법은 단순하다. <strong>현재 값과 다를 때만</strong> 변경하기. UIView 확장으로 한 번 만들어두면 어디서나 안전하게 쓸 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>UIView</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>겉보기엔 멀쩡한 코드. 그런데 토글 버튼을 빠르게 여러 번 누르면 화면이 점점 어색해지고, 어느 시점부터는 버튼을 눌러도 view가 안 보인다. show/hide가 1:1로 대응되지 않고 <strong>카운터가 쌓이는</strong> 느낌.</p><h2 id=원인>원인</h2><p><code>UIView.animate(...)</code> 블록 안에서 <code>isHidden</code>을 set 하면 UIKit이 이걸 &ldquo;애니메이션 가능한 속성 변경"으로 큐에 넣는다. <code>isHidden</code>은 <code>Bool</code> 한 값이지만, 내부적으로는 이 변경이 hide/show 트랜잭션 형태로 누적된다. 같은 값으로 다시 set 해도 트랜잭션이 별도로 쌓여서, 결과적으로 호출 횟수만큼 큐가 채워지는 거다.</p><p>StackOverflow의 <a href=https://stackoverflow.com/questions/33240635/hidden-property-cannot-be-changed-within-an-animation-block>예전 글</a>에 같은 현상이 정리돼 있는데, 핵심은 &ldquo;<strong>같은 값으로 isHidden을 반복해서 set 하지 마라</strong>&ldquo;는 것. 즉 <code>false → false</code> 같은 무의미한 set도 큐에는 의미 있는 이벤트로 들어간다.</p><p><code>toggle()</code> 자체는 값을 뒤집기만 하니까 큐가 안 쌓일 것 같지만, <strong>animate 블록과 빠른 사용자 입력이 겹치면</strong> 동일 값 set이 일어나는 타이밍이 생긴다. 결과적으로 누적.</p><h2 id=해결-값이-바뀔-때만-set>해결: &ldquo;값이 바뀔 때만 set&rdquo;</h2><p>해법은 단순하다. <strong>현재 값과 다를 때만</strong> 변경하기. UIView 확장으로 한 번 만들어두면 어디서나 안전하게 쓸 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>UIView</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>setHiddenSafely</span><span class=p>(</span><span class=kc>_</span> <span class=n>hidden</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=n>isHidden</span> <span class=o>!=</span> <span class=n>hidden</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>        <span class=n>isHidden</span> <span class=p>=</span> <span class=n>hidden</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>토글 시:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>UIView</span><span class=p>.</span><span class=n>animate</span><span class=p>(</span><span class=n>withDuration</span><span class=p>:</span> <span class=mf>0.25</span><span class=p>)</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>토글 시:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>UIView</span><span class=p>.</span><span class=n>animate</span><span class=p>(</span><span class=n>withDuration</span><span class=p>:</span> <span class=mf>0.25</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kc>self</span><span class=p>.</span><span class=n>targetView</span><span class=p>.</span><span class=n>setHiddenSafely</span><span class=p>(</span><span class=o>!</span><span class=kc>self</span><span class=p>.</span><span class=n>targetView</span><span class=p>.</span><span class=n>isHidden</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이렇게 하면 같은 값으로의 set이 차단돼서 큐 누적이 발생하지 않는다. 빠르게 연타해도 보이는 상태와 호출 횟수가 1:1로 대응됨.</p><p>조금 더 명시적으로 쓰고 싶다면 메서드를 두 개로 쪼개도 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>UIView</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>이렇게 하면 같은 값으로의 set이 차단돼서 큐 누적이 발생하지 않는다. 빠르게 연타해도 보이는 상태와 호출 횟수가 1:1로 대응됨.</p><p>조금 더 명시적으로 쓰고 싶다면 메서드를 두 개로 쪼개도 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>UIView</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>showAnimated</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=n>isHidden</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>        <span class=n>isHidden</span> <span class=p>=</span> <span class=kc>false</span>
@@ -43,8 +67,17 @@
 </span></span><span class=line><span class=cl>        <span class=n>isHidden</span> <span class=p>=</span> <span class=kc>true</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>호출 측에서 의도가 명확해진다는 장점. 다만 토글 동작 한 줄로 끝낼 수 없어서 상황에 따라 위 두 방식 중 선택.</p><h2 id=animate-블록-바깥에서-호출하면>animate 블록 바깥에서 호출하면?</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kc>self</span><span class=p>.</span><span class=n>targetView</span><span class=p>.</span><span class=n>isHidden</span><span class=p>.</span><span class=n>toggle</span><span class=p>()</span>
-</span></span></code></pre></div><p>애니메이션 없이 그냥 토글하면 누적은 거의 안 보인다. 결국 누적은 <strong>애니메이션 블록 안에서의 반복 set</strong>과 결합될 때 도드라진다. 그래서 &ldquo;isHidden 토글 + UIView.animate 조합"을 쓸 때만 위 가드를 신경 쓰면 된다.</p><h2 id=같은-패턴이-적용되는-다른-곳>같은 패턴이 적용되는 다른 곳</h2><p>isHidden과 비슷하게 &ldquo;같은 값으로 set 해도 트랜잭션이 쌓이는&rdquo; 속성이 UIKit에는 종종 있다. 대표적으로 <code>alpha</code>나 <code>transform</code>을 애니메이션 블록 안에서 다룰 때. 굳이 안 바뀐 값을 다시 박아 넣는 코드를 짜지 않으면 되는데, ViewModel 바인딩으로 자동 set 되는 경우엔 모르고 지나가기 쉽다.</p><p>Rx나 Combine 바인딩에서 자주 만나는 케이스인데, <code>distinctUntilChanged</code>(Rx) 또는 <code>removeDuplicates()</code>(Combine) 하나만 끼워둬도 같은 효과를 낼 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>viewModel</span><span class=p>.</span><span class=n>isLoading</span>
+</span></span></code></pre></td></tr></table></div></div><p>호출 측에서 의도가 명확해진다는 장점. 다만 토글 동작 한 줄로 끝낼 수 없어서 상황에 따라 위 두 방식 중 선택.</p><h2 id=animate-블록-바깥에서-호출하면>animate 블록 바깥에서 호출하면?</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kc>self</span><span class=p>.</span><span class=n>targetView</span><span class=p>.</span><span class=n>isHidden</span><span class=p>.</span><span class=n>toggle</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>애니메이션 없이 그냥 토글하면 누적은 거의 안 보인다. 결국 누적은 <strong>애니메이션 블록 안에서의 반복 set</strong>과 결합될 때 도드라진다. 그래서 &ldquo;isHidden 토글 + UIView.animate 조합"을 쓸 때만 위 가드를 신경 쓰면 된다.</p><h2 id=같은-패턴이-적용되는-다른-곳>같은 패턴이 적용되는 다른 곳</h2><p>isHidden과 비슷하게 &ldquo;같은 값으로 set 해도 트랜잭션이 쌓이는&rdquo; 속성이 UIKit에는 종종 있다. 대표적으로 <code>alpha</code>나 <code>transform</code>을 애니메이션 블록 안에서 다룰 때. 굳이 안 바뀐 값을 다시 박아 넣는 코드를 짜지 않으면 되는데, ViewModel 바인딩으로 자동 set 되는 경우엔 모르고 지나가기 쉽다.</p><p>Rx나 Combine 바인딩에서 자주 만나는 케이스인데, <code>distinctUntilChanged</code>(Rx) 또는 <code>removeDuplicates()</code>(Combine) 하나만 끼워둬도 같은 효과를 낼 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>viewModel</span><span class=p>.</span><span class=n>isLoading</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>distinctUntilChanged</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>bind</span><span class=p>(</span><span class=n>onNext</span><span class=p>:</span> <span class=p>{</span> <span class=p>[</span><span class=kr>weak</span> <span class=kc>self</span><span class=p>]</span> <span class=n>hidden</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>        <span class=n>UIView</span><span class=p>.</span><span class=n>animate</span><span class=p>(</span><span class=n>withDuration</span><span class=p>:</span> <span class=mf>0.25</span><span class=p>)</span> <span class=p>{</span>
@@ -52,187 +85,11 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>})</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>disposed</span><span class=p>(</span><span class=n>by</span><span class=p>:</span> <span class=n>bag</span><span class=p>)</span>
-</span></span></code></pre></div><h2 id=정리>정리</h2><ul><li><code>UIStackView</code> 안의 view를 <code>isHidden</code>으로 토글하면서 애니메이션을 걸면 <strong>같은 값으로의 반복 set이 큐에 쌓여</strong> 호출 횟수만큼 hide/show가 누적된다.</li><li>해결은 단순: <strong>값이 실제로 바뀔 때만 set</strong>. <code>guard isHidden != newValue</code>.</li><li>바인딩 기반이라면 <code>distinctUntilChanged</code> / <code>removeDuplicates</code>로 사전에 걸러두는 게 더 안전.</li><li>alpha, transform 같은 다른 애니메이션 속성도 같은 문제가 잠재돼 있으니 동일 패턴 적용 권장.</li></ul><p>UIKit 시절의 가장 미묘한 함정 중 하나. 한 번 잡아두면 어디서나 똑같이 써먹을 수 있다.</p><h2 id=참고>참고</h2><ul><li><a href=https://stackoverflow.com/questions/33240635/hidden-property-cannot-be-changed-within-an-animation-block>Hidden property cannot be changed within an animation block — StackOverflow</a></li><li><a href=https://stackoverflow.com/questions/43831695/stackview-ishidden-attribute-not-updating-as-expected>stackview isHidden attribute not updating as expected — StackOverflow</a></li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><h2 id=정리>정리</h2><ul><li><code>UIStackView</code> 안의 view를 <code>isHidden</code>으로 토글하면서 애니메이션을 걸면 <strong>같은 값으로의 반복 set이 큐에 쌓여</strong> 호출 횟수만큼 hide/show가 누적된다.</li><li>해결은 단순: <strong>값이 실제로 바뀔 때만 set</strong>. <code>guard isHidden != newValue</code>.</li><li>바인딩 기반이라면 <code>distinctUntilChanged</code> / <code>removeDuplicates</code>로 사전에 걸러두는 게 더 안전.</li><li>alpha, transform 같은 다른 애니메이션 속성도 같은 문제가 잠재돼 있으니 동일 패턴 적용 권장.</li></ul><p>UIKit 시절의 가장 미묘한 함정 중 하나. 한 번 잡아두면 어디서나 똑같이 써먹을 수 있다.</p><h2 id=참고>참고</h2><ul><li><a href=https://stackoverflow.com/questions/33240635/hidden-property-cannot-be-changed-within-an-animation-block>Hidden property cannot be changed within an animation block — StackOverflow</a></li><li><a href=https://stackoverflow.com/questions/43831695/stackview-ishidden-attribute-not-updating-as-expected>stackview isHidden attribute not updating as expected — StackOverflow</a></li></ul></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/ios-fastlane%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%B4%EB%B3%B4%EC%9E%90/><span>← PREVIOUS FILE</span>
+<strong>iOS Fastlane을 적용해보자</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/><span>NEXT FILE →</span>
+<strong>Swift 5.7에서 매일 쓰는 개선 7가지</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#현상>현상</a></li><li><a href=#원인>원인</a></li><li><a href=#해결-값이-바뀔-때만-set>해결: &ldquo;값이 바뀔 때만 set&rdquo;</a></li><li><a href=#animate-블록-바깥에서-호출하면>animate 블록 바깥에서 호출하면?</a></li><li><a href=#같은-패턴이-적용되는-다른-곳>같은 패턴이 적용되는 다른 곳</a></li><li><a href=#정리>정리</a></li><li><a href=#참고>참고</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

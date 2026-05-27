@@ -1,30 +1,43 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>47개 @Model 중 4개만 보존하기 — default-safe 정책 설계 — 오깅중</title><meta name=description content="47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="47개 @Model 중 4개만 보존하기 — default-safe 정책 설계"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화."><meta property="og:image" content="https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="47개 @Model 중 4개만 보존하기 — default-safe 정책 설계"><meta property="article:published_time" content="2026-05-13T15:44:00+09:00"><meta property="article:modified_time" content="2026-05-13T15:44:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Architecture"><meta property="article:tag" content="DesignPattern"><meta property="article:tag" content="Migration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="47개 @Model 중 4개만 보존하기 — default-safe 정책 설계"><meta name=twitter:description content="47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화."><meta name=twitter:image content="https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>47개 @Model 중 4개만 보존하기 — default-safe 정책 설계 — 오깅중</title><meta name=description content="47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="47개 @Model 중 4개만 보존하기 — default-safe 정책 설계"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화."><meta property="og:image" content="https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="47개 @Model 중 4개만 보존하기 — default-safe 정책 설계"><meta property="article:published_time" content="2026-05-13T15:44:00+09:00"><meta property="article:modified_time" content="2026-05-13T15:44:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Architecture"><meta property="article:tag" content="DesignPattern"><meta property="article:tag" content="Migration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="47개 @Model 중 4개만 보존하기 — default-safe 정책 설계"><meta name=twitter:description content="47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화."><meta name=twitter:image content="https://jun7680.github.io/p/swiftdata-default-safe-delete-policy/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 13, 2026</span>
-<span>·</span>
-<span>3분 읽기</span></div><h1 class=article__title>47개 @Model 중 4개만 보존하기 — default-safe 정책 설계</h1><p class=article__desc>47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화.</p></header><div class=article__body><p>SwiftData 마이그하면서 풀어야 하는 흔한 문제 하나. 로그아웃 시 데이터 어떻게 정리할 거냐.</p><ul><li>사용자 도메인 데이터: 다음 로그인 시 새로 받아오면 됨 → 삭제</li><li>계정 정보: 보존 (캐싱)</li><li>공지 팝업 본 적 있음 표시: 보존</li><li>실험실 토글 상태: 보존</li></ul><p>총 47개 <code>@Model</code> 중 4개만 보존, 43개는 삭제. 이걸 어떻게 표현할 거냐? 코드에 들어가는 한 줄, 한 변수의 위치가 안전성을 바꾸는 케이스다.</p><h2 id=후보-1-명시적-삭제-호출-실패>후보 1: 명시적 삭제 호출 (실패)</h2><p>처음 떠오르는 방식. 부트스트랩 영역에서 삭제할 모델을 다 적는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deleteUserScopedData</span><span class=p>()</span> <span class=p>{</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260513</span></nav><pre class=file-header>//  swiftdata-default-safe-delete-policy.swift
+//  ogging.dev / Swift
+//  MAY 13, 2026 · 3 min read
+//  #swiftdata, #architecture, #designpattern, #migration</pre><header class=article__header><h1 class=article__title>47개 @Model 중 4개만 보존하기 — default-safe 정책 설계</h1><p class=article__desc>47개 @Model 중 4개만 보존하고 43개는 삭제하는 정책을 설계하면서 만난 네 가지 후보. 누락이 안전을 깨지 않는 design 원칙: default = 삭제, 정책 = 한 곳, 적용 = 자동화.</p><div class=article__meta><span>MAY 13, 2026 · 3 MIN READ</span><div class=article__tags><span>#swiftdata</span><span>#architecture</span><span>#designpattern</span><span>#migration</span></div></div></header><div class=article__body><p>SwiftData 마이그하면서 풀어야 하는 흔한 문제 하나. 로그아웃 시 데이터 어떻게 정리할 거냐.</p><ul><li>사용자 도메인 데이터: 다음 로그인 시 새로 받아오면 됨 → 삭제</li><li>계정 정보: 보존 (캐싱)</li><li>공지 팝업 본 적 있음 표시: 보존</li><li>실험실 토글 상태: 보존</li></ul><p>총 47개 <code>@Model</code> 중 4개만 보존, 43개는 삭제. 이걸 어떻게 표현할 거냐? 코드에 들어가는 한 줄, 한 변수의 위치가 안전성을 바꾸는 케이스다.</p><h2 id=후보-1-명시적-삭제-호출-실패>후보 1: 명시적 삭제 호출 (실패)</h2><p>처음 떠오르는 방식. 부트스트랩 영역에서 삭제할 모델을 다 적는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deleteUserScopedData</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>ItemEntity</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>ContactEntity</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>CalendarEntity</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=c1>// ... 43줄 반복</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>문제: <strong>신규 <code>@Model</code> 추가 시 누락되면 영구 보존됨</strong>. 새 도메인 생겼는데 deletion 호출을 까먹으면, 사용자가 로그아웃해도 그 데이터가 안 지워짐. 다른 계정으로 로그인하면 이전 계정 데이터가 보일 수 있음. <strong>누락이 안전을 깬다</strong> → 위험.</p><h2 id=후보-2-두-배열로-분리-실패>후보 2: 두 배열로 분리 (실패)</h2><p>명시적 호출의 변형. 도메인 모델을 &ldquo;사용자 스코프"와 &ldquo;보존"으로 둘로 나눈다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppSchemaV1</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>문제: <strong>신규 <code>@Model</code> 추가 시 누락되면 영구 보존됨</strong>. 새 도메인 생겼는데 deletion 호출을 까먹으면, 사용자가 로그아웃해도 그 데이터가 안 지워짐. 다른 계정으로 로그인하면 이전 계정 데이터가 보일 수 있음. <strong>누락이 안전을 깬다</strong> → 위험.</p><h2 id=후보-2-두-배열로-분리-실패>후보 2: 두 배열로 분리 (실패)</h2><p>명시적 호출의 변형. 도메인 모델을 &ldquo;사용자 스코프"와 &ldquo;보존"으로 둘로 나눈다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppSchemaV1</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>var</span> <span class=nv>userScopedModels</span><span class=p>:</span> <span class=p>[</span><span class=n>any</span> <span class=n>PersistentModel</span><span class=p>.</span><span class=kr>Type</span><span class=p>]</span> <span class=p>{</span> <span class=p>[</span><span class=cm>/* 43개 */</span><span class=p>]</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>var</span> <span class=nv>preservedModels</span><span class=p>:</span> <span class=p>[</span><span class=n>any</span> <span class=n>PersistentModel</span><span class=p>.</span><span class=kr>Type</span><span class=p>]</span> <span class=p>{</span> <span class=p>[</span><span class=cm>/* 4개 */</span><span class=p>]</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
@@ -32,15 +45,42 @@
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deleteUserScopedData</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>AppSchemaV1</span><span class=p>.</span><span class=n>userScopedModels</span><span class=p>.</span><span class=n>forEach</span> <span class=p>{</span> <span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>조금 낫지만 <strong>신규 Entity가 두 배열 모두에서 누락될 수 있음</strong>. SwiftData가 model을 인식 못해서 런타임 크래시 ㅋㅋ. 게다가 47개 모델 리스트가 두 곳에 나눠져 있어 매번 합집합 = 전체인지 확인해야 함.</p><h2 id=후보-3-marker-protocol-실패>후보 3: marker protocol (실패)</h2><p>도메인 모델 자체에 의도를 박는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>protocol</span> <span class=nc>PersistentAcrossLogout</span> <span class=p>{}</span>  <span class=c1>// marker</span>
+</span></span></code></pre></td></tr></table></div></div><p>조금 낫지만 <strong>신규 Entity가 두 배열 모두에서 누락될 수 있음</strong>. SwiftData가 model을 인식 못해서 런타임 크래시 ㅋㅋ. 게다가 47개 모델 리스트가 두 곳에 나눠져 있어 매번 합집합 = 전체인지 확인해야 함.</p><h2 id=후보-3-marker-protocol-실패>후보 3: marker protocol (실패)</h2><p>도메인 모델 자체에 의도를 박는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>protocol</span> <span class=nc>PersistentAcrossLogout</span> <span class=p>{}</span>  <span class=c1>// marker</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>AccountEntity</span><span class=p>:</span> <span class=n>PersistentAcrossLogout</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ItemEntity</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>  <span class=c1>// 이건 채택 안 함</span>
-</span></span></code></pre></div><p>장점: 의도가 Entity 정의부에 명확히 드러남.
-단점: <strong>Entity마다 conformance 추가가 필요하고, 보존 의사 표현이 47개 파일에 흩어짐</strong>. 정책 변경 시 한눈에 파악이 안 됨. 마이그 같은 대규모 작업에선 변경 추적이 빡세다.</p><h2 id=후보-4-단일-보존-리스트--자동-차집합--채택>후보 4: 단일 보존 리스트 + 자동 차집합 (✅ 채택)</h2><p><code>AppSchemaV1</code>에 전체 models 리스트와 보존 리스트만 둔다. 삭제는 두 리스트의 차집합으로 자동 도출.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppSchemaV1</span><span class=p>:</span> <span class=n>VersionedSchema</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>장점: 의도가 Entity 정의부에 명확히 드러남.
+단점: <strong>Entity마다 conformance 추가가 필요하고, 보존 의사 표현이 47개 파일에 흩어짐</strong>. 정책 변경 시 한눈에 파악이 안 됨. 마이그 같은 대규모 작업에선 변경 추적이 빡세다.</p><h2 id=후보-4-단일-보존-리스트--자동-차집합--채택>후보 4: 단일 보존 리스트 + 자동 차집합 (✅ 채택)</h2><p><code>AppSchemaV1</code>에 전체 models 리스트와 보존 리스트만 둔다. 삭제는 두 리스트의 차집합으로 자동 도출.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppSchemaV1</span><span class=p>:</span> <span class=n>VersionedSchema</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>static</span> <span class=kd>var</span> <span class=nv>models</span><span class=p>:</span> <span class=p>[</span><span class=n>any</span> <span class=n>PersistentModel</span><span class=p>.</span><span class=kr>Type</span><span class=p>]</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=p>[</span><span class=cm>/* 47개 전체 */</span><span class=p>]</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
@@ -60,187 +100,11 @@
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=n>toDelete</span><span class=p>.</span><span class=n>forEach</span> <span class=p>{</span> <span class=k>try</span><span class=p>?</span> <span class=n>context</span><span class=p>.</span><span class=n>delete</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>신규 Entity 추가 시 시나리오를 다시 보자.</p><ul><li><strong>models 등록 누락</strong>: SwiftData가 인식 못 함 → 즉시 발견 (정의 자체가 안 됨)</li><li><strong>preservedModels 등록 누락</strong>: default = 삭제 → <strong>안전</strong> (보존 의도였으면 데이터 사라져서 사용자가 깨닫고 수정. 보존 의도가 아니었으면 그대로 정상)</li></ul><p>핵심은 <strong>default 동작이 안전한 쪽</strong>이라는 거. &ldquo;기억 못 하면 보존&rdquo; 정책은 보안 사고로 번지지만, &ldquo;기억 못 하면 삭제&rdquo; 정책은 최악의 경우라도 데이터 복구로 끝남.</p><h2 id=일반화-default-safe-설계-원칙>일반화: default-safe 설계 원칙</h2><p>이 패턴은 SwiftData 떠나서도 적용됨.</p><ul><li>누락의 비용이 비대칭일 때 — default가 비용 낮은 쪽으로 가야 한다</li><li>정책 결정은 <strong>한 곳</strong>에 모아야 함 — 흩어지면 누락 추적 빡셈</li><li>정책 적용은 <strong>자동화</strong> — 명시적 호출은 누락 가능성을 만든다</li></ul><p>비슷한 사례들:</p><ul><li>HTTP API 응답: 신규 필드 default = <code>nil</code> (parsing 실패해도 앱은 살아남음, default = throw였다면 신규 필드 한 줄 추가에 앱 전체 깨짐)</li><li>Feature flag: 신규 flag default = <code>false</code> (활성화는 명시적으로, 비활성화는 자동으로)</li><li>Auth scope: 신규 endpoint default = &ldquo;require auth&rdquo; (실수로 public이 되는 것보다 안전)</li></ul><h2 id=교훈>교훈</h2><p>설계의 좋고 나쁨은 &ldquo;잘 썼을 때"가 아니라 &ldquo;실수했을 때&rdquo; 갈린다. 잘 쓰면 4개 후보 다 동작함. 실수했을 때:</p><ul><li>후보 1, 2: 보안 사고 또는 런타임 크래시</li><li>후보 3: 가시성 부족, 변경 추적 어려움</li><li>후보 4: default = 삭제로 자동 흡수, 최악도 데이터 복구 수준</li></ul><p>코드 한 줄을 어디 두느냐가 안전마진을 만든다는 거.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>신규 Entity 추가 시 시나리오를 다시 보자.</p><ul><li><strong>models 등록 누락</strong>: SwiftData가 인식 못 함 → 즉시 발견 (정의 자체가 안 됨)</li><li><strong>preservedModels 등록 누락</strong>: default = 삭제 → <strong>안전</strong> (보존 의도였으면 데이터 사라져서 사용자가 깨닫고 수정. 보존 의도가 아니었으면 그대로 정상)</li></ul><p>핵심은 <strong>default 동작이 안전한 쪽</strong>이라는 거. &ldquo;기억 못 하면 보존&rdquo; 정책은 보안 사고로 번지지만, &ldquo;기억 못 하면 삭제&rdquo; 정책은 최악의 경우라도 데이터 복구로 끝남.</p><h2 id=일반화-default-safe-설계-원칙>일반화: default-safe 설계 원칙</h2><p>이 패턴은 SwiftData 떠나서도 적용됨.</p><ul><li>누락의 비용이 비대칭일 때 — default가 비용 낮은 쪽으로 가야 한다</li><li>정책 결정은 <strong>한 곳</strong>에 모아야 함 — 흩어지면 누락 추적 빡셈</li><li>정책 적용은 <strong>자동화</strong> — 명시적 호출은 누락 가능성을 만든다</li></ul><p>비슷한 사례들:</p><ul><li>HTTP API 응답: 신규 필드 default = <code>nil</code> (parsing 실패해도 앱은 살아남음, default = throw였다면 신규 필드 한 줄 추가에 앱 전체 깨짐)</li><li>Feature flag: 신규 flag default = <code>false</code> (활성화는 명시적으로, 비활성화는 자동으로)</li><li>Auth scope: 신규 endpoint default = &ldquo;require auth&rdquo; (실수로 public이 되는 것보다 안전)</li></ul><h2 id=교훈>교훈</h2><p>설계의 좋고 나쁨은 &ldquo;잘 썼을 때"가 아니라 &ldquo;실수했을 때&rdquo; 갈린다. 잘 쓰면 4개 후보 다 동작함. 실수했을 때:</p><ul><li>후보 1, 2: 보안 사고 또는 런타임 크래시</li><li>후보 3: 가시성 부족, 변경 추적 어려움</li><li>후보 4: default = 삭제로 자동 흡수, 최악도 데이터 복구 수준</li></ul><p>코드 한 줄을 어디 두느냐가 안전마진을 만든다는 거.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/swiftdata-predicate-enum-silent-zero/><span>← PREVIOUS FILE</span>
+<strong>SwiftData #Predicate에서 enum 비교가 0건을 반환하는 이유</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/gcd-serial-queue-over-actor-for-thread-confined/><span>NEXT FILE →</span>
+<strong>GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#후보-1-명시적-삭제-호출-실패>후보 1: 명시적 삭제 호출 (실패)</a></li><li><a href=#후보-2-두-배열로-분리-실패>후보 2: 두 배열로 분리 (실패)</a></li><li><a href=#후보-3-marker-protocol-실패>후보 3: marker protocol (실패)</a></li><li><a href=#후보-4-단일-보존-리스트--자동-차집합--채택>후보 4: 단일 보존 리스트 + 자동 차집합 (✅ 채택)</a></li><li><a href=#일반화-default-safe-설계-원칙>일반화: default-safe 설계 원칙</a></li><li><a href=#교훈>교훈</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

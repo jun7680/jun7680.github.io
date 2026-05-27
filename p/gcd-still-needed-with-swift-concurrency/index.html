@@ -1,30 +1,40 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들 — 오깅중</title><meta name=description content="Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백"><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/gcd-still-needed-with-swift-concurrency/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/gcd-still-needed-with-swift-concurrency/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백"><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들"><meta property="article:published_time" content="2026-05-20T00:00:00Z"><meta property="article:modified_time" content="2026-05-20T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="GCD"><meta property="article:tag" content="DispatchQueue"><meta property="article:tag" content="Architecture"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들"><meta name=twitter:description content="Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백"><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들 — 오깅중</title><meta name=description content="Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백"><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/gcd-still-needed-with-swift-concurrency/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/gcd-still-needed-with-swift-concurrency/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백"><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들"><meta property="article:published_time" content="2026-05-20T00:00:00Z"><meta property="article:modified_time" content="2026-05-20T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="GCD"><meta property="article:tag" content="DispatchQueue"><meta property="article:tag" content="Architecture"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들"><meta name=twitter:description content="Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백"><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 20, 2026</span>
-<span>·</span>
-<span>8분 읽기</span></div><h1 class=article__title>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들</h1><p class=article__desc>Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백</p></header><div class=article__body><p>요즘 프로젝트를 Swift Concurrency(async/await, actor)로 통일해가고 있다. 그런데 코드 곳곳에 GCD를 일부러 남겨둔 자리들이 보인다. &ldquo;다 옮기면 깔끔하지 않을까?&rdquo; 싶어서 한 번씩 시도해봤는데, 그때마다 코드가 더 길어지거나 의미가 더 흐려지는 자리가 있더라. 그래서 이 글에서는 &ldquo;Concurrency 시대에도 GCD가 답인 자리들"을 카탈로그로 정리해본다. GCD 기본기와 async/await 마이그레이션 입문은 예전에 쓴 <a href=/post/concurrency/>동시성 정리 글</a>에 둬뒀으니 그쪽을 먼저 봐도 좋다.</p><p>판단 기준은 두 축으로 좁힐 수 있다. 하나는 <strong>&ldquo;Concurrency가 표현할 수 있는 문제인가&rdquo;</strong>, 다른 하나는 <strong>&ldquo;굳이 옮길 이유가 있는가&rdquo;</strong>. 두 질문에 모두 &ldquo;예"라고 답할 수 있을 때만 옮긴다. 하나라도 &ldquo;아니오"면 GCD를 남겨둔다.</p><pre class=mermaid>flowchart TD
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260520</span></nav><pre class=file-header>//  gcd-still-needed-with-swift-concurrency.swift
+//  ogging.dev / Swift
+//  MAY 20, 2026 · 8 min read
+//  #swift, #concurrency, #gcd, #dispatchqueue, #architecture</pre><header class=article__header><h1 class=article__title>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들</h1><p class=article__desc>Concurrency로 통일 중이지만 GCD를 일부러 남긴 자리들 — 폴링, fire-and-forget, RW lock, 그리고 sync 콜백</p><div class=article__meta><span>MAY 20, 2026 · 8 MIN READ</span><div class=article__tags><span>#swift</span><span>#concurrency</span><span>#gcd</span><span>#dispatchqueue</span></div></div></header><div class=article__body><p>요즘 프로젝트를 Swift Concurrency(async/await, actor)로 통일해가고 있다. 그런데 코드 곳곳에 GCD를 일부러 남겨둔 자리들이 보인다. &ldquo;다 옮기면 깔끔하지 않을까?&rdquo; 싶어서 한 번씩 시도해봤는데, 그때마다 코드가 더 길어지거나 의미가 더 흐려지는 자리가 있더라. 그래서 이 글에서는 &ldquo;Concurrency 시대에도 GCD가 답인 자리들"을 카탈로그로 정리해본다. GCD 기본기와 async/await 마이그레이션 입문은 예전에 쓴 <a href=/post/concurrency/>동시성 정리 글</a>에 둬뒀으니 그쪽을 먼저 봐도 좋다.</p><p>판단 기준은 두 축으로 좁힐 수 있다. 하나는 <strong>&ldquo;Concurrency가 표현할 수 있는 문제인가&rdquo;</strong>, 다른 하나는 <strong>&ldquo;굳이 옮길 이유가 있는가&rdquo;</strong>. 두 질문에 모두 &ldquo;예"라고 답할 수 있을 때만 옮긴다. 하나라도 &ldquo;아니오"면 GCD를 남겨둔다.</p><pre class=mermaid>flowchart TD
     Start([어떤 동시성 도구를 쓸까]) --> Q1{Concurrency가<br>표현할 수 있는 문제인가}
     Q1 -- 아니오 --> GCD1[GCD 유지<br>sync 콜백 / thread identity / RW lock / C 콜백]
     Q1 -- 예 --> Q2{굳이 옮길<br>이유가 있는가}
     Q2 -- 아니오 --> GCD2[GCD 유지<br>폴링 / fire-and-forget / 정밀 타이머]
     Q2 -- 예 --> SC[Swift Concurrency로 이전]
-</pre><h2 id=사례-1-디퍼드-딥링크와-푸시-폴링>사례 1. 디퍼드 딥링크와 푸시 폴링</h2><p>가장 길게 적고 싶은 자리다. 푸시가 도착했는데 앱은 아직 준비가 안 된 상태인 경우가 종종 있다. rootVC가 아직 안 만들어졌거나, 로그인이 안 끝났거나, 유저 데이터를 로딩 중이거나. 딥링크도 같은 결이다. AppDelegate/SceneDelegate에서 URL은 받았는데 띄울 컨텍스트가 없다. 그래서 &ldquo;준비될 때까지 기다렸다가 라우팅"이 필요하다.</p><p>내가 쓰는 패턴은 이렇다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deliverDeepLink</span><span class=p>(</span><span class=kc>_</span> <span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>,</span> <span class=n>attempt</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+</pre><h2 id=사례-1-디퍼드-딥링크와-푸시-폴링>사례 1. 디퍼드 딥링크와 푸시 폴링</h2><p>가장 길게 적고 싶은 자리다. 푸시가 도착했는데 앱은 아직 준비가 안 된 상태인 경우가 종종 있다. rootVC가 아직 안 만들어졌거나, 로그인이 안 끝났거나, 유저 데이터를 로딩 중이거나. 딥링크도 같은 결이다. AppDelegate/SceneDelegate에서 URL은 받았는데 띄울 컨텍스트가 없다. 그래서 &ldquo;준비될 때까지 기다렸다가 라우팅"이 필요하다.</p><p>내가 쓰는 패턴은 이렇다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deliverDeepLink</span><span class=p>(</span><span class=kc>_</span> <span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>,</span> <span class=n>attempt</span><span class=p>:</span> <span class=nb>Int</span> <span class=p>=</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=n>attempt</span> <span class=o>&lt;</span> <span class=mi>30</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>  <span class=c1>// ~3초 cap</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>appIsReady</span><span class=p>()</span> <span class=p>{</span>
@@ -35,7 +45,7 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>DispatchQueue.main.asyncAfter</code> 재귀로 100ms마다 ready 여부를 확인하고, 준비되면 라우팅, 아니면 다시 enqueue. 30회 cap으로 무한 루프를 막아둔다. (이 글에서는 cap 도달 시 silently drop이지만, 운영에서는 에러 화면이나 안내 토스트로 보강해두는 편이 좋다.)</p><p>흐름을 그림으로 보면 이렇다.</p><pre class=mermaid>sequenceDiagram
+</span></span></code></pre></td></tr></table></div></div><p><code>DispatchQueue.main.asyncAfter</code> 재귀로 100ms마다 ready 여부를 확인하고, 준비되면 라우팅, 아니면 다시 enqueue. 30회 cap으로 무한 루프를 막아둔다. (이 글에서는 cap 도달 시 silently drop이지만, 운영에서는 에러 화면이나 안내 토스트로 보강해두는 편이 좋다.)</p><p>흐름을 그림으로 보면 이렇다.</p><pre class=mermaid>sequenceDiagram
     participant OS as iOS / Push
     participant App as AppDelegate
     participant Q as DispatchQueue.main
@@ -53,7 +63,18 @@
     Q->>State: appIsReady()?
     State-->>Q: true
     Q->>Router: router.route(to: url)
-</pre><p>같은 일을 Concurrency로 풀면 대충 이런 모양이 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deliverDeepLink</span><span class=p>(</span><span class=kc>_</span> <span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>)</span> <span class=p>{</span>
+</pre><p>같은 일을 Concurrency로 풀면 대충 이런 모양이 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>deliverDeepLink</span><span class=p>(</span><span class=kc>_</span> <span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>Task</span> <span class=p>{</span> <span class=p>@</span><span class=n>MainActor</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=kc>_</span> <span class=k>in</span> <span class=mf>0.</span><span class=p>.&lt;</span><span class=mi>30</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>appIsReady</span><span class=p>()</span> <span class=p>{</span>
@@ -64,16 +85,34 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>언뜻 보면 비슷한데, 실제로 들여다보면 네 가지가 어색하다.</p><ol><li><strong>호출 컨텍스트가 sync다</strong> — <code>application(_:didReceiveRemoteNotification:)</code>이나 <code>scene(_:openURLContexts:)</code> 같은 콜백은 sync로 들어온다. async 폴링을 하려면 안에서 결국 <code>Task { ... }</code>를 띄워야 한다. GCD 버전은 그냥 <code>asyncAfter</code>로 끝난다.</li><li><strong>lifecycle/cancellation이 비어 있다</strong> — 띄운 Task를 누가 cancel할 것인가. URL 핸들러는 fire-and-forget 성격인데 Task는 handle을 retain하지 않으면 cancel 통로가 사라진다. 들고 다닐 자리가 없어서 결국 cancellation은 무방비.</li><li><strong>종료 조건이 외부 상태 변화다</strong> — <code>appIsReady()</code>는 다른 모듈의 상태다. 이걸 AsyncStream으로 깔끔하게 표현하려면 ready 시점에 yield하는 NotificationCenter/Combine 브릿지를 따로 만들어야 한다. 그 변환 작업이 폴링 한 줄보다 훨씬 크다.</li><li><strong>Task 스폰 비용이 굳이다</strong> — 푸시·딥링크 자체가 자주 들어오는 이벤트는 아니라 부담이 큰 건 아니지만, &ldquo;단순한 일을 단순하게&rdquo; 원칙으로 봐도 <code>asyncAfter</code> 쪽이 코드량이 더 적다. Apple도 Swift Concurrency의 thread pool 부담을 <a href=https://developer.apple.com/videos/play/wwdc2022/110350/>별도 WWDC 세션</a>에서 다루고 있을 정도라 굳이 모든 일을 Task로 끌어올릴 이유는 없다.</li></ol><p>요약하면 이건 &ldquo;Concurrency가 못 표현하는 문제"라기보다 &ldquo;옮길 이유가 별로 없는 문제"다.</p><h2 id=사례-2-thread-confined-자료-접근>사례 2. Thread-confined 자료 접근</h2><p>actor는 mutual exclusion은 보장하지만 thread identity는 보장하지 않는다. 그래서 Realm 인스턴스처럼 &ldquo;만든 스레드에서만 동작"하는 객체를 actor로 감싸면 런타임에서 깨질 수 있다. 이런 자리는 GCD serial queue로 묶는 편이 안전하다. 이 패턴은 따로 <a href=/post/gcd-serial-queue-over-actor-for-thread-confined/>GCD serial queue를 actor 대신 쓰는 이야기</a>에 정리해뒀으니 자세한 흐름은 그쪽을 보면 된다.</p><h2 id=사례-3-fire-and-forget-hot-path>사례 3. Fire-and-forget hot path</h2><p>로그·메트릭·이벤트 sink처럼 호출처가 수백 곳인 경로가 있다. 매 호출마다 <code>Task { await ... }</code>를 띄우면 어떤 일이 벌어질까.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 안티패턴: 호출처가 수백 곳일 때 Task 스폰이 누적</span>
+</span></span></code></pre></td></tr></table></div></div><p>언뜻 보면 비슷한데, 실제로 들여다보면 네 가지가 어색하다.</p><ol><li><strong>호출 컨텍스트가 sync다</strong> — <code>application(_:didReceiveRemoteNotification:)</code>이나 <code>scene(_:openURLContexts:)</code> 같은 콜백은 sync로 들어온다. async 폴링을 하려면 안에서 결국 <code>Task { ... }</code>를 띄워야 한다. GCD 버전은 그냥 <code>asyncAfter</code>로 끝난다.</li><li><strong>lifecycle/cancellation이 비어 있다</strong> — 띄운 Task를 누가 cancel할 것인가. URL 핸들러는 fire-and-forget 성격인데 Task는 handle을 retain하지 않으면 cancel 통로가 사라진다. 들고 다닐 자리가 없어서 결국 cancellation은 무방비.</li><li><strong>종료 조건이 외부 상태 변화다</strong> — <code>appIsReady()</code>는 다른 모듈의 상태다. 이걸 AsyncStream으로 깔끔하게 표현하려면 ready 시점에 yield하는 NotificationCenter/Combine 브릿지를 따로 만들어야 한다. 그 변환 작업이 폴링 한 줄보다 훨씬 크다.</li><li><strong>Task 스폰 비용이 굳이다</strong> — 푸시·딥링크 자체가 자주 들어오는 이벤트는 아니라 부담이 큰 건 아니지만, &ldquo;단순한 일을 단순하게&rdquo; 원칙으로 봐도 <code>asyncAfter</code> 쪽이 코드량이 더 적다. Apple도 Swift Concurrency의 thread pool 부담을 <a href=https://developer.apple.com/videos/play/wwdc2022/110350/>별도 WWDC 세션</a>에서 다루고 있을 정도라 굳이 모든 일을 Task로 끌어올릴 이유는 없다.</li></ol><p>요약하면 이건 &ldquo;Concurrency가 못 표현하는 문제"라기보다 &ldquo;옮길 이유가 별로 없는 문제"다.</p><h2 id=사례-2-thread-confined-자료-접근>사례 2. Thread-confined 자료 접근</h2><p>actor는 mutual exclusion은 보장하지만 thread identity는 보장하지 않는다. 그래서 Realm 인스턴스처럼 &ldquo;만든 스레드에서만 동작"하는 객체를 actor로 감싸면 런타임에서 깨질 수 있다. 이런 자리는 GCD serial queue로 묶는 편이 안전하다. 이 패턴은 따로 <a href=/post/gcd-serial-queue-over-actor-for-thread-confined/>GCD serial queue를 actor 대신 쓰는 이야기</a>에 정리해뒀으니 자세한 흐름은 그쪽을 보면 된다.</p><h2 id=사례-3-fire-and-forget-hot-path>사례 3. Fire-and-forget hot path</h2><p>로그·메트릭·이벤트 sink처럼 호출처가 수백 곳인 경로가 있다. 매 호출마다 <code>Task { await ... }</code>를 띄우면 어떤 일이 벌어질까.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 안티패턴: 호출처가 수백 곳일 때 Task 스폰이 누적</span>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>track</span><span class=p>(</span><span class=kc>_</span> <span class=n>event</span><span class=p>:</span> <span class=n>Event</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>Task</span> <span class=p>{</span> <span class=n>await</span> <span class=n>sink</span><span class=p>.</span><span class=n>write</span><span class=p>(</span><span class=n>event</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>각각의 Task는 가볍지만, 폭주하는 호출처를 그대로 두면 cooperative thread pool과 actor contention이 같이 쌓인다. 같은 일을 GCD로 풀면 이렇게 끝난다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>eventQueue</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;event.sink&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>각각의 Task는 가볍지만, 폭주하는 호출처를 그대로 두면 cooperative thread pool과 actor contention이 같이 쌓인다. 같은 일을 GCD로 풀면 이렇게 끝난다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>eventQueue</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;event.sink&#34;</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>track</span><span class=p>(</span><span class=kc>_</span> <span class=n>event</span><span class=p>:</span> <span class=n>Event</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>eventQueue</span><span class=p>.</span><span class=n>async</span> <span class=p>{</span> <span class=n>sink</span><span class=p>.</span><span class=n>write</span><span class=p>(</span><span class=n>event</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>serial queue 하나에 enqueue 하면 순서도 자연스럽게 보장되고, 호출처에서 보이는 코드 모양도 단순하다. Apple도 cooperative thread pool 부담을 <a href=https://developer.apple.com/videos/play/wwdc2022/110350/>WWDC 세션</a>에서 별도로 다루는 만큼, 호출 빈도가 높은 경로에는 Task 스폰을 디폴트로 두지 않는 편이 마음이 편하다.</p><h2 id=사례-4-cobj-c-콜백-브릿지>사례 4. C/Obj-C 콜백 브릿지</h2><p>CoreBluetooth, IOKit, CFRunLoop 같이 콜백을 async로 끌어올리기 어려운 API들이 있다. CoreBluetooth는 아예 <a href=https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518695-init><code>CBCentralManager(delegate:queue:)</code></a>처럼 생성자에서 콜백 큐 자체를 받는다. 즉 <code>DispatchQueue</code>가 이 API에선 1급 시민이다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>bluetoothQueue</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;bt.callbacks&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>serial queue 하나에 enqueue 하면 순서도 자연스럽게 보장되고, 호출처에서 보이는 코드 모양도 단순하다. Apple도 cooperative thread pool 부담을 <a href=https://developer.apple.com/videos/play/wwdc2022/110350/>WWDC 세션</a>에서 별도로 다루는 만큼, 호출 빈도가 높은 경로에는 Task 스폰을 디폴트로 두지 않는 편이 마음이 편하다.</p><h2 id=사례-4-cobj-c-콜백-브릿지>사례 4. C/Obj-C 콜백 브릿지</h2><p>CoreBluetooth, IOKit, CFRunLoop 같이 콜백을 async로 끌어올리기 어려운 API들이 있다. CoreBluetooth는 아예 <a href=https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518695-init><code>CBCentralManager(delegate:queue:)</code></a>처럼 생성자에서 콜백 큐 자체를 받는다. 즉 <code>DispatchQueue</code>가 이 API에선 1급 시민이다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>bluetoothQueue</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;bt.callbacks&#34;</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>central</span> <span class=p>=</span> <span class=n>CBCentralManager</span><span class=p>(</span><span class=n>delegate</span><span class=p>:</span> <span class=kc>self</span><span class=p>,</span> <span class=n>queue</span><span class=p>:</span> <span class=n>bluetoothQueue</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 델리게이트 안에서, 필요한 곳만 main으로 hop</span>
@@ -82,7 +121,17 @@
 </span></span><span class=line><span class=cl>        <span class=n>statusView</span><span class=p>.</span><span class=n>update</span><span class=p>(</span><span class=n>central</span><span class=p>.</span><span class=n>state</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>continuation으로 일부 콜백은 감쌀 수 있지만, 다회 호출되는 델리게이트를 AsyncStream wrapper로 바꾸기 시작하면 오히려 코드가 무거워진다. 콜백 큐는 GCD에 맡기고, 필요한 hop만 Task로 끌어올리는 정도가 자연스럽다.</p><h2 id=사례-5-reader-writer-barrier>사례 5. Reader-writer barrier</h2><p>actor는 read도 write도 모두 직렬화한다. <a href=https://github.com/apple/swift-evolution/blob/main/proposals/0306-actors.md>SE-0306</a>이 말한 &ldquo;single-threaded illusion&rdquo; 그대로다. 그런데 캐시·인덱스처럼 read가 압도적으로 많고 write는 가끔인 자료구조가 있다. 이걸 actor로 감싸면 reader끼리도 줄을 서야 한다.</p><p>이때는 GCD concurrent queue에 <code>.barrier</code> flag가 여전히 명료하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>rw</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;cache.rw&#34;</span><span class=p>,</span> <span class=n>attributes</span><span class=p>:</span> <span class=p>.</span><span class=n>concurrent</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>continuation으로 일부 콜백은 감쌀 수 있지만, 다회 호출되는 델리게이트를 AsyncStream wrapper로 바꾸기 시작하면 오히려 코드가 무거워진다. 콜백 큐는 GCD에 맡기고, 필요한 hop만 Task로 끌어올리는 정도가 자연스럽다.</p><h2 id=사례-5-reader-writer-barrier>사례 5. Reader-writer barrier</h2><p>actor는 read도 write도 모두 직렬화한다. <a href=https://github.com/apple/swift-evolution/blob/main/proposals/0306-actors.md>SE-0306</a>이 말한 &ldquo;single-threaded illusion&rdquo; 그대로다. 그런데 캐시·인덱스처럼 read가 압도적으로 많고 write는 가끔인 자료구조가 있다. 이걸 actor로 감싸면 reader끼리도 줄을 서야 한다.</p><p>이때는 GCD concurrent queue에 <code>.barrier</code> flag가 여전히 명료하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>let</span> <span class=nv>rw</span> <span class=p>=</span> <span class=n>DispatchQueue</span><span class=p>(</span><span class=n>label</span><span class=p>:</span> <span class=s>&#34;cache.rw&#34;</span><span class=p>,</span> <span class=n>attributes</span><span class=p>:</span> <span class=p>.</span><span class=n>concurrent</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>var</span> <span class=nv>store</span><span class=p>:</span> <span class=p>[</span><span class=nb>String</span><span class=p>:</span> <span class=n>Value</span><span class=p>]</span> <span class=p>=</span> <span class=p>[:]</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>read</span><span class=p>(</span><span class=kc>_</span> <span class=n>key</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=n>Value</span><span class=p>?</span> <span class=p>{</span>
@@ -92,190 +141,14 @@
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>write</span><span class=p>(</span><span class=kc>_</span> <span class=n>key</span><span class=p>:</span> <span class=nb>String</span><span class=p>,</span> <span class=kc>_</span> <span class=n>value</span><span class=p>:</span> <span class=n>Value</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>rw</span><span class=p>.</span><span class=n>async</span><span class=p>(</span><span class=n>flags</span><span class=p>:</span> <span class=p>.</span><span class=n>barrier</span><span class=p>)</span> <span class=p>{</span> <span class=kc>self</span><span class=p>.</span><span class=n>store</span><span class=p>[</span><span class=n>key</span><span class=p>]</span> <span class=p>=</span> <span class=n>value</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>다중 reader가 동시에 진행되고 writer만 배타 락을 잡는다. Swift 쪽 락으로는 <a href=https://developer.apple.com/documentation/os/osallocatedunfairlock><code>OSAllocatedUnfairLock</code></a>이 깔끔한 선택이지만, 이건 어디까지나 mutual exclusion 락이지 reader-writer 락이 아니다. RW 시맨틱 자체는 GCD barrier 쪽이 1급으로 표현된다.</p><h2 id=사례-6-정밀-leeway-타이머-옵션>사례 6. 정밀 leeway 타이머 (옵션)</h2><p><code>Task.sleep</code>은 cooperative cancellation 측면에서 매끄럽다. 다만 시스템에게 허용 지연 폭을 알려주고 전력 최적화 여지를 주는 leeway 개념은 <a href=https://developer.apple.com/documentation/dispatch/dispatchsourcetimer><code>DispatchSourceTimer</code></a>에 1급으로 들어있고, <code>Task.sleep</code>에는 그 결이 직접 노출되지 않는다. 백그라운드 주기 작업처럼 &ldquo;조금 늦어도 되니 묶어서 깨워달라"는 쪽은 여전히 GCD가 더 자연스럽다.</p><h2 id=마무리>마무리</h2><p>다 옮기고 보니 두 줄로 묶인다.</p><ul><li><strong>Concurrency가 못/안 하는 일</strong> — sync 콜백 컨텍스트, thread identity, reader-writer 락, C 콜백 큐. 사례 1·2·4·5가 여기.</li><li><strong>굳이 옮길 이유가 없는 일</strong> — 폴링, fire-and-forget hot path, 정밀 leeway 타이머. 사례 1·3·6이 여기.</li></ul><p>옮기지 않은 것이 보수적인 선택이라서가 아니라, 그 자리에 더 잘 맞는 도구가 GCD라서 남겨뒀다. 환경은 Xcode 26.4 / iOS 17+에서 굴리고 있는데, 그래도 GCD는 여전히 자리를 차지하고 있다. async/await가 정답이라는 말은 절반만 맞다는 게 결국 이 카탈로그의 한 줄 요약인 것 같다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>다중 reader가 동시에 진행되고 writer만 배타 락을 잡는다. Swift 쪽 락으로는 <a href=https://developer.apple.com/documentation/os/osallocatedunfairlock><code>OSAllocatedUnfairLock</code></a>이 깔끔한 선택이지만, 이건 어디까지나 mutual exclusion 락이지 reader-writer 락이 아니다. RW 시맨틱 자체는 GCD barrier 쪽이 1급으로 표현된다.</p><h2 id=사례-6-정밀-leeway-타이머-옵션>사례 6. 정밀 leeway 타이머 (옵션)</h2><p><code>Task.sleep</code>은 cooperative cancellation 측면에서 매끄럽다. 다만 시스템에게 허용 지연 폭을 알려주고 전력 최적화 여지를 주는 leeway 개념은 <a href=https://developer.apple.com/documentation/dispatch/dispatchsourcetimer><code>DispatchSourceTimer</code></a>에 1급으로 들어있고, <code>Task.sleep</code>에는 그 결이 직접 노출되지 않는다. 백그라운드 주기 작업처럼 &ldquo;조금 늦어도 되니 묶어서 깨워달라"는 쪽은 여전히 GCD가 더 자연스럽다.</p><h2 id=마무리>마무리</h2><p>다 옮기고 보니 두 줄로 묶인다.</p><ul><li><strong>Concurrency가 못/안 하는 일</strong> — sync 콜백 컨텍스트, thread identity, reader-writer 락, C 콜백 큐. 사례 1·2·4·5가 여기.</li><li><strong>굳이 옮길 이유가 없는 일</strong> — 폴링, fire-and-forget hot path, 정밀 leeway 타이머. 사례 1·3·6이 여기.</li></ul><p>옮기지 않은 것이 보수적인 선택이라서가 아니라, 그 자리에 더 잘 맞는 도구가 GCD라서 남겨뒀다. 환경은 Xcode 26.4 / iOS 17+에서 굴리고 있는데, 그래도 GCD는 여전히 자리를 차지하고 있다. async/await가 정답이라는 말은 절반만 맞다는 게 결국 이 카탈로그의 한 줄 요약인 것 같다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/mcp-windows-deploy-6-traps/><span>← PREVIOUS FILE</span>
+<strong>MCP 서버 비개발자 동료에게 배포하다 Windows에서 6번 죽었다</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/mainactor-class-fetch-trap/><span>NEXT FILE →</span>
+<strong>@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#사례-1-디퍼드-딥링크와-푸시-폴링>사례 1. 디퍼드 딥링크와 푸시 폴링</a></li><li><a href=#사례-2-thread-confined-자료-접근>사례 2. Thread-confined 자료 접근</a></li><li><a href=#사례-3-fire-and-forget-hot-path>사례 3. Fire-and-forget hot path</a></li><li><a href=#사례-4-cobj-c-콜백-브릿지>사례 4. C/Obj-C 콜백 브릿지</a></li><li><a href=#사례-5-reader-writer-barrier>사례 5. Reader-writer barrier</a></li><li><a href=#사례-6-정밀-leeway-타이머-옵션>사례 6. 정밀 leeway 타이머 (옵션)</a></li><li><a href=#마무리>마무리</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script><script type=module>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script><script type=module>
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
   mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
 </script></body></html>

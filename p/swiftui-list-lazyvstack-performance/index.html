@@ -1,30 +1,43 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI List 스크롤 끊길 때 점검하는 메모 — 오깅중</title><meta name=description content="SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI List 스크롤 끊길 때 점검하는 메모"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지."><meta property="og:image" content="https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="SwiftUI List 스크롤 끊길 때 점검하는 메모"><meta property="article:published_time" content="2026-05-12T12:00:00+09:00"><meta property="article:modified_time" content="2026-05-12T12:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="Performance"><meta property="article:tag" content="List"><meta property="article:tag" content="LazyVStack"><meta property="article:tag" content="ForEach"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI List 스크롤 끊길 때 점검하는 메모"><meta name=twitter:description content="SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지."><meta name=twitter:image content="https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI List 스크롤 끊길 때 점검하는 메모 — 오깅중</title><meta name=description content="SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI List 스크롤 끊길 때 점검하는 메모"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지."><meta property="og:image" content="https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="SwiftUI List 스크롤 끊길 때 점검하는 메모"><meta property="article:published_time" content="2026-05-12T12:00:00+09:00"><meta property="article:modified_time" content="2026-05-12T12:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="Performance"><meta property="article:tag" content="List"><meta property="article:tag" content="LazyVStack"><meta property="article:tag" content="ForEach"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI List 스크롤 끊길 때 점검하는 메모"><meta name=twitter:description content="SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지."><meta name=twitter:image content="https://jun7680.github.io/p/swiftui-list-lazyvstack-performance/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 12, 2026</span>
-<span>·</span>
-<span>5분 읽기</span></div><h1 class=article__title>SwiftUI List 스크롤 끊길 때 점검하는 메모</h1><p class=article__desc>SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지.</p></header><div class=article__body><p>SwiftUI에서 List나 LazyVStack에 row 100개 넣었더니 스크롤이 뚝뚝 끊기는 게 보인다. UIKit <code>UITableView</code>/<code>UICollectionView</code>보다 손이 덜 가는 대신 안 보이는 함정이 좀 있다. 디버깅하면서 매번 같은 패턴이 나와서 메모로 남긴다.</p><h2 id=list와-lazyvstack-둘-다-lazy인데-차이가-있다>List와 LazyVStack 둘 다 lazy인데 차이가 있다</h2><p>먼저 짚어둘 것. 공식 문서 (<a href=https://developer.apple.com/documentation/swiftui/picking-container-views-for-your-content>Picking container views for your content</a>)에 따르면 <code>List</code>는 개념적으로 <code>LazyVStack + ScrollView</code>에 플랫폼 스타일링이 입혀진 것. 둘 다 row를 lazy로 그린다. 차이는 이 정도.</p><table><thead><tr><th></th><th>List</th><th>LazyVStack</th></tr></thead><tbody><tr><td>셀 재사용</td><td>일반적으로 됨</td><td>안 됨 (한 번 그린 건 메모리에 유지)</td></tr><tr><td>구분선·swipe-to-delete</td><td>기본</td><td>직접 구현</td></tr><tr><td>ScrollView 감싸기</td><td>내장</td><td>직접</td></tr><tr><td>헤더·섹션 스타일</td><td>기본 제공</td><td>직접</td></tr></tbody></table><p><strong>스크롤 안 끊긴다고 LazyVStack을 마구 쓰면 메모리가 계속 쌓인다</strong>. row 수천 개 띄울 거면 <code>List</code>가 안전. 화면에 한두 페이지만 띄울 거면 <code>LazyVStack</code>도 OK.</p><h2 id=foreach-안의-if부터-의심>ForEach 안의 <code>if</code>부터 의심</h2><p>공식 문서가 직접 경고하는 패턴. ForEach 클로저 안에서 if로 뷰를 골라 그리면 <strong>각 element가 1개나 0개 view를 만들 수 있어서</strong> lazy 컨테이너가 최적화를 못 한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 안티패턴</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260512</span></nav><pre class=file-header>//  swiftui-list-lazyvstack-performance.swift
+//  ogging.dev / Swift
+//  MAY 12, 2026 · 5 min read
+//  #swiftui, #performance, #list, #lazyvstack, #foreach</pre><header class=article__header><h1 class=article__title>SwiftUI List 스크롤 끊길 때 점검하는 메모</h1><p class=article__desc>SwiftUI List/LazyVStack 스크롤이 끊기거나 셀이 깜빡일 때 가장 먼저 보는 곳들. ForEach id, 셀 안 ViewModel 생성, AsyncImage 캐싱, 무거운 body 계산까지.</p><div class=article__meta><span>MAY 12, 2026 · 5 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#performance</span><span>#list</span><span>#lazyvstack</span></div></div></header><div class=article__body><p>SwiftUI에서 List나 LazyVStack에 row 100개 넣었더니 스크롤이 뚝뚝 끊기는 게 보인다. UIKit <code>UITableView</code>/<code>UICollectionView</code>보다 손이 덜 가는 대신 안 보이는 함정이 좀 있다. 디버깅하면서 매번 같은 패턴이 나와서 메모로 남긴다.</p><h2 id=list와-lazyvstack-둘-다-lazy인데-차이가-있다>List와 LazyVStack 둘 다 lazy인데 차이가 있다</h2><p>먼저 짚어둘 것. 공식 문서 (<a href=https://developer.apple.com/documentation/swiftui/picking-container-views-for-your-content>Picking container views for your content</a>)에 따르면 <code>List</code>는 개념적으로 <code>LazyVStack + ScrollView</code>에 플랫폼 스타일링이 입혀진 것. 둘 다 row를 lazy로 그린다. 차이는 이 정도.</p><table><thead><tr><th></th><th>List</th><th>LazyVStack</th></tr></thead><tbody><tr><td>셀 재사용</td><td>일반적으로 됨</td><td>안 됨 (한 번 그린 건 메모리에 유지)</td></tr><tr><td>구분선·swipe-to-delete</td><td>기본</td><td>직접 구현</td></tr><tr><td>ScrollView 감싸기</td><td>내장</td><td>직접</td></tr><tr><td>헤더·섹션 스타일</td><td>기본 제공</td><td>직접</td></tr></tbody></table><p><strong>스크롤 안 끊긴다고 LazyVStack을 마구 쓰면 메모리가 계속 쌓인다</strong>. row 수천 개 띄울 거면 <code>List</code>가 안전. 화면에 한두 페이지만 띄울 거면 <code>LazyVStack</code>도 OK.</p><h2 id=foreach-안의-if부터-의심>ForEach 안의 <code>if</code>부터 의심</h2><p>공식 문서가 직접 경고하는 패턴. ForEach 클로저 안에서 if로 뷰를 골라 그리면 <strong>각 element가 1개나 0개 view를 만들 수 있어서</strong> lazy 컨테이너가 최적화를 못 한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 안티패턴</span>
 </span></span><span class=line><span class=cl><span class=n>ForEach</span><span class=p>(</span><span class=n>items</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>item</span><span class=p>.</span><span class=n>shouldShow</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>ItemRow</span><span class=p>(</span><span class=n>item</span><span class=p>:</span> <span class=n>item</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ✅ VStack/HStack/ZStack 같은 컨테이너로 감싸서 view count 고정</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ✅ VStack/HStack/ZStack 같은 컨테이너로 감싸서 view count 고정</span>
 </span></span><span class=line><span class=cl><span class=n>ForEach</span><span class=p>(</span><span class=n>items</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>VStack</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>item</span><span class=p>.</span><span class=n>shouldShow</span> <span class=p>{</span>
@@ -32,10 +45,22 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>또는 그냥 <code>filter</code>로 미리 거르고 들어가는 게 더 깔끔하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>ForEach</span><span class=p>(</span><span class=n>items</span><span class=p>.</span><span class=bp>filter</span> <span class=p>{</span> <span class=nv>$0</span><span class=p>.</span><span class=n>shouldShow</span> <span class=p>})</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
+</span></span></code></pre></td></tr></table></div></div><p>또는 그냥 <code>filter</code>로 미리 거르고 들어가는 게 더 깔끔하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>ForEach</span><span class=p>(</span><span class=n>items</span><span class=p>.</span><span class=bp>filter</span> <span class=p>{</span> <span class=nv>$0</span><span class=p>.</span><span class=n>shouldShow</span> <span class=p>})</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>ItemRow</span><span class=p>(</span><span class=n>item</span><span class=p>:</span> <span class=n>item</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><a href=https://developer.apple.com/documentation/swiftui/foreach>공식 문서</a>에 디버깅 launch argument도 박혀 있다. <code>-LogForEachSlowPath YES</code>를 Scheme의 Arguments에 추가하면 SwiftUI가 non-constant view count 만날 때마다 콘솔에 로그 찍어준다. 안 봤으면 한 번 켜보길 권함.</p><h2 id=foreach-id-누락--매번-전체-재계산>ForEach <code>id:</code> 누락 → 매번 전체 재계산</h2><p><code>ForEach</code>가 element identity를 잃으면 데이터 바뀔 때마다 전체 row가 재계산된다. 두 가지 방법.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 방법 1 — 모델이 Identifiable 채택</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href=https://developer.apple.com/documentation/swiftui/foreach>공식 문서</a>에 디버깅 launch argument도 박혀 있다. <code>-LogForEachSlowPath YES</code>를 Scheme의 Arguments에 추가하면 SwiftUI가 non-constant view count 만날 때마다 콘솔에 로그 찍어준다. 안 봤으면 한 번 켜보길 권함.</p><h2 id=foreach-id-누락--매번-전체-재계산>ForEach <code>id:</code> 누락 → 매번 전체 재계산</h2><p><code>ForEach</code>가 element identity를 잃으면 데이터 바뀔 때마다 전체 row가 재계산된다. 두 가지 방법.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 방법 1 — 모델이 Identifiable 채택</span>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>Item</span><span class=p>:</span> <span class=n>Identifiable</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>id</span><span class=p>:</span> <span class=n>UUID</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>title</span><span class=p>:</span> <span class=nb>String</span>
@@ -44,18 +69,37 @@
 </span></span><span class=line><span class=cl><span class=n>ForEach</span><span class=p>(</span><span class=n>items</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>ItemRow</span><span class=p>(</span><span class=n>item</span><span class=p>:</span> <span class=n>item</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 방법 2 — id: KeyPath 명시</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 방법 2 — id: KeyPath 명시</span>
 </span></span><span class=line><span class=cl><span class=n>ForEach</span><span class=p>(</span><span class=n>items</span><span class=p>,</span> <span class=n>id</span><span class=p>:</span> <span class=err>\</span><span class=p>.</span><span class=n>uuid</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>ItemRow</span><span class=p>(</span><span class=n>item</span><span class=p>:</span> <span class=n>item</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>가장 자주 보는 사고는 <code>ForEach(0..&lt;items.count, id: \.self)</code> 패턴. 인덱스를 id로 쓰면 <strong>중간에 한 row가 삭제될 때 그 뒤 모든 row의 identity가 바뀐다</strong>. 결과적으로 변경 안 된 row들도 전부 다시 그려짐. row 모델이 <code>Identifiable</code>이거나 안정적인 unique key가 있으면 그걸 써야 함.</p><h2 id=셀-안에서-stateobject-새로-만들면-매-reuse마다-새-인스턴스>셀 안에서 <code>@StateObject</code> 새로 만들면 매 reuse마다 새 인스턴스</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 셀 reuse 때마다 ViewModel 새로 생성</span>
+</span></span></code></pre></td></tr></table></div></div><p>가장 자주 보는 사고는 <code>ForEach(0..&lt;items.count, id: \.self)</code> 패턴. 인덱스를 id로 쓰면 <strong>중간에 한 row가 삭제될 때 그 뒤 모든 row의 identity가 바뀐다</strong>. 결과적으로 변경 안 된 row들도 전부 다시 그려짐. row 모델이 <code>Identifiable</code>이거나 안정적인 unique key가 있으면 그걸 써야 함.</p><h2 id=셀-안에서-stateobject-새로-만들면-매-reuse마다-새-인스턴스>셀 안에서 <code>@StateObject</code> 새로 만들면 매 reuse마다 새 인스턴스</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 셀 reuse 때마다 ViewModel 새로 생성</span>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ItemRow</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>item</span><span class=p>:</span> <span class=n>Item</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>StateObject</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>vm</span> <span class=p>=</span> <span class=n>ItemRowViewModel</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>@StateObject</code>는 View identity 기준 한 번만 생성된다는 게 보장이긴 한데, <strong>List 셀처럼 identity가 바뀌면서 reuse되는 상황에선 매번 새로 만들어진다</strong>. 한 row가 viewmodel 하나씩 들고 있어야 할 정당한 이유가 없으면 부모에서 만들어서 주입하는 게 낫다. iOS 17+면 <code>@Observable</code> + <code>@State</code>로 같은 패턴이 더 가벼움 (이전 글 <a href=/p/state-stateobject-observedobject-observable-ios17/>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</a> 참고).</p><h2 id=asyncimage는-캐싱이-없다>AsyncImage는 캐싱이 없다</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 스크롤 위아래로 움직일 때마다 같은 이미지 재요청</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>@StateObject</code>는 View identity 기준 한 번만 생성된다는 게 보장이긴 한데, <strong>List 셀처럼 identity가 바뀌면서 reuse되는 상황에선 매번 새로 만들어진다</strong>. 한 row가 viewmodel 하나씩 들고 있어야 할 정당한 이유가 없으면 부모에서 만들어서 주입하는 게 낫다. iOS 17+면 <code>@Observable</code> + <code>@State</code>로 같은 패턴이 더 가벼움 (이전 글 <a href=/p/state-stateobject-observedobject-observable-ios17/>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</a> 참고).</p><h2 id=asyncimage는-캐싱이-없다>AsyncImage는 캐싱이 없다</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 스크롤 위아래로 움직일 때마다 같은 이미지 재요청</span>
 </span></span><span class=line><span class=cl><span class=n>List</span><span class=p>(</span><span class=n>items</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>HStack</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>AsyncImage</span><span class=p>(</span><span class=n>url</span><span class=p>:</span> <span class=n>item</span><span class=p>.</span><span class=n>thumbnailURL</span><span class=p>)</span>
@@ -63,7 +107,17 @@
 </span></span><span class=line><span class=cl>        <span class=n>Text</span><span class=p>(</span><span class=n>item</span><span class=p>.</span><span class=n>title</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>AsyncImage</code>는 디스크/메모리 캐싱이 없다. 같은 셀이 화면에 다시 들어올 때마다 네트워크 요청이 다시 나간다. row 수가 적으면 모르겠는데, 50개 넘어가면 체감되기 시작함. 해결은 보통 외부 라이브러리.</p><ul><li><a href=https://github.com/SDWebImage/SDWebImageSwiftUI>SDWebImageSwiftUI</a></li><li><a href=https://github.com/onevcat/Kingfisher>Kingfisher</a></li><li><a href=https://github.com/kean/Nuke>Nuke</a></li></ul><p>셋 다 SwiftUI 친화적이고 캐싱·다운샘플링·플레이스홀더를 다 들고 있다. 직접 <code>URLCache + NSCache</code>로 짜도 되긴 하는데, 이미지 디코딩 메인 스레드 차단까지 신경 쓰려면 외부 라이브러리가 빠르고 안전.</p><h2 id=셀-body-안에서-무거운-계산-x>셀 body 안에서 무거운 계산 X</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ body가 호출될 때마다 정렬·필터링 다시</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>AsyncImage</code>는 디스크/메모리 캐싱이 없다. 같은 셀이 화면에 다시 들어올 때마다 네트워크 요청이 다시 나간다. row 수가 적으면 모르겠는데, 50개 넘어가면 체감되기 시작함. 해결은 보통 외부 라이브러리.</p><ul><li><a href=https://github.com/SDWebImage/SDWebImageSwiftUI>SDWebImageSwiftUI</a></li><li><a href=https://github.com/onevcat/Kingfisher>Kingfisher</a></li><li><a href=https://github.com/kean/Nuke>Nuke</a></li></ul><p>셋 다 SwiftUI 친화적이고 캐싱·다운샘플링·플레이스홀더를 다 들고 있다. 직접 <code>URLCache + NSCache</code>로 짜도 되긴 하는데, 이미지 디코딩 메인 스레드 차단까지 신경 쓰려면 외부 라이브러리가 빠르고 안전.</p><h2 id=셀-body-안에서-무거운-계산-x>셀 body 안에서 무거운 계산 X</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ body가 호출될 때마다 정렬·필터링 다시</span>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ItemRow</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>item</span><span class=p>:</span> <span class=n>Item</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
@@ -73,7 +127,20 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ✅ 미리 가공해서 넘기거나 computed property로</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ✅ 미리 가공해서 넘기거나 computed property로</span>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ItemRow</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>item</span><span class=p>:</span> <span class=n>Item</span>
 </span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>var</span> <span class=nv>tagText</span><span class=p>:</span> <span class=nb>String</span> <span class=p>{</span>
@@ -86,194 +153,25 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>body</code>는 SwiftUI가 보기에 자주 호출되는 함수다. 정렬, 큰 배열 매핑, 날짜 포맷팅, 정규식 같은 게 body 안에 들어가면 스크롤 한 번에 전체 셀이 다 같은 작업을 또 하게 된다. <strong>body는 가능한 가벼운 view 조합만</strong>, 데이터 가공은 모델 단계에서 끝내고 들어가는 게 안전.</p><p>날짜 포맷터도 자주 걸리는 부분. <code>DateFormatter</code> 인스턴스를 body 안에서 새로 만들면 꽤 비싸다. static let으로 한 번만 만들거나 모델 안에 캐싱해두자.</p><h2 id=측정은-instruments로>측정은 Instruments로</h2><p>추측으로 가지 말고 진짜 무거운 곳을 찾아봐야 한다.</p><ul><li><strong>Instruments → SwiftUI template</strong>: View body 호출 횟수, 재계산 지점, hitch 발생 시점을 다 보여준다. Xcode 15부터 들어온 가장 강력한 SwiftUI 디버깅 도구.</li><li><strong><code>-LogForEachSlowPath YES</code></strong>: 위에서 말한 ForEach non-constant view count 로그.</li><li><strong><code>Self._printChanges()</code></strong>: View body 안에 한 줄 추가하면 어떤 프로퍼티 변경이 다시 그리게 했는지 콘솔에 찍어준다.</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ItemRow</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>body</code>는 SwiftUI가 보기에 자주 호출되는 함수다. 정렬, 큰 배열 매핑, 날짜 포맷팅, 정규식 같은 게 body 안에 들어가면 스크롤 한 번에 전체 셀이 다 같은 작업을 또 하게 된다. <strong>body는 가능한 가벼운 view 조합만</strong>, 데이터 가공은 모델 단계에서 끝내고 들어가는 게 안전.</p><p>날짜 포맷터도 자주 걸리는 부분. <code>DateFormatter</code> 인스턴스를 body 안에서 새로 만들면 꽤 비싸다. static let으로 한 번만 만들거나 모델 안에 캐싱해두자.</p><h2 id=측정은-instruments로>측정은 Instruments로</h2><p>추측으로 가지 말고 진짜 무거운 곳을 찾아봐야 한다.</p><ul><li><strong>Instruments → SwiftUI template</strong>: View body 호출 횟수, 재계산 지점, hitch 발생 시점을 다 보여준다. Xcode 15부터 들어온 가장 강력한 SwiftUI 디버깅 도구.</li><li><strong><code>-LogForEachSlowPath YES</code></strong>: 위에서 말한 ForEach non-constant view count 로그.</li><li><strong><code>Self._printChanges()</code></strong>: View body 안에 한 줄 추가하면 어떤 프로퍼티 변경이 다시 그리게 했는지 콘솔에 찍어준다.</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ItemRow</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>item</span><span class=p>:</span> <span class=n>Item</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>_</span> <span class=p>=</span> <span class=kc>Self</span><span class=p>.</span><span class=n>_printChanges</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>        <span class=n>Text</span><span class=p>(</span><span class=n>item</span><span class=p>.</span><span class=n>title</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>콘솔에 <code>ItemRow: @self changed.</code> 이런 식으로 찍힌다. body가 자꾸 호출된다면 어떤 프로퍼티가 식별 비교에서 다른 걸로 보이는지 추적 가능.</p><hr><p>정리하면 List 스크롤 끊김이나 버벅임 이슈 잡을 때 보는 순서는 대충 이렇다.</p><ol><li>ForEach <code>id</code> 안정성 (Identifiable 채택, index id 회피)</li><li>ForEach 안의 if 분기 → 컨테이너 감싸기 또는 filter로 빼기</li><li>셀 안에서 ViewModel 생성하는 부분 없는지</li><li>AsyncImage → 캐싱 라이브러리로 갈아끼우기</li><li>body 안에 무거운 계산 → 밖으로</li><li>Instruments로 진짜 무거운 곳 측정</li></ol><p>UIKit 시절 셀 reuse·prefetch를 직접 짜야 했던 거에 비하면 SwiftUI는 손이 덜 가는데, 대신 안 보이는 자동화에 함정이 좀 있다. 한 번 패턴 익히면 같은 흐름이 매번 나옴.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>콘솔에 <code>ItemRow: @self changed.</code> 이런 식으로 찍힌다. body가 자꾸 호출된다면 어떤 프로퍼티가 식별 비교에서 다른 걸로 보이는지 추적 가능.</p><hr><p>정리하면 List 스크롤 끊김이나 버벅임 이슈 잡을 때 보는 순서는 대충 이렇다.</p><ol><li>ForEach <code>id</code> 안정성 (Identifiable 채택, index id 회피)</li><li>ForEach 안의 if 분기 → 컨테이너 감싸기 또는 filter로 빼기</li><li>셀 안에서 ViewModel 생성하는 부분 없는지</li><li>AsyncImage → 캐싱 라이브러리로 갈아끼우기</li><li>body 안에 무거운 계산 → 밖으로</li><li>Instruments로 진짜 무거운 곳 측정</li></ol><p>UIKit 시절 셀 reuse·prefetch를 직접 짜야 했던 거에 비하면 SwiftUI는 손이 덜 가는데, 대신 안 보이는 자동화에 함정이 좀 있다. 한 번 패턴 익히면 같은 흐름이 매번 나옴.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><span>← PREVIOUS FILE</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/swiftui-animation-modifier-vs-withanimation/><span>NEXT FILE →</span>
+<strong>withAnimation, .animation, .transition 헷갈릴 때 보는 메모</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#list와-lazyvstack-둘-다-lazy인데-차이가-있다>List와 LazyVStack 둘 다 lazy인데 차이가 있다</a></li><li><a href=#foreach-안의-if부터-의심>ForEach 안의 <code>if</code>부터 의심</a></li><li><a href=#foreach-id-누락--매번-전체-재계산>ForEach <code>id:</code> 누락 → 매번 전체 재계산</a></li><li><a href=#셀-안에서-stateobject-새로-만들면-매-reuse마다-새-인스턴스>셀 안에서 <code>@StateObject</code> 새로 만들면 매 reuse마다 새 인스턴스</a></li><li><a href=#asyncimage는-캐싱이-없다>AsyncImage는 캐싱이 없다</a></li><li><a href=#셀-body-안에서-무거운-계산-x>셀 body 안에서 무거운 계산 X</a></li><li><a href=#측정은-instruments로>측정은 Instruments로</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

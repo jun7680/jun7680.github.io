@@ -1,34 +1,52 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>NavigationView에서 NavigationStack으로 옮긴 메모 — 오깅중</title><meta name=description content="iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/navigationview-to-navigationstack-migration/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="NavigationView에서 NavigationStack으로 옮긴 메모"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/navigationview-to-navigationstack-migration/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리."><meta property="og:image" content="https://jun7680.github.io/p/navigationview-to-navigationstack-migration/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="NavigationView에서 NavigationStack으로 옮긴 메모"><meta property="article:published_time" content="2026-05-12T12:30:00+09:00"><meta property="article:modified_time" content="2026-05-12T12:30:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="NavigationStack"><meta property="article:tag" content="Migration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="NavigationView에서 NavigationStack으로 옮긴 메모"><meta name=twitter:description content="iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리."><meta name=twitter:image content="https://jun7680.github.io/p/navigationview-to-navigationstack-migration/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>NavigationView에서 NavigationStack으로 옮긴 메모 — 오깅중</title><meta name=description content="iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/navigationview-to-navigationstack-migration/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="NavigationView에서 NavigationStack으로 옮긴 메모"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/navigationview-to-navigationstack-migration/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리."><meta property="og:image" content="https://jun7680.github.io/p/navigationview-to-navigationstack-migration/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="NavigationView에서 NavigationStack으로 옮긴 메모"><meta property="article:published_time" content="2026-05-12T12:30:00+09:00"><meta property="article:modified_time" content="2026-05-12T12:30:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="NavigationStack"><meta property="article:tag" content="Migration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="NavigationView에서 NavigationStack으로 옮긴 메모"><meta name=twitter:description content="iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리."><meta name=twitter:image content="https://jun7680.github.io/p/navigationview-to-navigationstack-migration/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 12, 2026</span>
-<span>·</span>
-<span>5분 읽기</span></div><h1 class=article__title>NavigationView에서 NavigationStack으로 옮긴 메모</h1><p class=article__desc>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p></header><div class=article__body><p>NavigationView가 iOS 16에서 deprecated된 지 한참 됐는데, 콘솔 경고 한 줄만 무시하면서 끌고 왔다. SwiftData 마이그하면서 어차피 화면들 다시 만질 일 생긴 김에 같이 옮겼다.</p><p>단순 치환은 진짜 단순하다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationView</span> <span class=p>{</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260512</span></nav><pre class=file-header>//  navigationview-to-navigationstack-migration.swift
+//  ogging.dev / Swift
+//  MAY 12, 2026 · 5 min read
+//  #swiftui, #navigationstack, #migration</pre><header class=article__header><h1 class=article__title>NavigationView에서 NavigationStack으로 옮긴 메모</h1><p class=article__desc>iOS 16에서 deprecated된 NavigationView를 NavigationStack으로 옮기면서 정리한 메모. 값 기반 push, NavigationPath, 시간 잡아먹은 두 자리.</p><div class=article__meta><span>MAY 12, 2026 · 5 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#navigationstack</span><span>#migration</span></div></div></header><div class=article__body><p>NavigationView가 iOS 16에서 deprecated된 지 한참 됐는데, 콘솔 경고 한 줄만 무시하면서 끌고 왔다. SwiftData 마이그하면서 어차피 화면들 다시 만질 일 생긴 김에 같이 옮겼다.</p><p>단순 치환은 진짜 단순하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationView</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>List</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>NavigationLink</span><span class=p>(</span><span class=n>destination</span><span class=p>:</span> <span class=n>DetailView</span><span class=p>())</span> <span class=p>{</span> <span class=n>Text</span><span class=p>(</span><span class=s>&#34;상세&#34;</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이거를</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationStack</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>이거를</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationStack</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>List</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>NavigationLink</span> <span class=p>{</span> <span class=n>DetailView</span><span class=p>()</span> <span class=p>}</span> <span class=n>label</span><span class=p>:</span> <span class=p>{</span> <span class=n>Text</span><span class=p>(</span><span class=s>&#34;상세&#34;</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이렇게. grep 한 번 돌려서 한꺼번에 바꿀 수 있는 자리. 근데 이렇게만 끝내면 NavigationStack의 진짜 가치는 거의 못 누린다.</p><h2 id=값-기반-push가-진짜-변화>값 기반 push가 진짜 변화</h2><p>View를 직접 push하는 게 아니라 값을 path에 넣고, 그 값에 매핑된 View가 뜨는 구조다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationStack</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>이렇게. grep 한 번 돌려서 한꺼번에 바꿀 수 있는 자리. 근데 이렇게만 끝내면 NavigationStack의 진짜 가치는 거의 못 누린다.</p><h2 id=값-기반-push가-진짜-변화>값 기반 push가 진짜 변화</h2><p>View를 직접 push하는 게 아니라 값을 path에 넣고, 그 값에 매핑된 View가 뜨는 구조다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationStack</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>List</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>NavigationLink</span><span class=p>(</span><span class=s>&#34;Mint&#34;</span><span class=p>,</span> <span class=n>value</span><span class=p>:</span> <span class=n>Color</span><span class=p>.</span><span class=n>mint</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>        <span class=n>NavigationLink</span><span class=p>(</span><span class=s>&#34;Pink&#34;</span><span class=p>,</span> <span class=n>value</span><span class=p>:</span> <span class=n>Color</span><span class=p>.</span><span class=n>pink</span><span class=p>)</span>
@@ -37,9 +55,19 @@
 </span></span><span class=line><span class=cl>        <span class=n>ColorDetail</span><span class=p>(</span><span class=n>color</span><span class=p>:</span> <span class=n>color</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>NavigationLink는 <code>Color.mint</code>라는 값만 들고 있다. 어디로 갈지는 <code>navigationDestination(for: Color.self)</code>가 결정. 라우팅과 View가 분리됐다는 게 핵심. (위 예제는 <a href=https://developer.apple.com/documentation/swiftui/navigationlink>Apple 공식 문서</a> 패턴 거의 그대로다.)</p><p>여러 타입을 라우팅하려면 타입별로 modifier를 따로 박는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Color</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>ColorDetail</span><span class=p>(</span><span class=n>color</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>NavigationLink는 <code>Color.mint</code>라는 값만 들고 있다. 어디로 갈지는 <code>navigationDestination(for: Color.self)</code>가 결정. 라우팅과 View가 분리됐다는 게 핵심. (위 예제는 <a href=https://developer.apple.com/documentation/swiftui/navigationlink>Apple 공식 문서</a> 패턴 거의 그대로다.)</p><p>여러 타입을 라우팅하려면 타입별로 modifier를 따로 박는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Color</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>ColorDetail</span><span class=p>(</span><span class=n>color</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Recipe</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>RecipeDetail</span><span class=p>(</span><span class=n>recipe</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
-</span></span></code></pre></div><h2 id=코드에서-직접-pushpop>코드에서 직접 push·pop</h2><p><code>path</code>를 binding으로 잡으면 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=코드에서-직접-pushpop>코드에서 직접 push·pop</h2><p><code>path</code>를 binding으로 잡으면 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>path</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>List</span> <span class=p>{</span>
@@ -47,16 +75,33 @@
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Color</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>ColorDetail</span><span class=p>(</span><span class=n>color</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>자주 쓰는 조작.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>       <span class=c1>// push</span>
+</span></span></code></pre></td></tr></table></div></div><p>자주 쓰는 조작.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>       <span class=c1>// push</span>
 </span></span><span class=line><span class=cl><span class=n>path</span><span class=p>.</span><span class=bp>removeLast</span><span class=p>()</span>        <span class=c1>// pop</span>
 </span></span><span class=line><span class=cl><span class=n>path</span><span class=p>.</span><span class=bp>removeAll</span><span class=p>()</span>         <span class=c1>// popToRoot</span>
 </span></span><span class=line><span class=cl><span class=n>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>  <span class=c1>// 같은 popToRoot</span>
-</span></span></code></pre></div><p>타입이 하나로 정해지면 NavigationPath 대신 그냥 <code>[Type]</code> binding을 써도 된다. 요소 타입이 Codable이면 <code>@SceneStorage</code>랑 묶어서 상태 복원도 깔끔. NavigationPath 자체에도 <code>codable</code> 프로퍼티가 있는데, path에 들어간 모든 값이 Codable이어야 사용 가능하다.</p><p>딥링크는 path 한 번 비우고 새로 쌓는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>onOpenURL</span> <span class=p>{</span> <span class=n>url</span> <span class=k>in</span>
+</span></span></code></pre></td></tr></table></div></div><p>타입이 하나로 정해지면 NavigationPath 대신 그냥 <code>[Type]</code> binding을 써도 된다. 요소 타입이 Codable이면 <code>@SceneStorage</code>랑 묶어서 상태 복원도 깔끔. NavigationPath 자체에도 <code>codable</code> 프로퍼티가 있는데, path에 들어간 모든 값이 Codable이어야 사용 가능하다.</p><p>딥링크는 path 한 번 비우고 새로 쌓는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>onOpenURL</span> <span class=p>{</span> <span class=n>url</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=kd>let</span> <span class=nv>host</span> <span class=p>=</span> <span class=n>URLComponents</span><span class=p>(</span><span class=n>url</span><span class=p>:</span> <span class=n>url</span><span class=p>,</span> <span class=n>resolvingAgainstBaseURL</span><span class=p>:</span> <span class=kc>true</span><span class=p>)?.</span><span class=n>host</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=n>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>host</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>isActive</code> binding 단계마다 켜던 NavigationView 시절보다 한결 낫다 ㅋㅋ</p><h2 id=옮기다가-시간-잡아먹은-자리>옮기다가 시간 잡아먹은 자리</h2><p><code>navigationDestination</code>을 <code>List</code>나 <code>LazyVStack</code> <strong>안쪽</strong>에 박은 게 처음 한 번. 동작이 들쭉날쭉해서 한참 봤는데, 공식 문서에 정확히 적혀 있었다.</p><blockquote><p><em>Do NOT place the navigation destination modifier inside lazy containers like List or LazyVStack&mldr;</em> — <a href=https://developer.apple.com/documentation/swiftui/view/navigationdestination(for:destination:)>navigationDestination(for:destination:) — Apple Developer</a></p></blockquote><p>lazy container는 자식 view를 필요할 때만 만든다. NavigationStack이 destination을 못 보는 순간이 생기는 거. <strong>항상 lazy container 바깥</strong>에 박는다. 문서 먼저 읽었으면 안 헤맸을 자리.</p><p>또 하나는 popToRoot. <code>path.removeLast(path.count)</code>로 길게 짰다가 한참 뒤에 <code>path.removeAll()</code>이 그냥 있다는 걸 알았다. 시그니처 한 번 봤으면 끝났을 일.</p><p>그리고 마이그 마지막에 발견한 거 — <code>NavigationLink(destination:label:)</code> 옛날 형태 그대로 둔 화면이 있었는데, 컴파일은 되는데 path 추적에 안 걸린다. 사용자가 탭해서 들어간 화면을 <code>path.removeLast()</code>로 못 뺀다. NavigationStack의 path 추적은 <a href=https://developer.apple.com/documentation/swiftui/navigationlink/init(_:value:)-810b2><code>NavigationLink(value:)</code> + <code>navigationDestination(for:)</code> 짝</a>에서만 동작하니까, 마이그할 때 NavigationLink 형태도 다 같이 바꿔야 한다.</p><p>화면 단위로 점진 마이그가 되니까 큰 PR 만들 필요는 없었다. 한 화면 옮기고 동작 확인, 다음 화면 옮기고. SwiftData 시리즈 마이그 흐름이랑 같음.</p><h2 id=navigationstack-vs-navigationsplitview>NavigationStack vs NavigationSplitView</h2><p>iPad/Mac에서 두 컬럼·세 컬럼 레이아웃을 쓰려면 <code>NavigationSplitView</code>가 따로 있다. 둘이 별개 컨테이너지만 안쪽 push 흐름은 <code>NavigationStack</code>을 다시 쓰는 구조라서 섞어 쓰는 게 자연스럽다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationSplitView</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>isActive</code> binding 단계마다 켜던 NavigationView 시절보다 한결 낫다 ㅋㅋ</p><h2 id=옮기다가-시간-잡아먹은-자리>옮기다가 시간 잡아먹은 자리</h2><p><code>navigationDestination</code>을 <code>List</code>나 <code>LazyVStack</code> <strong>안쪽</strong>에 박은 게 처음 한 번. 동작이 들쭉날쭉해서 한참 봤는데, 공식 문서에 정확히 적혀 있었다.</p><blockquote><p><em>Do NOT place the navigation destination modifier inside lazy containers like List or LazyVStack&mldr;</em> — <a href=https://developer.apple.com/documentation/swiftui/view/navigationdestination(for:destination:)>navigationDestination(for:destination:) — Apple Developer</a></p></blockquote><p>lazy container는 자식 view를 필요할 때만 만든다. NavigationStack이 destination을 못 보는 순간이 생기는 거. <strong>항상 lazy container 바깥</strong>에 박는다. 문서 먼저 읽었으면 안 헤맸을 자리.</p><p>또 하나는 popToRoot. <code>path.removeLast(path.count)</code>로 길게 짰다가 한참 뒤에 <code>path.removeAll()</code>이 그냥 있다는 걸 알았다. 시그니처 한 번 봤으면 끝났을 일.</p><p>그리고 마이그 마지막에 발견한 거 — <code>NavigationLink(destination:label:)</code> 옛날 형태 그대로 둔 화면이 있었는데, 컴파일은 되는데 path 추적에 안 걸린다. 사용자가 탭해서 들어간 화면을 <code>path.removeLast()</code>로 못 뺀다. NavigationStack의 path 추적은 <a href=https://developer.apple.com/documentation/swiftui/navigationlink/init(_:value:)-810b2><code>NavigationLink(value:)</code> + <code>navigationDestination(for:)</code> 짝</a>에서만 동작하니까, 마이그할 때 NavigationLink 형태도 다 같이 바꿔야 한다.</p><p>화면 단위로 점진 마이그가 되니까 큰 PR 만들 필요는 없었다. 한 화면 옮기고 동작 확인, 다음 화면 옮기고. SwiftData 시리즈 마이그 흐름이랑 같음.</p><h2 id=navigationstack-vs-navigationsplitview>NavigationStack vs NavigationSplitView</h2><p>iPad/Mac에서 두 컬럼·세 컬럼 레이아웃을 쓰려면 <code>NavigationSplitView</code>가 따로 있다. 둘이 별개 컨테이너지만 안쪽 push 흐름은 <code>NavigationStack</code>을 다시 쓰는 구조라서 섞어 쓰는 게 자연스럽다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>NavigationSplitView</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>SidebarView</span><span class=p>()</span>
 </span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>detail</span><span class=p>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>path</span><span class=p>)</span> <span class=p>{</span>
@@ -64,7 +109,17 @@
 </span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Post</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>PostDetail</span><span class=p>(</span><span class=n>post</span><span class=p>:</span> <span class=nv>$0</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>iPhone에선 NavigationSplitView가 자동으로 <code>NavigationStack</code>처럼 동작해서 한 코드로 양쪽 폼팩터를 커버. iPad·Mac 지원 안 하는 앱이라면 NavigationStack만 써도 충분.</p><h2 id=tabview에서-탭마다-path-따로-관리>TabView에서 탭마다 path 따로 관리</h2><p>탭 기반 앱이면 각 탭이 독립적인 navigation 히스토리를 가져야 한다. path도 탭별로 따로.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>feedPath</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>iPhone에선 NavigationSplitView가 자동으로 <code>NavigationStack</code>처럼 동작해서 한 코드로 양쪽 폼팩터를 커버. iPad·Mac 지원 안 하는 앱이라면 NavigationStack만 써도 충분.</p><h2 id=tabview에서-탭마다-path-따로-관리>TabView에서 탭마다 path 따로 관리</h2><p>탭 기반 앱이면 각 탭이 독립적인 navigation 히스토리를 가져야 한다. path도 탭별로 따로.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>feedPath</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
 </span></span><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>profilePath</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=n>TabView</span> <span class=p>{</span>
@@ -74,7 +129,34 @@
 </span></span><span class=line><span class=cl>    <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>profilePath</span><span class=p>)</span> <span class=p>{</span> <span class=n>ProfileView</span><span class=p>()</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>tabItem</span> <span class=p>{</span> <span class=n>Label</span><span class=p>(</span><span class=s>&#34;Profile&#34;</span><span class=p>,</span> <span class=n>systemImage</span><span class=p>:</span> <span class=s>&#34;person&#34;</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>탭 간 이동 시 안쪽 navigation이 유지되는 기본 UX가 그대로 살아난다. 한 path 공유하면 탭 갈아탈 때 히스토리가 다 사라지니까 주의.</p><h2 id=router-패턴으로-path-외부화>Router 패턴으로 path 외부화</h2><p>스택 깊이가 깊어지면 화면마다 path를 binding으로 들고 다니는 게 번거롭다. <code>@Observable</code> 클래스 하나에 path를 묶고 환경으로 흘려보내면 어디서든 <code>router.push(.detail(id))</code>로 호출 가능.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Observable</span>
+</span></span></code></pre></td></tr></table></div></div><p>탭 간 이동 시 안쪽 navigation이 유지되는 기본 UX가 그대로 살아난다. 한 path 공유하면 탭 갈아탈 때 히스토리가 다 사라지니까 주의.</p><h2 id=router-패턴으로-path-외부화>Router 패턴으로 path 외부화</h2><p>스택 깊이가 깊어지면 화면마다 path를 binding으로 들고 다니는 게 번거롭다. <code>@Observable</code> 클래스 하나에 path를 묶고 환경으로 흘려보내면 어디서든 <code>router.push(.detail(id))</code>로 호출 가능.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Observable</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>Router</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>path</span> <span class=p>=</span> <span class=n>NavigationPath</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>push</span><span class=p>(</span><span class=kc>_</span> <span class=n>value</span><span class=p>:</span> <span class=nb>Hashable</span><span class=p>)</span> <span class=p>{</span> <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=p>)</span> <span class=p>}</span>
@@ -101,187 +183,11 @@
 </span></span><span class=line><span class=cl>        <span class=n>Button</span><span class=p>(</span><span class=s>&#34;취소&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>router</span><span class=p>.</span><span class=n>popToRoot</span><span class=p>()</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>화면 어디서든 라우팅 가능 + 딥링크/푸시 알림 같은 외부 트리거에서도 같은 인터페이스로 push. 옛 <code>NavigationView</code> 시절 <code>@Binding var isActive</code>를 화면마다 흘려보내던 패턴이 한 번에 정리됨.</p><h2 id=정리>정리</h2><ul><li>표면적 치환은 grep으로 끝나지만, <strong>값 기반 push + navigationDestination</strong>까지 가야 NavigationStack의 가치를 누림.</li><li>destination modifier는 lazy container 바깥에. <code>NavigationLink(destination:label:)</code> 옛 형태가 남아 있으면 path 추적이 깨짐.</li><li>폼팩터 분기는 <code>NavigationSplitView</code>, 탭은 path 분리, 깊은 트리는 Router 객체로 외부화.</li></ul><p>한 화면씩 옮기면서 path 흐름이 깔끔해지는 게 보이는 마이그레이션이라 작업 자체가 꽤 재밌었다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>화면 어디서든 라우팅 가능 + 딥링크/푸시 알림 같은 외부 트리거에서도 같은 인터페이스로 push. 옛 <code>NavigationView</code> 시절 <code>@Binding var isActive</code>를 화면마다 흘려보내던 패턴이 한 번에 정리됨.</p><h2 id=정리>정리</h2><ul><li>표면적 치환은 grep으로 끝나지만, <strong>값 기반 push + navigationDestination</strong>까지 가야 NavigationStack의 가치를 누림.</li><li>destination modifier는 lazy container 바깥에. <code>NavigationLink(destination:label:)</code> 옛 형태가 남아 있으면 path 추적이 깨짐.</li><li>폼팩터 분기는 <code>NavigationSplitView</code>, 탭은 path 분리, 깊은 트리는 Router 객체로 외부화.</li></ul><p>한 화면씩 옮기면서 path 흐름이 깔끔해지는 게 보이는 마이그레이션이라 작업 자체가 꽤 재밌었다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/swiftui-animation-modifier-vs-withanimation/><span>← PREVIOUS FILE</span>
+<strong>withAnimation, .animation, .transition 헷갈릴 때 보는 메모</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/uikit-diffable-datasource-memo/><span>NEXT FILE →</span>
+<strong>UICollectionViewDiffableDataSource 쓰면서 정리한 메모</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#값-기반-push가-진짜-변화>값 기반 push가 진짜 변화</a></li><li><a href=#코드에서-직접-pushpop>코드에서 직접 push·pop</a></li><li><a href=#옮기다가-시간-잡아먹은-자리>옮기다가 시간 잡아먹은 자리</a></li><li><a href=#navigationstack-vs-navigationsplitview>NavigationStack vs NavigationSplitView</a></li><li><a href=#tabview에서-탭마다-path-따로-관리>TabView에서 탭마다 path 따로 관리</a></li><li><a href=#router-패턴으로-path-외부화>Router 패턴으로 path 외부화</a></li><li><a href=#정리>정리</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

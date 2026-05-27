@@ -1,24 +1,44 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지 — 오깅중</title><meta name=description content="UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/uikit-swiftui-bridging/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/uikit-swiftui-bridging/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리."><meta property="og:image" content="https://jun7680.github.io/p/uikit-swiftui-bridging/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지"><meta property="article:published_time" content="2026-05-13T11:00:00+09:00"><meta property="article:modified_time" content="2026-05-13T11:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="UIViewRepresentable"><meta property="article:tag" content="UIHostingController"><meta property="article:tag" content="Migration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지"><meta name=twitter:description content="UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리."><meta name=twitter:image content="https://jun7680.github.io/p/uikit-swiftui-bridging/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지 — 오깅중</title><meta name=description content="UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/uikit-swiftui-bridging/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/uikit-swiftui-bridging/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리."><meta property="og:image" content="https://jun7680.github.io/p/uikit-swiftui-bridging/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지"><meta property="article:published_time" content="2026-05-13T11:00:00+09:00"><meta property="article:modified_time" content="2026-05-13T11:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="UIViewRepresentable"><meta property="article:tag" content="UIHostingController"><meta property="article:tag" content="Migration"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지"><meta name=twitter:description content="UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리."><meta name=twitter:image content="https://jun7680.github.io/p/uikit-swiftui-bridging/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 13, 2026</span>
-<span>·</span>
-<span>7분 읽기</span></div><h1 class=article__title>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지</h1><p class=article__desc>UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리.</p></header><div class=article__body><p>iOS 앱에서 UIKit과 SwiftUI를 한 번에 다 들어내는 마이그레이션은 거의 없다. 새 화면은 SwiftUI로 짜지만 기존 UIKit 컴포넌트가 한참 남아 있고, 또 반대로 SwiftUI 화면 안에 PDFView 같은 UIKit 전용 컨트롤을 넣어야 하는 경우도 있다. 그래서 두 프레임워크 사이를 잇는 다리 네 가지는 거의 모든 프로젝트에서 한 번씩 만난다. 어떤 상황에 어떤 걸 골라야 하는지 한 번 정리해 둔다.</p><h2 id=네-가지-다리-한눈에>네 가지 다리 한눈에</h2><table><thead><tr><th>다리</th><th>방향</th><th>단위</th></tr></thead><tbody><tr><td><code>UIViewRepresentable</code></td><td>UIKit → SwiftUI</td><td>View</td></tr><tr><td><code>UIViewControllerRepresentable</code></td><td>UIKit → SwiftUI</td><td>View Controller</td></tr><tr><td><code>UIHostingController</code></td><td>SwiftUI → UIKit</td><td>View Controller</td></tr><tr><td><code>UIHostingConfiguration</code></td><td>SwiftUI → UIKit</td><td>UICollectionView / UITableView Cell content</td></tr></tbody></table><p>방향과 단위가 다르다. 가운데 두 개가 가장 자주 쓰이고, 마지막 <code>UIHostingConfiguration</code>은 iOS 16+에서 cell 안 content를 SwiftUI로 채울 때 쓴다.</p><h2 id=uiviewrepresentable--uikit-view를-swiftui-안에-넣기>UIViewRepresentable — UIKit View를 SwiftUI 안에 넣기</h2><p><code>UISearchBar</code>, <code>MKMapView</code>, <code>WKWebView</code> 같이 SwiftUI 대응이 부족하거나 옛 UIKit 자산이 많은 컴포넌트를 그대로 들이고 싶을 때 가장 흔한 다리다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>SwiftUI</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260513</span></nav><pre class=file-header>//  uikit-swiftui-bridging.swift
+//  ogging.dev / Swift
+//  MAY 13, 2026 · 7 min read
+//  #swiftui, #uikit, #uiviewrepresentable, #uihostingcontroller, #migration</pre><header class=article__header><h1 class=article__title>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지</h1><p class=article__desc>UIKit과 SwiftUI를 같은 앱에서 섞어 쓸 때 등장하는 네 가지 다리(UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, UIHostingConfiguration)의 용도, 패턴, 함정 정리.</p><div class=article__meta><span>MAY 13, 2026 · 7 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#uikit</span><span>#uiviewrepresentable</span><span>#uihostingcontroller</span></div></div></header><div class=article__body><p>iOS 앱에서 UIKit과 SwiftUI를 한 번에 다 들어내는 마이그레이션은 거의 없다. 새 화면은 SwiftUI로 짜지만 기존 UIKit 컴포넌트가 한참 남아 있고, 또 반대로 SwiftUI 화면 안에 PDFView 같은 UIKit 전용 컨트롤을 넣어야 하는 경우도 있다. 그래서 두 프레임워크 사이를 잇는 다리 네 가지는 거의 모든 프로젝트에서 한 번씩 만난다. 어떤 상황에 어떤 걸 골라야 하는지 한 번 정리해 둔다.</p><h2 id=네-가지-다리-한눈에>네 가지 다리 한눈에</h2><table><thead><tr><th>다리</th><th>방향</th><th>단위</th></tr></thead><tbody><tr><td><code>UIViewRepresentable</code></td><td>UIKit → SwiftUI</td><td>View</td></tr><tr><td><code>UIViewControllerRepresentable</code></td><td>UIKit → SwiftUI</td><td>View Controller</td></tr><tr><td><code>UIHostingController</code></td><td>SwiftUI → UIKit</td><td>View Controller</td></tr><tr><td><code>UIHostingConfiguration</code></td><td>SwiftUI → UIKit</td><td>UICollectionView / UITableView Cell content</td></tr></tbody></table><p>방향과 단위가 다르다. 가운데 두 개가 가장 자주 쓰이고, 마지막 <code>UIHostingConfiguration</code>은 iOS 16+에서 cell 안 content를 SwiftUI로 채울 때 쓴다.</p><h2 id=uiviewrepresentable--uikit-view를-swiftui-안에-넣기>UIViewRepresentable — UIKit View를 SwiftUI 안에 넣기</h2><p><code>UISearchBar</code>, <code>MKMapView</code>, <code>WKWebView</code> 같이 SwiftUI 대응이 부족하거나 옛 UIKit 자산이 많은 컴포넌트를 그대로 들이고 싶을 때 가장 흔한 다리다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>SwiftUI</span>
 </span></span><span class=line><span class=cl><span class=kd>import</span> <span class=nc>WebKit</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>WebView</span><span class=p>:</span> <span class=n>UIViewRepresentable</span> <span class=p>{</span>
@@ -39,7 +59,31 @@
 </span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>ignoresSafeArea</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>핵심은 두 메서드.</p><ul><li><code>makeUIView(context:)</code> — <strong>딱 한 번</strong> UIView 인스턴스를 만든다. init 비용이 큰 객체는 여기서.</li><li><code>updateUIView(_:context:)</code> — SwiftUI 상태가 바뀔 때마다 호출. <strong>여기에는 init 코드 절대 넣지 말기</strong>. URL 갱신, 텍스트 동기화 같은 &ldquo;변경&rdquo; 작업만.</li></ul><p><code>updateUIView</code>는 body 재평가될 때마다 호출될 수 있어서 매번 새 객체를 만드는 식으로 짜면 성능과 상태가 깨진다.</p><h2 id=coordinator--delegate-target-action을-swiftui로-흘리기>Coordinator — delegate, target-action을 SwiftUI로 흘리기</h2><p>UIKit 컴포넌트 대부분은 delegate나 target-action으로 외부와 통신한다. 이걸 SwiftUI binding으로 잇는 자리가 Coordinator다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchBar</span><span class=p>:</span> <span class=n>UIViewRepresentable</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>핵심은 두 메서드.</p><ul><li><code>makeUIView(context:)</code> — <strong>딱 한 번</strong> UIView 인스턴스를 만든다. init 비용이 큰 객체는 여기서.</li><li><code>updateUIView(_:context:)</code> — SwiftUI 상태가 바뀔 때마다 호출. <strong>여기에는 init 코드 절대 넣지 말기</strong>. URL 갱신, 텍스트 동기화 같은 &ldquo;변경&rdquo; 작업만.</li></ul><p><code>updateUIView</code>는 body 재평가될 때마다 호출될 수 있어서 매번 새 객체를 만드는 식으로 짜면 성능과 상태가 깨진다.</p><h2 id=coordinator--delegate-target-action을-swiftui로-흘리기>Coordinator — delegate, target-action을 SwiftUI로 흘리기</h2><p>UIKit 컴포넌트 대부분은 delegate나 target-action으로 외부와 통신한다. 이걸 SwiftUI binding으로 잇는 자리가 Coordinator다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>SearchBar</span><span class=p>:</span> <span class=n>UIViewRepresentable</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Binding</span> <span class=kd>var</span> <span class=nv>text</span><span class=p>:</span> <span class=nb>String</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>makeUIView</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=n>Context</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=n>UISearchBar</span> <span class=p>{</span>
@@ -63,7 +107,34 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>updateUIView</code>에서 <code>uiView.text != text</code> 가드를 거는 부분이 자주 빠지는데, 가드를 안 걸면 <strong>delegate → binding 갱신 → updateUIView 호출 → text 다시 set → delegate 호출 → &mldr;</strong> 식의 무한 루프가 생길 수 있다. UIKit의 일부 컨트롤은 같은 값을 set 해도 delegate를 다시 부르기 때문.</p><h2 id=uiviewcontrollerrepresentable--vc-단위로-넣기>UIViewControllerRepresentable — VC 단위로 넣기</h2><p>UIKit 컴포넌트가 자체 VC를 가지면(예: <code>PHPickerViewController</code>, <code>UIImagePickerController</code>, <code>MFMailComposeViewController</code>, <code>UIPageViewController</code>) 이쪽이 더 맞다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ImagePicker</span><span class=p>:</span> <span class=n>UIViewControllerRepresentable</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>updateUIView</code>에서 <code>uiView.text != text</code> 가드를 거는 부분이 자주 빠지는데, 가드를 안 걸면 <strong>delegate → binding 갱신 → updateUIView 호출 → text 다시 set → delegate 호출 → &mldr;</strong> 식의 무한 루프가 생길 수 있다. UIKit의 일부 컨트롤은 같은 값을 set 해도 delegate를 다시 부르기 때문.</p><h2 id=uiviewcontrollerrepresentable--vc-단위로-넣기>UIViewControllerRepresentable — VC 단위로 넣기</h2><p>UIKit 컴포넌트가 자체 VC를 가지면(예: <code>PHPickerViewController</code>, <code>UIImagePickerController</code>, <code>MFMailComposeViewController</code>, <code>UIPageViewController</code>) 이쪽이 더 맞다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ImagePicker</span><span class=p>:</span> <span class=n>UIViewControllerRepresentable</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Binding</span> <span class=kd>var</span> <span class=nv>image</span><span class=p>:</span> <span class=n>UIImage</span><span class=p>?</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Environment</span><span class=p>(</span><span class=err>\</span><span class=p>.</span><span class=n>dismiss</span><span class=p>)</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>dismiss</span>
 </span></span><span class=line><span class=cl>
@@ -90,7 +161,27 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>@Environment(\.dismiss)</code>를 코디네이터가 아닌 부모 구조체 쪽에서 잡아두고, 코디네이터가 <code>parent.dismiss()</code>로 호출하는 패턴이 깔끔. SwiftUI 환경 변수를 코디네이터에서 직접 잡으려고 하면 잘 안 풀린다.</p><h2 id=uihostingcontroller--swiftui-view를-uikit-안에-넣기>UIHostingController — SwiftUI View를 UIKit 안에 넣기</h2><p>방향이 반대인 경우. UIKit 화면(특히 옛 storyboard 기반 화면)에서 새로 짠 SwiftUI View 하나만 끼우고 싶을 때.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>SwiftUI</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>@Environment(\.dismiss)</code>를 코디네이터가 아닌 부모 구조체 쪽에서 잡아두고, 코디네이터가 <code>parent.dismiss()</code>로 호출하는 패턴이 깔끔. SwiftUI 환경 변수를 코디네이터에서 직접 잡으려고 하면 잘 안 풀린다.</p><h2 id=uihostingcontroller--swiftui-view를-uikit-안에-넣기>UIHostingController — SwiftUI View를 UIKit 안에 넣기</h2><p>방향이 반대인 경우. UIKit 화면(특히 옛 storyboard 기반 화면)에서 새로 짠 SwiftUI View 하나만 끼우고 싶을 때.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>SwiftUI</span>
 </span></span><span class=line><span class=cl><span class=kd>import</span> <span class=nc>UIKit</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>LegacyVC</span><span class=p>:</span> <span class=n>UIViewController</span> <span class=p>{</span>
@@ -110,9 +201,21 @@
 </span></span><span class=line><span class=cl>        <span class=n>host</span><span class=p>.</span><span class=n>didMove</span><span class=p>(</span><span class=n>toParent</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>VC를 자식으로 추가하는 표준 컨테이너 패턴 그대로. SwiftUI 쪽 상태가 바뀌면 SwiftUI가 알아서 자기 영역만 다시 그린다.</p><h3 id=사이즈-자동-계산--sizingoptions>사이즈 자동 계산 — sizingOptions</h3><p>iOS 16부터 <code>sizingOptions</code>로 hosting controller 크기를 SwiftUI 자체 intrinsic size에 맞춰 자동 조정 가능.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>host</span> <span class=p>=</span> <span class=n>UIHostingController</span><span class=p>(</span><span class=n>rootView</span><span class=p>:</span> <span class=n>ProfileCard</span><span class=p>(...))</span>
+</span></span></code></pre></td></tr></table></div></div><p>VC를 자식으로 추가하는 표준 컨테이너 패턴 그대로. SwiftUI 쪽 상태가 바뀌면 SwiftUI가 알아서 자기 영역만 다시 그린다.</p><h3 id=사이즈-자동-계산--sizingoptions>사이즈 자동 계산 — sizingOptions</h3><p>iOS 16부터 <code>sizingOptions</code>로 hosting controller 크기를 SwiftUI 자체 intrinsic size에 맞춰 자동 조정 가능.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>host</span> <span class=p>=</span> <span class=n>UIHostingController</span><span class=p>(</span><span class=n>rootView</span><span class=p>:</span> <span class=n>ProfileCard</span><span class=p>(...))</span>
 </span></span><span class=line><span class=cl><span class=n>host</span><span class=p>.</span><span class=n>sizingOptions</span> <span class=p>=</span> <span class=p>[.</span><span class=n>intrinsicContentSize</span><span class=p>,</span> <span class=p>.</span><span class=n>preferredContentSize</span><span class=p>]</span>
-</span></span></code></pre></div><p>이전엔 SwiftUI가 그리는 콘텐츠 크기를 UIKit이 못 잡아서 명시적 constraint를 다 잡아주거나 <code>view.invalidateIntrinsicContentSize()</code>를 수동으로 부르던 자리. 16+ 타깃이면 사용하면 편하다.</p><h2 id=uihostingconfiguration--cell-콘텐츠를-swiftui로>UIHostingConfiguration — Cell 콘텐츠를 SwiftUI로</h2><p>iOS 16에서 추가된 가장 깔끔한 다리. <code>UICollectionView</code> / <code>UITableView</code> cell의 content를 SwiftUI로 채운다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>cellRegistration</span> <span class=p>=</span> <span class=n>UICollectionView</span><span class=p>.</span><span class=n>CellRegistration</span><span class=p>&lt;</span><span class=n>UICollectionViewListCell</span><span class=p>,</span> <span class=n>Todo</span><span class=p>&gt;</span> <span class=p>{</span> <span class=n>cell</span><span class=p>,</span> <span class=kc>_</span><span class=p>,</span> <span class=n>todo</span> <span class=k>in</span>
+</span></span></code></pre></td></tr></table></div></div><p>이전엔 SwiftUI가 그리는 콘텐츠 크기를 UIKit이 못 잡아서 명시적 constraint를 다 잡아주거나 <code>view.invalidateIntrinsicContentSize()</code>를 수동으로 부르던 자리. 16+ 타깃이면 사용하면 편하다.</p><h2 id=uihostingconfiguration--cell-콘텐츠를-swiftui로>UIHostingConfiguration — Cell 콘텐츠를 SwiftUI로</h2><p>iOS 16에서 추가된 가장 깔끔한 다리. <code>UICollectionView</code> / <code>UITableView</code> cell의 content를 SwiftUI로 채운다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>cellRegistration</span> <span class=p>=</span> <span class=n>UICollectionView</span><span class=p>.</span><span class=n>CellRegistration</span><span class=p>&lt;</span><span class=n>UICollectionViewListCell</span><span class=p>,</span> <span class=n>Todo</span><span class=p>&gt;</span> <span class=p>{</span> <span class=n>cell</span><span class=p>,</span> <span class=kc>_</span><span class=p>,</span> <span class=n>todo</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>cell</span><span class=p>.</span><span class=n>contentConfiguration</span> <span class=p>=</span> <span class=n>UIHostingConfiguration</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>HStack</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=n>Image</span><span class=p>(</span><span class=n>systemName</span><span class=p>:</span> <span class=n>todo</span><span class=p>.</span><span class=n>done</span> <span class=p>?</span> <span class=s>&#34;checkmark.circle.fill&#34;</span> <span class=p>:</span> <span class=s>&#34;circle&#34;</span><span class=p>)</span>
@@ -122,187 +225,11 @@
 </span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>padding</span><span class=p>(.</span><span class=n>vertical</span><span class=p>,</span> <span class=mi>4</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>기존 UICollectionView 인프라(<code>UICollectionViewDiffableDataSource</code>, <code>UICollectionViewCompositionalLayout</code>)는 그대로 두고 cell 안만 SwiftUI로 채우는 식. 새 list 화면을 통째로 SwiftUI로 옮길지 망설여질 때 가장 부담 적은 선택.</p><h2 id=자주-마주치는-함정>자주 마주치는 함정</h2><h3 id=updateuiviewuiviewcontroller-안에서-무거운-작업>updateUIView/UIViewController 안에서 무거운 작업</h3><p><code>updateUIView</code>는 SwiftUI body가 재평가될 때마다 호출될 수 있다. 그 안에서 네트워크 호출, 무거운 레이아웃 계산 같은 걸 하면 체감 성능이 폭락한다. &ldquo;정말 바뀐 값에 대해서만&rdquo; 변경하는 가드를 거는 게 기본.</p><h3 id=coordinator의-강한-참조>Coordinator의 강한 참조</h3><p>Coordinator가 parent struct를 강하게 들고 있는데, parent는 또 Coordinator를 들고 있다. 보통은 SwiftUI가 라이프사이클을 잘 정리해주지만, 콜백 클로저를 외부로 흘려보내거나 NotificationCenter에 register 하면 cycle이 생길 수 있다. parent를 <code>weak</code>나 closure capture로 깔끔하게 잘라두는 게 안전.</p><h3 id=uihostingcontroller가-빈-공간을-만드는-경우>UIHostingController가 빈 공간을 만드는 경우</h3><p>UIHostingController는 기본적으로 자기 부모 VC의 safe area를 따른다. 그래서 부모 VC가 navigation bar를 가지면 SwiftUI 화면 위쪽이 비어 보이는 현상이 생긴다. <code>host.safeAreaRegions = []</code>로 무시하거나, SwiftUI 쪽에서 <code>.ignoresSafeArea()</code>로 처리.</p><h3 id=body가-너무-자주-재호출>body가 너무 자주 재호출</h3><p>UIKit에서 SwiftUI cell로 옮길 때, 외부 ObservableObject 한 곳에 모든 데이터를 묶어두면 list 한 칸의 변화에도 모든 cell이 다시 그려진다. SwiftData/<code>@Observable</code>로 옮기면 KeyPath 기반 추적이라 같은 코드여도 cell 단위 갱신이 자연스러워짐 — 이전 글에서 정리한 <a href=/p/state-stateobject-observedobject-observable-ios17/><code>@Observable</code> 도입기</a>와 같은 흐름.</p><h2 id=언제-뭘-고르나>언제 뭘 고르나</h2><p>흐름표로 정리.</p><table><thead><tr><th>상황</th><th>다리</th></tr></thead><tbody><tr><td>SwiftUI 화면 안에 UIKit View 한 조각</td><td><code>UIViewRepresentable</code></td></tr><tr><td>SwiftUI 화면 안에 UIKit VC(피커 등)</td><td><code>UIViewControllerRepresentable</code></td></tr><tr><td>UIKit 화면 한 부분만 SwiftUI로</td><td><code>UIHostingController</code> (자식 VC 패턴)</td></tr><tr><td>UICollectionView / UITableView cell 콘텐츠</td><td><code>UIHostingConfiguration</code> (iOS 16+)</td></tr><tr><td>화면 통째로 SwiftUI로 갈 수 있다</td><td>다리 안 만들고 그냥 SwiftUI View</td></tr></tbody></table><p>마이그레이션 중인 프로젝트면 마지막 줄이 목표지만, 도착하기 전까지는 위 네 줄을 자주 만난다.</p><h2 id=정리>정리</h2><ul><li>네 다리의 방향과 단위가 다르다. <strong>방향(어디서 어디로)</strong> + <strong>단위(View냐 VC냐 Cell이냐)</strong> 두 축으로 고르면 헷갈리지 않음.</li><li>Representable의 <code>update</code>는 &ldquo;변경"용으로만. 초기화는 <code>make</code>에 가둔다.</li><li>Coordinator로 delegate를 SwiftUI binding으로 흘리되 무한 루프 가드를 잊지 말기.</li><li>16+ 타깃이면 cell 콘텐츠는 <code>UIHostingConfiguration</code>이 가장 부담 적은 마이그 경로.</li></ul><p>옛 UIKit 자산을 한 번에 다 들어낼 필요 없이, 화면 단위 / 컴포넌트 단위로 위 네 다리를 활용해 천천히 SwiftUI 비중을 늘려가는 게 가장 안정적인 마이그레이션 흐름인 것 같다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>기존 UICollectionView 인프라(<code>UICollectionViewDiffableDataSource</code>, <code>UICollectionViewCompositionalLayout</code>)는 그대로 두고 cell 안만 SwiftUI로 채우는 식. 새 list 화면을 통째로 SwiftUI로 옮길지 망설여질 때 가장 부담 적은 선택.</p><h2 id=자주-마주치는-함정>자주 마주치는 함정</h2><h3 id=updateuiviewuiviewcontroller-안에서-무거운-작업>updateUIView/UIViewController 안에서 무거운 작업</h3><p><code>updateUIView</code>는 SwiftUI body가 재평가될 때마다 호출될 수 있다. 그 안에서 네트워크 호출, 무거운 레이아웃 계산 같은 걸 하면 체감 성능이 폭락한다. &ldquo;정말 바뀐 값에 대해서만&rdquo; 변경하는 가드를 거는 게 기본.</p><h3 id=coordinator의-강한-참조>Coordinator의 강한 참조</h3><p>Coordinator가 parent struct를 강하게 들고 있는데, parent는 또 Coordinator를 들고 있다. 보통은 SwiftUI가 라이프사이클을 잘 정리해주지만, 콜백 클로저를 외부로 흘려보내거나 NotificationCenter에 register 하면 cycle이 생길 수 있다. parent를 <code>weak</code>나 closure capture로 깔끔하게 잘라두는 게 안전.</p><h3 id=uihostingcontroller가-빈-공간을-만드는-경우>UIHostingController가 빈 공간을 만드는 경우</h3><p>UIHostingController는 기본적으로 자기 부모 VC의 safe area를 따른다. 그래서 부모 VC가 navigation bar를 가지면 SwiftUI 화면 위쪽이 비어 보이는 현상이 생긴다. <code>host.safeAreaRegions = []</code>로 무시하거나, SwiftUI 쪽에서 <code>.ignoresSafeArea()</code>로 처리.</p><h3 id=body가-너무-자주-재호출>body가 너무 자주 재호출</h3><p>UIKit에서 SwiftUI cell로 옮길 때, 외부 ObservableObject 한 곳에 모든 데이터를 묶어두면 list 한 칸의 변화에도 모든 cell이 다시 그려진다. SwiftData/<code>@Observable</code>로 옮기면 KeyPath 기반 추적이라 같은 코드여도 cell 단위 갱신이 자연스러워짐 — 이전 글에서 정리한 <a href=/p/state-stateobject-observedobject-observable-ios17/><code>@Observable</code> 도입기</a>와 같은 흐름.</p><h2 id=언제-뭘-고르나>언제 뭘 고르나</h2><p>흐름표로 정리.</p><table><thead><tr><th>상황</th><th>다리</th></tr></thead><tbody><tr><td>SwiftUI 화면 안에 UIKit View 한 조각</td><td><code>UIViewRepresentable</code></td></tr><tr><td>SwiftUI 화면 안에 UIKit VC(피커 등)</td><td><code>UIViewControllerRepresentable</code></td></tr><tr><td>UIKit 화면 한 부분만 SwiftUI로</td><td><code>UIHostingController</code> (자식 VC 패턴)</td></tr><tr><td>UICollectionView / UITableView cell 콘텐츠</td><td><code>UIHostingConfiguration</code> (iOS 16+)</td></tr><tr><td>화면 통째로 SwiftUI로 갈 수 있다</td><td>다리 안 만들고 그냥 SwiftUI View</td></tr></tbody></table><p>마이그레이션 중인 프로젝트면 마지막 줄이 목표지만, 도착하기 전까지는 위 네 줄을 자주 만난다.</p><h2 id=정리>정리</h2><ul><li>네 다리의 방향과 단위가 다르다. <strong>방향(어디서 어디로)</strong> + <strong>단위(View냐 VC냐 Cell이냐)</strong> 두 축으로 고르면 헷갈리지 않음.</li><li>Representable의 <code>update</code>는 &ldquo;변경"용으로만. 초기화는 <code>make</code>에 가둔다.</li><li>Coordinator로 delegate를 SwiftUI binding으로 흘리되 무한 루프 가드를 잊지 말기.</li><li>16+ 타깃이면 cell 콘텐츠는 <code>UIHostingConfiguration</code>이 가장 부담 적은 마이그 경로.</li></ul><p>옛 UIKit 자산을 한 번에 다 들어낼 필요 없이, 화면 단위 / 컴포넌트 단위로 위 네 다리를 활용해 천천히 SwiftUI 비중을 늘려가는 게 가장 안정적인 마이그레이션 흐름인 것 같다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/uikit-cell-registration/><span>← PREVIOUS FILE</span>
+<strong>UICollectionView CellRegistration — 옛날 register/dequeue 그만 쓰자</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/coordinator-ispush-flag-trap/><span>NEXT FILE →</span>
+<strong>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#네-가지-다리-한눈에>네 가지 다리 한눈에</a></li><li><a href=#uiviewrepresentable--uikit-view를-swiftui-안에-넣기>UIViewRepresentable — UIKit View를 SwiftUI 안에 넣기</a></li><li><a href=#coordinator--delegate-target-action을-swiftui로-흘리기>Coordinator — delegate, target-action을 SwiftUI로 흘리기</a></li><li><a href=#uiviewcontrollerrepresentable--vc-단위로-넣기>UIViewControllerRepresentable — VC 단위로 넣기</a></li><li><a href=#uihostingcontroller--swiftui-view를-uikit-안에-넣기>UIHostingController — SwiftUI View를 UIKit 안에 넣기</a><ul><li><a href=#사이즈-자동-계산--sizingoptions>사이즈 자동 계산 — sizingOptions</a></li></ul></li><li><a href=#uihostingconfiguration--cell-콘텐츠를-swiftui로>UIHostingConfiguration — Cell 콘텐츠를 SwiftUI로</a></li><li><a href=#자주-마주치는-함정>자주 마주치는 함정</a><ul><li><a href=#updateuiviewuiviewcontroller-안에서-무거운-작업>updateUIView/UIViewController 안에서 무거운 작업</a></li><li><a href=#coordinator의-강한-참조>Coordinator의 강한 참조</a></li><li><a href=#uihostingcontroller가-빈-공간을-만드는-경우>UIHostingController가 빈 공간을 만드는 경우</a></li><li><a href=#body가-너무-자주-재호출>body가 너무 자주 재호출</a></li></ul></li><li><a href=#언제-뭘-고르나>언제 뭘 고르나</a></li><li><a href=#정리>정리</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

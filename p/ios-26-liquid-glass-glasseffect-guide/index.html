@@ -1,35 +1,45 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것 — 오깅중</title><meta name=description content="iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/ios-26-liquid-glass-glasseffect-guide/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/ios-26-liquid-glass-glasseffect-guide/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것"><meta property="article:published_time" content="2026-05-18T08:00:00+09:00"><meta property="article:modified_time" content="2026-05-18T08:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="iOS 26"><meta property="article:tag" content="Liquid Glass"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="WWDC25"><meta property="article:tag" content="디자인"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것"><meta name=twitter:description content="iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것 — 오깅중</title><meta name=description content="iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/ios-26-liquid-glass-glasseffect-guide/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/ios-26-liquid-glass-glasseffect-guide/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것"><meta property="article:published_time" content="2026-05-18T08:00:00+09:00"><meta property="article:modified_time" content="2026-05-18T08:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="iOS 26"><meta property="article:tag" content="Liquid Glass"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="WWDC25"><meta property="article:tag" content="디자인"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것"><meta name=twitter:description content="iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>iOS</span>
-<span>·</span>
-<span>MAY 18, 2026</span>
-<span>·</span>
-<span>5분 읽기</span></div><h1 class=article__title>iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것</h1><p class=article__desc>iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다.</p></header><div class=article__body><p>WWDC25 보고 제일 먼저 만져본 게 Liquid Glass다. 처음엔 그냥 블러 modifier 하나 추가된 줄 알았는데, 막상 이것저것 발라보니 &ldquo;한 줄 API"보다 &ldquo;어디에 바르냐"가 훨씬 중요한 기능이었다. iOS 7 이래 가장 큰 디자인 변화라는 말이 괜히 나온 게 아니다.</p><p>한국어 자료가 아직 거의 없어서, 직접 만져보며 정리한 내용을 남긴다. 환경은 <strong>Xcode 26 / iOS 26</strong>이다.</p><h2 id=공짜로-얻는-부분>공짜로 얻는 부분</h2><p>Xcode 26으로 빌드하고 iOS 26을 타겟으로 잡으면, navigation bar와 tab bar는 코드 한 줄 손대지 않아도 자동으로 Liquid Glass가 입혀진다. 기존 SwiftUI 프로젝트라면 리컴파일만 해도 분위기가 확 바뀐다.</p><blockquote><p>단, 커스텀 nav/tab bar를 직접 만들어 쓰고 있다면 자동 적용 대상이 아닐 수 있다. 시뮬레이터에서 한 번 확인해 보길 권한다.</p></blockquote><h2 id=glasseffect-한-줄-소개><code>.glassEffect()</code> 한 줄 소개</h2><p>가장 단순한 사용법은 이렇다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>SwiftUI</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--ios"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>IOS</span>
+<span>/</span>
+<span>P_260518</span></nav><pre class=file-header>//  ios-26-liquid-glass-glasseffect-guide.swift
+//  ogging.dev / iOS
+//  MAY 18, 2026 · 5 min read
+//  #ios 26, #liquid glass, #swiftui, #wwdc25, #디자인</pre><header class=article__header><h1 class=article__title>iOS 26 .glassEffect() 실전 가이드 — content엔 절대 바르지 말 것</h1><p class=article__desc>iOS 26 Liquid Glass는 한 줄짜리 modifier지만, 핵심은 '어디에 바르냐'다. .glassEffect() 사용법과 절대 바르면 안 되는 곳까지 한 번에 정리한다.</p><div class=article__meta><span>MAY 18, 2026 · 5 MIN READ</span><div class=article__tags><span>#ios 26</span><span>#liquid glass</span><span>#swiftui</span><span>#wwdc25</span></div></div></header><div class=article__body><p>WWDC25 보고 제일 먼저 만져본 게 Liquid Glass다. 처음엔 그냥 블러 modifier 하나 추가된 줄 알았는데, 막상 이것저것 발라보니 &ldquo;한 줄 API"보다 &ldquo;어디에 바르냐"가 훨씬 중요한 기능이었다. iOS 7 이래 가장 큰 디자인 변화라는 말이 괜히 나온 게 아니다.</p><p>한국어 자료가 아직 거의 없어서, 직접 만져보며 정리한 내용을 남긴다. 환경은 <strong>Xcode 26 / iOS 26</strong>이다.</p><h2 id=공짜로-얻는-부분>공짜로 얻는 부분</h2><p>Xcode 26으로 빌드하고 iOS 26을 타겟으로 잡으면, navigation bar와 tab bar는 코드 한 줄 손대지 않아도 자동으로 Liquid Glass가 입혀진다. 기존 SwiftUI 프로젝트라면 리컴파일만 해도 분위기가 확 바뀐다.</p><blockquote><p>단, 커스텀 nav/tab bar를 직접 만들어 쓰고 있다면 자동 적용 대상이 아닐 수 있다. 시뮬레이터에서 한 번 확인해 보길 권한다.</p></blockquote><h2 id=glasseffect-한-줄-소개><code>.glassEffect()</code> 한 줄 소개</h2><p>가장 단순한 사용법은 이렇다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>SwiftUI</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=n>Button</span><span class=p>(</span><span class=s>&#34;저장&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>save</span><span class=p>()</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>padding</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>glassEffect</span><span class=p>()</span>  <span class=c1>// .regular + .capsule 기본값</span>
-</span></span></code></pre></div><p><code>.glassEffect()</code>만 붙이면 기본값으로 <code>.regular</code> 변형 + <code>.capsule</code> 형태가 적용된다. 진짜 한 줄이다.</p><h2 id=형태shape-옵션>형태(shape) 옵션</h2><p><code>in:</code> 파라미터로 모양을 바꿀 수 있다. 선택지는 네 가지다.</p><ul><li><code>.capsule</code> — 기본값. 알약 모양</li><li><code>.circle</code> — 원형 아이콘 버튼에 적합</li><li><code>.ellipse</code> — 타원</li><li><code>.rect</code> — 사각형. adaptive corner radii라 컨텍스트에 맞춰 코너가 자연스럽게 잡힌다</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Image</span><span class=p>(</span><span class=n>systemName</span><span class=p>:</span> <span class=s>&#34;heart.fill&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>.glassEffect()</code>만 붙이면 기본값으로 <code>.regular</code> 변형 + <code>.capsule</code> 형태가 적용된다. 진짜 한 줄이다.</p><h2 id=형태shape-옵션>형태(shape) 옵션</h2><p><code>in:</code> 파라미터로 모양을 바꿀 수 있다. 선택지는 네 가지다.</p><ul><li><code>.capsule</code> — 기본값. 알약 모양</li><li><code>.circle</code> — 원형 아이콘 버튼에 적합</li><li><code>.ellipse</code> — 타원</li><li><code>.rect</code> — 사각형. adaptive corner radii라 컨텍스트에 맞춰 코너가 자연스럽게 잡힌다</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Image</span><span class=p>(</span><span class=n>systemName</span><span class=p>:</span> <span class=s>&#34;heart.fill&#34;</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>padding</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>glassEffect</span><span class=p>(.</span><span class=n>regular</span><span class=p>,</span> <span class=k>in</span><span class=p>:</span> <span class=p>.</span><span class=n>circle</span><span class=p>)</span>
-</span></span></code></pre></div><h2 id=변형variant-옵션>변형(variant) 옵션</h2><p>분위기 조정용 변형은 세 종류다.</p><ul><li><code>.regular</code> — 기본. 무난하게 두루 어울린다</li><li><code>.clear</code> — 더 투명한 느낌. 뒤가 잘 비친다</li><li><code>.identity</code> — 식별성 강조 변형</li></ul><blockquote><p>[작가 주: <code>.identity</code>의 정확한 동작·용도는 직접 사용해 본 케이스가 적어 단정하지 않는다. 정확한 차이가 궁금하면 Apple 공식 문서를 참고하길 권한다.]</p></blockquote><h2 id=interactive-효과>Interactive 효과</h2><p><code>.interactive()</code>를 체이닝하면 터치에 반응하는 효과(scaling, bounce, shimmer 등)가 같이 붙는다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Button</span><span class=p>(</span><span class=s>&#34;좋아요&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>like</span><span class=p>()</span> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=변형variant-옵션>변형(variant) 옵션</h2><p>분위기 조정용 변형은 세 종류다.</p><ul><li><code>.regular</code> — 기본. 무난하게 두루 어울린다</li><li><code>.clear</code> — 더 투명한 느낌. 뒤가 잘 비친다</li><li><code>.identity</code> — 식별성 강조 변형</li></ul><blockquote><p>[작가 주: <code>.identity</code>의 정확한 동작·용도는 직접 사용해 본 케이스가 적어 단정하지 않는다. 정확한 차이가 궁금하면 Apple 공식 문서를 참고하길 권한다.]</p></blockquote><h2 id=interactive-효과>Interactive 효과</h2><p><code>.interactive()</code>를 체이닝하면 터치에 반응하는 효과(scaling, bounce, shimmer 등)가 같이 붙는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Button</span><span class=p>(</span><span class=s>&#34;좋아요&#34;</span><span class=p>)</span> <span class=p>{</span> <span class=n>like</span><span class=p>()</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>padding</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>glassEffect</span><span class=p>(.</span><span class=n>clear</span><span class=p>.</span><span class=n>interactive</span><span class=p>())</span>
-</span></span></code></pre></div><p>버튼이나 토글처럼 사용자가 직접 누르는 컨트롤에 잘 어울린다. Semantic tinting까지 곁들이면 의미 기반 색조도 입힐 수 있는데, 이 부분은 아직 API 시그니처를 충분히 검증하지 못해 본 글에서는 키워드 소개만 한다.</p><h2 id=적용-위치-가이드라인--이-글에서-제일-중요한-부분>적용 위치 가이드라인 — 이 글에서 제일 중요한 부분</h2><p>여기서부터가 진짜다. Liquid Glass는 &ldquo;어디에 바르냐"로 디자인 성패가 갈린다. 레이어 개념부터 한 컷에 정리해 보자.</p><pre class=mermaid>flowchart TB
+</span></span></code></pre></td></tr></table></div></div><p>버튼이나 토글처럼 사용자가 직접 누르는 컨트롤에 잘 어울린다. Semantic tinting까지 곁들이면 의미 기반 색조도 입힐 수 있는데, 이 부분은 아직 API 시그니처를 충분히 검증하지 못해 본 글에서는 키워드 소개만 한다.</p><h2 id=적용-위치-가이드라인--이-글에서-제일-중요한-부분>적용 위치 가이드라인 — 이 글에서 제일 중요한 부분</h2><p>여기서부터가 진짜다. Liquid Glass는 &ldquo;어디에 바르냐"로 디자인 성패가 갈린다. 레이어 개념부터 한 컷에 정리해 보자.</p><pre class=mermaid>flowchart TB
     subgraph Nav["Navigation Layer ✅ glassEffect OK"]
         N1[Navigation Bar]
         N2[Tab Bar]
@@ -55,11 +65,15 @@
     class Nav,N1,N2,N3 ok
     class Content,C1,C2,C3 no
     class Base,B1 base
-</pre><p>Liquid Glass는 <strong>navigation layer 전용</strong>이다. 뒤에 뭔가가 있어야 멋있게 보이는 레이어, 즉 &ldquo;떠 있는&rdquo; 컨트롤에만 어울린다. base layer(배경)도 아니고, content layer(본문)도 아니다.</p><h3 id=-절대-하지-말-것--content에-적용>❌ 절대 하지 말 것 — content에 적용</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>List</span><span class=p>(</span><span class=n>items</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
+</pre><p>Liquid Glass는 <strong>navigation layer 전용</strong>이다. 뒤에 뭔가가 있어야 멋있게 보이는 레이어, 즉 &ldquo;떠 있는&rdquo; 컨트롤에만 어울린다. base layer(배경)도 아니고, content layer(본문)도 아니다.</p><h3 id=-절대-하지-말-것--content에-적용>❌ 절대 하지 말 것 — content에 적용</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>List</span><span class=p>(</span><span class=n>items</span><span class=p>)</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>Text</span><span class=p>(</span><span class=n>item</span><span class=p>.</span><span class=n>name</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>glassEffect</span><span class=p>()</span>  <span class=c1>// ❌ content layer에 적용하면 시각 위계가 무너진다</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>List row나 Table cell, 본문 텍스트·미디어에 발라버리면 그 자체가 &ldquo;떠 있는 무언가"처럼 보이게 된다. 결과적으로 화면 전체가 다 떠 있는 것처럼 보이고, 정작 사용자가 주목해야 할 navigation 컨트롤이 묻혀버린다. 시각 위계가 통째로 무너지는 셈이다.</p><p>내가 처음에 했던 실수가 정확히 이거였다. &ldquo;예쁘니까 다 발라보자&rdquo; 하고 List row에 추가했다가, 시뮬레이터를 켜보고 바로 다시 지웠다. 본문이 다 떠 있으면 어디를 봐야 할지 알 수 없다.</p><h2 id=의사결정-플로우>의사결정 플로우</h2><p>매번 헷갈리면 이 흐름 하나만 기억하면 된다.</p><pre class=mermaid>flowchart TD
+</span></span></code></pre></td></tr></table></div></div><p>List row나 Table cell, 본문 텍스트·미디어에 발라버리면 그 자체가 &ldquo;떠 있는 무언가"처럼 보이게 된다. 결과적으로 화면 전체가 다 떠 있는 것처럼 보이고, 정작 사용자가 주목해야 할 navigation 컨트롤이 묻혀버린다. 시각 위계가 통째로 무너지는 셈이다.</p><p>내가 처음에 했던 실수가 정확히 이거였다. &ldquo;예쁘니까 다 발라보자&rdquo; 하고 List row에 추가했다가, 시뮬레이터를 켜보고 바로 다시 지웠다. 본문이 다 떠 있으면 어디를 봐야 할지 알 수 없다.</p><h2 id=의사결정-플로우>의사결정 플로우</h2><p>매번 헷갈리면 이 흐름 하나만 기억하면 된다.</p><pre class=mermaid>flowchart TD
     Start([UI 요소에<br>.glassEffect 발라도 될까?]) --> Q1{어느 레이어인가?}
     Q1 -->|Navigation / Toolbar / 떠 있는 컨트롤| OK[✅ 적용 OK<br>.glassEffect 한 줄로 끝]
     Q1 -->|List / Table / 본문 콘텐츠| NO[❌ 적용 금지<br>시각 위계 무너짐]
@@ -77,190 +91,14 @@
     class OK,Cap,Cir,Ell,Rec ok
     class NO no
     class BG neutral
-</pre><h2 id=uikit-브릿징은-이제-안녕>UIKit 브릿징은 이제 안녕</h2><p>iOS 25 시절까지는 비슷한 느낌을 내려고 <code>UIVisualEffectView</code>를 <code>UIViewRepresentable</code>로 감싸서 SwiftUI에 가져다 쓰는 코드를 종종 작성했다. iOS 26부터는 이 브릿징이 사실상 필요 없어진다. <code>.glassEffect()</code> 한 줄이 그 자리를 대신한다.</p><h2 id=ios-25-이하-호환은-어쩌나>iOS 25 이하 호환은 어쩌나</h2><p><code>.glassEffect()</code>는 iOS 26 전용이다. 하위 버전을 같이 지원해야 한다면 <code>if #available(iOS 26, *)</code>로 분기해 두고, 그 외 버전에서는 <code>.background(.regularMaterial)</code> 같은 기존 머티리얼 효과로 폴백하는 방향이 자연스럽다.</p><blockquote><p>[작가 주: 정확한 <code>#available</code> 분기 코드 예시는 추가 검증 후 다음 글에서 정리해 보려고 한다.]</p></blockquote><h2 id=정리>정리</h2><ul><li>Liquid Glass는 <strong>navigation layer 전용</strong>이다. content/base에는 바르지 않는다</li><li>기본 사용은 <code>.glassEffect()</code> 한 줄. 형태는 <code>.capsule</code>/<code>.circle</code>/<code>.ellipse</code>/<code>.rect</code>, 변형은 <code>.regular</code>/<code>.clear</code>/<code>.identity</code></li><li>사용자가 누르는 컨트롤에는 <code>.interactive()</code>까지 같이 체이닝</li><li>Xcode 26 + iOS 26 타겟이면 nav/tab bar는 리컴파일만으로 자동 적용</li><li>하위 호환은 <code>#available</code> 분기 + 기존 머티리얼 폴백으로</li></ul><p>한 줄짜리 API라도 &ldquo;어디에 바르냐"는 룰만 지키면 디자인 위계는 알아서 살아난다. 반대로 룰을 무시하고 다 발라버리면 iOS 7급 변화도 그냥 어수선한 화면이 된다. 맘 편하게 navigation 쪽에만 발라 보자.</p><h2 id=참고-출처>참고 출처</h2><ul><li><a href=https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views>Apple — Applying Liquid Glass to custom views</a></li><li><a href=https://www.hackingwithswift.com/articles/278/whats-new-in-swiftui-for-ios-26>Hacking with Swift — What&rsquo;s new in SwiftUI for iOS 26</a></li><li><a href=https://www.donnywals.com/designing-custom-ui-with-liquid-glass-on-ios-26/>Donny Wals — Designing custom UI with Liquid Glass on iOS 26</a></li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</pre><h2 id=uikit-브릿징은-이제-안녕>UIKit 브릿징은 이제 안녕</h2><p>iOS 25 시절까지는 비슷한 느낌을 내려고 <code>UIVisualEffectView</code>를 <code>UIViewRepresentable</code>로 감싸서 SwiftUI에 가져다 쓰는 코드를 종종 작성했다. iOS 26부터는 이 브릿징이 사실상 필요 없어진다. <code>.glassEffect()</code> 한 줄이 그 자리를 대신한다.</p><h2 id=ios-25-이하-호환은-어쩌나>iOS 25 이하 호환은 어쩌나</h2><p><code>.glassEffect()</code>는 iOS 26 전용이다. 하위 버전을 같이 지원해야 한다면 <code>if #available(iOS 26, *)</code>로 분기해 두고, 그 외 버전에서는 <code>.background(.regularMaterial)</code> 같은 기존 머티리얼 효과로 폴백하는 방향이 자연스럽다.</p><blockquote><p>[작가 주: 정확한 <code>#available</code> 분기 코드 예시는 추가 검증 후 다음 글에서 정리해 보려고 한다.]</p></blockquote><h2 id=정리>정리</h2><ul><li>Liquid Glass는 <strong>navigation layer 전용</strong>이다. content/base에는 바르지 않는다</li><li>기본 사용은 <code>.glassEffect()</code> 한 줄. 형태는 <code>.capsule</code>/<code>.circle</code>/<code>.ellipse</code>/<code>.rect</code>, 변형은 <code>.regular</code>/<code>.clear</code>/<code>.identity</code></li><li>사용자가 누르는 컨트롤에는 <code>.interactive()</code>까지 같이 체이닝</li><li>Xcode 26 + iOS 26 타겟이면 nav/tab bar는 리컴파일만으로 자동 적용</li><li>하위 호환은 <code>#available</code> 분기 + 기존 머티리얼 폴백으로</li></ul><p>한 줄짜리 API라도 &ldquo;어디에 바르냐"는 룰만 지키면 디자인 위계는 알아서 살아난다. 반대로 룰을 무시하고 다 발라버리면 iOS 7급 변화도 그냥 어수선한 화면이 된다. 맘 편하게 navigation 쪽에만 발라 보자.</p><h2 id=참고-출처>참고 출처</h2><ul><li><a href=https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views>Apple — Applying Liquid Glass to custom views</a></li><li><a href=https://www.hackingwithswift.com/articles/278/whats-new-in-swiftui-for-ios-26>Hacking with Swift — What&rsquo;s new in SwiftUI for iOS 26</a></li><li><a href=https://www.donnywals.com/designing-custom-ui-with-liquid-glass-on-ios-26/>Donny Wals — Designing custom UI with Liquid Glass on iOS 26</a></li></ul></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/firebase-remoteconfig-to-static-json-migration/><span>← PREVIOUS FILE</span>
+<strong>Firebase RemoteConfig 빼고 GitHub Actions + 정적 JSON으로 갈아탄 후기</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/swiftui-entry-macro-environmentvalues/><span>NEXT FILE →</span>
+<strong>@Entry 매크로로 EnvironmentValues 보일러플레이트 날려버리기</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#공짜로-얻는-부분>공짜로 얻는 부분</a></li><li><a href=#glasseffect-한-줄-소개><code>.glassEffect()</code> 한 줄 소개</a></li><li><a href=#형태shape-옵션>형태(shape) 옵션</a></li><li><a href=#변형variant-옵션>변형(variant) 옵션</a></li><li><a href=#interactive-효과>Interactive 효과</a></li><li><a href=#적용-위치-가이드라인--이-글에서-제일-중요한-부분>적용 위치 가이드라인 — 이 글에서 제일 중요한 부분</a><ul><li><a href=#-절대-하지-말-것--content에-적용>❌ 절대 하지 말 것 — content에 적용</a></li></ul></li><li><a href=#의사결정-플로우>의사결정 플로우</a></li><li><a href=#uikit-브릿징은-이제-안녕>UIKit 브릿징은 이제 안녕</a></li><li><a href=#ios-25-이하-호환은-어쩌나>iOS 25 이하 호환은 어쩌나</a></li><li><a href=#정리>정리</a></li><li><a href=#참고-출처>참고 출처</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script><script type=module>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script><script type=module>
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
   mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
 </script></body></html>

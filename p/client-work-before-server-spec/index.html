@@ -1,24 +1,23 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>서버 스펙 안 나왔을 때 클라 먼저 작업하는 법 — 오깅중</title><meta name=description content="백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/client-work-before-server-spec/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="서버 스펙 안 나왔을 때 클라 먼저 작업하는 법"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/client-work-before-server-spec/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게."><meta property="og:image" content="https://jun7680.github.io/p/client-work-before-server-spec/thumbnail.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="서버 스펙 안 나왔을 때 클라 먼저 작업하는 법"><meta property="article:published_time" content="2026-05-14T00:00:00Z"><meta property="article:modified_time" content="2026-05-14T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Architecture"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="Workflow"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="서버 스펙 안 나왔을 때 클라 먼저 작업하는 법"><meta name=twitter:description content="백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게."><meta name=twitter:image content="https://jun7680.github.io/p/client-work-before-server-spec/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>서버 스펙 안 나왔을 때 클라 먼저 작업하는 법 — 오깅중</title><meta name=description content="백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/client-work-before-server-spec/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="서버 스펙 안 나왔을 때 클라 먼저 작업하는 법"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/client-work-before-server-spec/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게."><meta property="og:image" content="https://jun7680.github.io/p/client-work-before-server-spec/thumbnail.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="서버 스펙 안 나왔을 때 클라 먼저 작업하는 법"><meta property="article:published_time" content="2026-05-14T00:00:00Z"><meta property="article:modified_time" content="2026-05-14T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Architecture"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="Workflow"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="서버 스펙 안 나왔을 때 클라 먼저 작업하는 법"><meta name=twitter:description content="백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게."><meta name=twitter:image content="https://jun7680.github.io/p/client-work-before-server-spec/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 14, 2026</span>
-<span>·</span>
-<span>5분 읽기</span></div><h1 class=article__title>서버 스펙 안 나왔을 때 클라 먼저 작업하는 법</h1><p class=article__desc>백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게.</p></header><div class=article__body><h2 id=도입>도입</h2><p>기획에서 새 화면에 첨부 파일을 붙이라고 했다. 백엔드 쪽은 &ldquo;API는 다음 스프린트에"라는 답. 클라 입장에선 기다리거나, 일단 만들거나 둘 중 하나다.</p><p>기다리면 일정 밀리고, 일단 만들면 서버 응답 모양이 바뀌었을 때 다 갈아엎어야 한다. 어떻게 시작하느냐가 나중에 얼마나 고쳐야 하는지를 결정한다. 이번 작업에서 정리된 5가지가 꽤 깔끔하게 먹혀서 기록해둔다.</p><pre class=mermaid>flowchart TD
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260514</span></nav><pre class=file-header>//  client-work-before-server-spec.swift
+//  ogging.dev / Swift
+//  MAY 14, 2026 · 5 min read
+//  #swift, #ios, #architecture, #coordinator, #workflow</pre><header class=article__header><h1 class=article__title>서버 스펙 안 나왔을 때 클라 먼저 작업하는 법</h1><p class=article__desc>백엔드 기다리느라 일정 밀리는 게 싫어서 만든 나름의 체크리스트. 나중에 뜯어고칠 비용을 0에 가깝게.</p><div class=article__meta><span>MAY 14, 2026 · 5 MIN READ</span><div class=article__tags><span>#swift</span><span>#ios</span><span>#architecture</span><span>#coordinator</span></div></div></header><div class=article__body><h2 id=도입>도입</h2><p>기획에서 새 화면에 첨부 파일을 붙이라고 했다. 백엔드 쪽은 &ldquo;API는 다음 스프린트에"라는 답. 클라 입장에선 기다리거나, 일단 만들거나 둘 중 하나다.</p><p>기다리면 일정 밀리고, 일단 만들면 서버 응답 모양이 바뀌었을 때 다 갈아엎어야 한다. 어떻게 시작하느냐가 나중에 얼마나 고쳐야 하는지를 결정한다. 이번 작업에서 정리된 5가지가 꽤 깔끔하게 먹혀서 기록해둔다.</p><pre class=mermaid>flowchart TD
     A[새 화면 요청<br>서버 스펙 미확정] --> B{기존 모델로<br>표현 가능?}
     B -- Yes --> C[기존 모델 재사용<br>화면 정책은 enum case]
     B -- No --> D[일단 보류<br>스펙 나오면 만들기]
@@ -33,7 +32,15 @@
     K -- Yes --> L[ViewModel에 목 데이터<br>+ grep 마커 주석]
     K -- No --> M[진입처 시그니처 고정<br>호출처 영향 0]
     L --> M
-</pre><h2 id=1-모델-재사용>1. 모델 재사용</h2><p>첨부 파일 모델 <code>UploadModel</code>은 다른 화면에서 이미 잘 굴러가던 거였다. 화면이 다르다고 새 모델을 만들 이유가 딱히 없다. 같은 모델 그대로 들고 가면, 나중에 서버 응답이 어떻게 오든 매핑 한 줄만 추가하면 끝.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 기존</span>
+</pre><h2 id=1-모델-재사용>1. 모델 재사용</h2><p>첨부 파일 모델 <code>UploadModel</code>은 다른 화면에서 이미 잘 굴러가던 거였다. 화면이 다르다고 새 모델을 만들 이유가 딱히 없다. 같은 모델 그대로 들고 가면, 나중에 서버 응답이 어떻게 오든 매핑 한 줄만 추가하면 끝.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 기존</span>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>UploadModel</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>id</span><span class=p>:</span> <span class=n>UUID</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>fileName</span><span class=p>:</span> <span class=nb>String</span>
@@ -41,213 +48,60 @@
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>fileURL</span><span class=p>:</span> <span class=n>URL</span><span class=p>?</span>
 </span></span><span class=line><span class=cl>    <span class=p>...</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>화면별 미세한 차이는 정책 enum case로 분기한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>UploadEntryType</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>화면별 미세한 차이는 정책 enum case로 분기한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>UploadEntryType</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>screenA</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>screenB</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>screenC</span>  <span class=c1>// 신규</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이 enum의 <code>maxCount</code>, 용량 정책 같은 게 화면별 정책을 담는다. 새 화면이 또 들어와도 case만 하나 더 추가하면 됨.</p><h2 id=2-외부-의존-키는-추정값으로-두되-명시>2. 외부 의존 키는 추정값으로 두되 명시</h2><p>서비스 용량 드라이브 식별자가 enum으로 정의돼 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>public</span> <span class=kd>enum</span> <span class=nc>CapacityServiceType</span><span class=p>:</span> <span class=nb>String</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>이 enum의 <code>maxCount</code>, 용량 정책 같은 게 화면별 정책을 담는다. 새 화면이 또 들어와도 case만 하나 더 추가하면 됨.</p><h2 id=2-외부-의존-키는-추정값으로-두되-명시>2. 외부 의존 키는 추정값으로 두되 명시</h2><p>서비스 용량 드라이브 식별자가 enum으로 정의돼 있었다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>public</span> <span class=kd>enum</span> <span class=nc>CapacityServiceType</span><span class=p>:</span> <span class=nb>String</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>typeA</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>typeB</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>typeC</span>
 </span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>typeD</span>  <span class=c1>// 서버 키 확정 시 rawValue 조정 필요</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>서버가 어떤 문자열 내려줄지 모른다. 그래서 <code>"typeD"</code>로 추정해서 두되, <strong>주석에 &ldquo;서버 키 확정 시 조정"을 명시</strong>해둔다. 나중에 스펙 나왔을 때 이 한 줄짜리 string literal만 바꾸면 끝나니까.</p><p>추정값으로 시작하는 게 무서운 게 아니다. <strong>추정값임을 표시 안 하는 게</strong> 무섭다. 6개월 후에 이게 임시값인 줄 모르는 사람이 와서 다른 코드를 거기 맞춰 작성하기 시작하면, 그때는 진짜 답이 없다.</p><h2 id=3-서버-호출-경로는-보류>3. 서버 호출 경로는 보류</h2><p>가장 큰 함정이 이거다. &ldquo;서버 응답을 추측해서 디코딩까지 미리 만드는 것.&rdquo; DTO를 만들었는데 실제 응답이 다르면 매핑 전부 깨고 다시 짜야 한다. 진짜로.</p><p>이번엔 첨부 파일 업로드 호출은 아예 안 만들었다. 사진/파일 선택 → 로컬 <code>UploadModel</code> 적재 → 화면에 표시까지만. 사용자가 &ldquo;제출&rdquo; 버튼을 눌렀을 때 어떻게 서버로 보낼지는 서버 스펙 오면 그때 결정.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// UploadUseCase.upload(...)  ← 호출 안 함</span>
+</span></span></code></pre></td></tr></table></div></div><p>서버가 어떤 문자열 내려줄지 모른다. 그래서 <code>"typeD"</code>로 추정해서 두되, <strong>주석에 &ldquo;서버 키 확정 시 조정"을 명시</strong>해둔다. 나중에 스펙 나왔을 때 이 한 줄짜리 string literal만 바꾸면 끝나니까.</p><p>추정값으로 시작하는 게 무서운 게 아니다. <strong>추정값임을 표시 안 하는 게</strong> 무섭다. 6개월 후에 이게 임시값인 줄 모르는 사람이 와서 다른 코드를 거기 맞춰 작성하기 시작하면, 그때는 진짜 답이 없다.</p><h2 id=3-서버-호출-경로는-보류>3. 서버 호출 경로는 보류</h2><p>가장 큰 함정이 이거다. &ldquo;서버 응답을 추측해서 디코딩까지 미리 만드는 것.&rdquo; DTO를 만들었는데 실제 응답이 다르면 매핑 전부 깨고 다시 짜야 한다. 진짜로.</p><p>이번엔 첨부 파일 업로드 호출은 아예 안 만들었다. 사진/파일 선택 → 로컬 <code>UploadModel</code> 적재 → 화면에 표시까지만. 사용자가 &ldquo;제출&rdquo; 버튼을 눌렀을 때 어떻게 서버로 보낼지는 서버 스펙 오면 그때 결정.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// UploadUseCase.upload(...)  ← 호출 안 함</span>
 </span></span><span class=line><span class=cl><span class=n>viewModel</span><span class=p>.</span><span class=n>uploadItems</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>model</span><span class=p>)</span>  <span class=c1>// 로컬에만 적재</span>
-</span></span></code></pre></div><p>플랜에는 &ldquo;Out of Scope"로 적어둔다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>- 서버 첨부 업로드 호출 (스펙 미확정)
+</span></span></code></pre></td></tr></table></div></div><p>플랜에는 &ldquo;Out of Scope"로 적어둔다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>- 서버 첨부 업로드 호출 (스펙 미확정)
 </span></span><span class=line><span class=cl>- SubmitProtocol에 첨부 필드 추가 — 서버 API 변경되면 그때 추가
 </span></span><span class=line><span class=cl>- 폼 제출에 첨부 파라미터 포함
-</span></span></code></pre></div><p>이거 안 적어두면 리뷰어가 &ldquo;왜 업로드 호출 없어요?&ldquo;라고 물어보고, 답하느라 시간이 또 간다.</p><h2 id=4-ui-검증용-목-데이터는-따로>4. UI 검증용 목 데이터는 따로</h2><p>상세 화면에서 서버 응답에 첨부 필드가 없는데도 첨부 섹션을 UI로 보여줘야 했다. 이럴 땐 ViewModel/Store 단에서 임시로 목 데이터를 주입한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 서버 응답에 uploads 필드가 없어 UI 검증용 목 데이터 주입 (스펙 확정 시 제거)</span>
+</span></span></code></pre></td></tr></table></div></div><p>이거 안 적어두면 리뷰어가 &ldquo;왜 업로드 호출 없어요?&ldquo;라고 물어보고, 답하느라 시간이 또 간다.</p><h2 id=4-ui-검증용-목-데이터는-따로>4. UI 검증용 목 데이터는 따로</h2><p>상세 화면에서 서버 응답에 첨부 필드가 없는데도 첨부 섹션을 UI로 보여줘야 했다. 이럴 땐 ViewModel/Store 단에서 임시로 목 데이터를 주입한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 서버 응답에 uploads 필드가 없어 UI 검증용 목 데이터 주입 (스펙 확정 시 제거)</span>
 </span></span><span class=line><span class=cl><span class=n>state</span><span class=p>.</span><span class=n>uploads</span> <span class=p>=</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>    <span class=n>UploadModel</span><span class=p>(</span><span class=n>fileName</span><span class=p>:</span> <span class=s>&#34;Test1.png&#34;</span><span class=p>,</span> <span class=n>fileSize</span><span class=p>:</span> <span class=mi>1_900_000</span><span class=p>,</span> <span class=p>...),</span>
 </span></span><span class=line><span class=cl>    <span class=n>UploadModel</span><span class=p>(</span><span class=n>fileName</span><span class=p>:</span> <span class=s>&#34;Test2.png&#34;</span><span class=p>,</span> <span class=n>fileSize</span><span class=p>:</span> <span class=mi>2_600_000</span><span class=p>,</span> <span class=p>...),</span>
 </span></span><span class=line><span class=cl><span class=p>]</span>
-</span></span></code></pre></div><p>코드 안에 <code>// 스펙 확정 시 제거</code> 같은 마커를 꼭 같이 적어둔다. 작업 끝나갈 때쯤 grep으로 한 번에 찾아낼 수 있어서. 마커 안 남기면 이 코드가 영영 살아남는다. 진짜 영영.</p><h2 id=5-진입처-시그니처-유지>5. 진입처 시그니처 유지</h2><p>화면 새로 짤 때 진입점(Coordinator의 init/start 메서드 시그니처)을 그대로 유지하면, 호출처는 수정할 게 없다. 서버 스펙 와서 진짜로 갈아낄 때도 진입처는 안 건드린다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 호출처에서는 변경 없음</span>
+</span></span></code></pre></td></tr></table></div></div><p>코드 안에 <code>// 스펙 확정 시 제거</code> 같은 마커를 꼭 같이 적어둔다. 작업 끝나갈 때쯤 grep으로 한 번에 찾아낼 수 있어서. 마커 안 남기면 이 코드가 영영 살아남는다. 진짜 영영.</p><h2 id=5-진입처-시그니처-유지>5. 진입처 시그니처 유지</h2><p>화면 새로 짤 때 진입점(Coordinator의 init/start 메서드 시그니처)을 그대로 유지하면, 호출처는 수정할 게 없다. 서버 스펙 와서 진짜로 갈아낄 때도 진입처는 안 건드린다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 호출처에서는 변경 없음</span>
 </span></span><span class=line><span class=cl><span class=n>detailCoordinator</span><span class=p>.</span><span class=n>start</span><span class=p>(</span><span class=n>documentId</span><span class=p>:</span> <span class=n>id</span><span class=p>)</span>
-</span></span></code></pre></div><p>내부가 UIKit이든 SwiftUI든 호출처는 모른다. 이게 깨지면 리팩토링 비용이 폭증한다. 화면 하나 바꾸려고 했는데 호출처 30군데를 다 손봐야 하는 상황이 생긴다.</p><h2 id=회고>회고</h2><p>정리하면 이렇다.</p><ul><li>모델은 미리 만들지 말기. 있는 거 재사용하고, 안 되면 그때 만들기.</li><li>추정한 외부 의존 값(서버 키, 엔드포인트 경로 등)은 반드시 주석에 &ldquo;추정값"이라고 표시.</li><li>서버 호출 경로는 스펙 확정 전엔 만들지 않기. 만들면 다 깨야 함.</li><li>UI 검증용 목 데이터는 반드시 <code>// 스펙 확정 시 제거</code> 같은 grep 가능한 마커.</li><li>진입처 시그니처 유지하면 내부 구현 자유롭게 갈아낄 수 있음. 시그니처 깨지면 작업 범위 폭발.</li></ul><p>이 5가지만 지키면 서버 스펙이 늦어도 클라 작업은 일정대로 굴러간다. 나중에 진짜 스펙 왔을 때 고칠 양도 진짜 적다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>내부가 UIKit이든 SwiftUI든 호출처는 모른다. 이게 깨지면 리팩토링 비용이 폭증한다. 화면 하나 바꾸려고 했는데 호출처 30군데를 다 손봐야 하는 상황이 생긴다.</p><h2 id=회고>회고</h2><p>정리하면 이렇다.</p><ul><li>모델은 미리 만들지 말기. 있는 거 재사용하고, 안 되면 그때 만들기.</li><li>추정한 외부 의존 값(서버 키, 엔드포인트 경로 등)은 반드시 주석에 &ldquo;추정값"이라고 표시.</li><li>서버 호출 경로는 스펙 확정 전엔 만들지 않기. 만들면 다 깨야 함.</li><li>UI 검증용 목 데이터는 반드시 <code>// 스펙 확정 시 제거</code> 같은 grep 가능한 마커.</li><li>진입처 시그니처 유지하면 내부 구현 자유롭게 갈아낄 수 있음. 시그니처 깨지면 작업 범위 폭발.</li></ul><p>이 5가지만 지키면 서버 스펙이 늦어도 클라 작업은 일정대로 굴러간다. 나중에 진짜 스펙 왔을 때 고칠 양도 진짜 적다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/gcd-serial-queue-over-actor-for-thread-confined/><span>← PREVIOUS FILE</span>
+<strong>GCD 시리얼 큐로 로그 라이터를 재작성한 이유 — actor + AsyncStream을 버린 결정</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/swiftui-shared-component-margin-policy/><span>NEXT FILE →</span>
+<strong>공용 SwiftUI 컴포넌트의 마진, 누구 책임이지?</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#도입>도입</a></li><li><a href=#1-모델-재사용>1. 모델 재사용</a></li><li><a href=#2-외부-의존-키는-추정값으로-두되-명시>2. 외부 의존 키는 추정값으로 두되 명시</a></li><li><a href=#3-서버-호출-경로는-보류>3. 서버 호출 경로는 보류</a></li><li><a href=#4-ui-검증용-목-데이터는-따로>4. UI 검증용 목 데이터는 따로</a></li><li><a href=#5-진입처-시그니처-유지>5. 진입처 시그니처 유지</a></li><li><a href=#회고>회고</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script><script type=module>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script><script type=module>
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
   mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
 </script></body></html>

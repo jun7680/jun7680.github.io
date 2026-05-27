@@ -1,24 +1,23 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편) — 오깅중</title><meta name=description content="iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)"><meta property="article:published_time" content="2026-05-11T10:00:00+09:00"><meta property="article:modified_time" content="2026-05-11T10:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Realm"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Migration"><meta property="article:tag" content="ModelContainer"><meta property="article:tag" content="Swift6"><meta property="article:tag" content="Concurrency"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)"><meta name=twitter:description content="iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편) — 오깅중</title><meta name=description content="iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다."><meta property="og:image" content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/cover.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)"><meta property="article:published_time" content="2026-05-11T10:00:00+09:00"><meta property="article:modified_time" content="2026-05-11T10:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftData"><meta property="article:tag" content="Realm"><meta property="article:tag" content="iOS17"><meta property="article:tag" content="Migration"><meta property="article:tag" content="ModelContainer"><meta property="article:tag" content="Swift6"><meta property="article:tag" content="Concurrency"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)"><meta name=twitter:description content="iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다."><meta name=twitter:image content="https://jun7680.github.io/p/realm-to-swiftdata-migration-part-1-strategy/cover.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 11, 2026</span>
-<span>·</span>
-<span>13분 읽기</span></div><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)</h1><p class=article__desc>iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다.</p></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — iOS 앱(데이터 모델 42개, 수만~십만 단위 row 운영) Realm을 SwiftData로 옮기기로 했다. <strong>iOS 17 최소 지원 + 일괄 마이그레이션 + 사용자 데이터는 다음 sync에서 자연 복원</strong> 전략. 이 글은 그 결정의 배경과, 마이그레이션 도는 동안 UX를 어떻게 처리했는지를 정리한다. 총 6편 시리즈의 <strong>1편(전략편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p>운영 중인 iOS 앱이 한 덩치 한다. 어느 정도냐면:</p><ul><li><strong>데이터 모델 42개</strong> — 검색 히스토리, 설정, 로그, 그리고 핵심 도메인 몇 개</li><li><strong>데이터 규모</strong> — 단일 컨테이너 하나가 100k row를 우습게 넘긴다. 캐시까지 더하면 더 커진다</li><li><strong>클라이언트 동기화</strong> — 서버 sync로 대부분 데이터가 복원 가능하다. 즉 일부 캐시는 &ldquo;잃어버려도 되는&rdquo; 데이터다</li><li><strong>빌드·실행 환경</strong> — Swift 6.x+, Tuist + mise</li></ul><p>이 친구한테서 Realm을 떼어내고 SwiftData로 갈아끼우는 작업을 시작했다. 시리즈 1편인 이 글에서는 코드 얘기는 거의 안 한다. 그보다 먼저 <strong>뭘 결정해야 했는지</strong>를 다룬다. 마이그레이션은 코드보다 결정이 어렵다는 걸 이번에 또 배웠다. <del>(매번 배움)</del></p><p>다음 편들에서 다룰 함정들(Primary Key, DAO 패턴, Combine, async/await race, View 다중 mount)은 전부 이 결정들 위에서 굴러간다.</p><hr><h2 id=결정-1--왜-realm을-떠나는가>결정 1 — 왜 Realm을 떠나는가</h2><p>여러 이유가 겹쳤지만, <strong>가장 무게 있었던 건 Swift 6 Strict Concurrency였다.</strong> Realm Object는 thread-confined 제약이 강해서 Sendable/actor 모델과 깨끗하게 안 어울린다. concurrency 도입을 진지하게 밀기 시작하니, Realm 객체를 어떻게 actor 경계 너머로 안전하게 넘길지 우회 코드가 도메인마다 늘어났다. 단순한 빌드 워닝이면 참고 살겠는데, 새 코드가 들어올 때마다 &ldquo;여기서 Realm 만지면 안 되는데&rdquo; 라는 멘탈 오버헤드가 매번 붙는다. 이게 누적되면 못 견딘다.</p><p>나머지는 부수적인 이유.</p><ul><li><strong>iOS 17+ 환경에서 SwiftData가 First-party</strong> — Apple 공식 프레임워크라 OS와 함께 진화한다</li><li><strong>빌드 시간</strong> — Realm을 SwiftPM으로 통합하면 dependency tree가 한 덩어리 커진다</li><li><strong>모델 정의 단순성</strong> — <code>@Model</code> 매크로 기반이라 보일러플레이트가 적다. CoreData보다 같은 결과를 짧게 적을 수 있다</li><li><strong>CloudKit 통합 기본 제공</strong> — 우리는 로컬 전용으로 쓰기 때문에 명시적으로 끄고 쓴다 (뒤에서 다시 다룬다)</li></ul><p>정리하면 &ldquo;더 좋은 게 나와서 갈아탄다"보다는 &ldquo;지금 코드 베이스 방향(Swift 6 + actor 모델)과 정면 충돌하는 친구를 떠나보낸다"에 가깝다.</p><hr><h2 id=결정-2--ios-17-최소-지원으로-올린다>결정 2 — iOS 17 최소 지원으로 올린다</h2><p>SwiftData는 iOS 17부터. 기존 앱의 최소 지원 OS가 iOS 16 이하였다면 큰 결정이다.</p><p><strong>우리 결정</strong>: iOS 17 최소 지원으로 올린다.</p><p>근거는 두 가지.</p><ol><li>대다수 사용자가 이미 iOS 17+ 분포에 들어와 있다고 판단했다. 정확한 수치는 공개 어렵지만, &ldquo;iOS 17 미만은 별도 호환 빌드를 운영하는 게 차라리 깨끗하다"는 결론이 나오는 수준이었다.</li><li>더 중요한 건 <strong>듀얼 DAO 분기를 피하는 것</strong>이었다. iOS 16을 그대로 끌고 가면 거의 모든 도메인 DAO에 &ldquo;iOS 17이면 SwiftData, 아니면 Realm&rdquo; 분기가 박힌다. 이 분기는 한 번 박히면 사라지지 않는다. 진짜다.</li></ol><p>이 결정 없이 Realm/SwiftData 듀얼 운영을 깔면 마이그레이션 자체가 어려워진다. <strong>iOS 17 최소 지원은 SwiftData 도입의 전제 조건이지 결과가 아니다.</strong></p><hr><h2 id=결정-3--일괄-vs-점진-마이그레이션>결정 3 — 일괄 vs 점진 마이그레이션</h2><p><strong>우리 결정</strong>: 일괄 마이그레이션.</p><p>이유 두 가지.</p><ul><li><strong>도메인 간 데이터 의존성이 깊다.</strong> 예를 들면 <code>Container</code> → <code>Summary</code> → <code>Attachment</code> 처럼 한 도메인 안에서도 참조가 줄줄이 엮인다. 일부만 SwiftData로 옮기면 cross-DB join이 안 된다. join을 우회하려면 메모리에서 수동 매칭하는 코드가 들어가는데, 그게 한 번 들어가면 마이그레이션이 끝나도 안 빠진다.</li><li><strong>듀얼 운영 시 publisher/observer 패턴이 양쪽에 모두 있어야 한다.</strong> Realm의 <code>Results</code> 자동 알림과 SwiftData의 변경 감지를 동시에 굴려야 하면 도메인마다 알림 코드가 두 벌. 끔찍.</li></ul><p>대신 <strong>PR 단위로는 도메인별 점진 머지</strong>다. 코드 단위로는 점진, 런타임은 일괄. 한 도메인이 새 DAO 패턴(enum + static)으로 완전히 전환되면 다음 도메인을 시작한다.</p><p>도메인 전환 순서 로드맵은 이렇게 굴렸다.</p><pre class=mermaid>flowchart LR
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260511</span></nav><pre class=file-header>//  realm-to-swiftdata-migration-part-1-strategy.swift
+//  ogging.dev / Swift
+//  MAY 11, 2026 · 13 min read
+//  #swiftdata, #realm, #ios17, #migration, #modelcontainer, #swift6, #concurrency</pre><header class=article__header><h1 class=article__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)</h1><p class=article__desc>iOS 17 최소 지원, 일괄 마이그레이션, 데이터는 다음 sync에서 자연 복원. Realm 의존성을 떼어내는 첫 단추를 정리한다.</p><div class=article__meta><span>MAY 11, 2026 · 13 MIN READ</span><div class=article__tags><span>#swiftdata</span><span>#realm</span><span>#ios17</span><span>#migration</span></div></div></header><div class=article__body><blockquote><p><strong>TL;DR</strong> — iOS 앱(데이터 모델 42개, 수만~십만 단위 row 운영) Realm을 SwiftData로 옮기기로 했다. <strong>iOS 17 최소 지원 + 일괄 마이그레이션 + 사용자 데이터는 다음 sync에서 자연 복원</strong> 전략. 이 글은 그 결정의 배경과, 마이그레이션 도는 동안 UX를 어떻게 처리했는지를 정리한다. 총 6편 시리즈의 <strong>1편(전략편)</strong>.</p></blockquote><hr><h2 id=시작하며>시작하며</h2><p>운영 중인 iOS 앱이 한 덩치 한다. 어느 정도냐면:</p><ul><li><strong>데이터 모델 42개</strong> — 검색 히스토리, 설정, 로그, 그리고 핵심 도메인 몇 개</li><li><strong>데이터 규모</strong> — 단일 컨테이너 하나가 100k row를 우습게 넘긴다. 캐시까지 더하면 더 커진다</li><li><strong>클라이언트 동기화</strong> — 서버 sync로 대부분 데이터가 복원 가능하다. 즉 일부 캐시는 &ldquo;잃어버려도 되는&rdquo; 데이터다</li><li><strong>빌드·실행 환경</strong> — Swift 6.x+, Tuist + mise</li></ul><p>이 친구한테서 Realm을 떼어내고 SwiftData로 갈아끼우는 작업을 시작했다. 시리즈 1편인 이 글에서는 코드 얘기는 거의 안 한다. 그보다 먼저 <strong>뭘 결정해야 했는지</strong>를 다룬다. 마이그레이션은 코드보다 결정이 어렵다는 걸 이번에 또 배웠다. <del>(매번 배움)</del></p><p>다음 편들에서 다룰 함정들(Primary Key, DAO 패턴, Combine, async/await race, View 다중 mount)은 전부 이 결정들 위에서 굴러간다.</p><hr><h2 id=결정-1--왜-realm을-떠나는가>결정 1 — 왜 Realm을 떠나는가</h2><p>여러 이유가 겹쳤지만, <strong>가장 무게 있었던 건 Swift 6 Strict Concurrency였다.</strong> Realm Object는 thread-confined 제약이 강해서 Sendable/actor 모델과 깨끗하게 안 어울린다. concurrency 도입을 진지하게 밀기 시작하니, Realm 객체를 어떻게 actor 경계 너머로 안전하게 넘길지 우회 코드가 도메인마다 늘어났다. 단순한 빌드 워닝이면 참고 살겠는데, 새 코드가 들어올 때마다 &ldquo;여기서 Realm 만지면 안 되는데&rdquo; 라는 멘탈 오버헤드가 매번 붙는다. 이게 누적되면 못 견딘다.</p><p>나머지는 부수적인 이유.</p><ul><li><strong>iOS 17+ 환경에서 SwiftData가 First-party</strong> — Apple 공식 프레임워크라 OS와 함께 진화한다</li><li><strong>빌드 시간</strong> — Realm을 SwiftPM으로 통합하면 dependency tree가 한 덩어리 커진다</li><li><strong>모델 정의 단순성</strong> — <code>@Model</code> 매크로 기반이라 보일러플레이트가 적다. CoreData보다 같은 결과를 짧게 적을 수 있다</li><li><strong>CloudKit 통합 기본 제공</strong> — 우리는 로컬 전용으로 쓰기 때문에 명시적으로 끄고 쓴다 (뒤에서 다시 다룬다)</li></ul><p>정리하면 &ldquo;더 좋은 게 나와서 갈아탄다"보다는 &ldquo;지금 코드 베이스 방향(Swift 6 + actor 모델)과 정면 충돌하는 친구를 떠나보낸다"에 가깝다.</p><hr><h2 id=결정-2--ios-17-최소-지원으로-올린다>결정 2 — iOS 17 최소 지원으로 올린다</h2><p>SwiftData는 iOS 17부터. 기존 앱의 최소 지원 OS가 iOS 16 이하였다면 큰 결정이다.</p><p><strong>우리 결정</strong>: iOS 17 최소 지원으로 올린다.</p><p>근거는 두 가지.</p><ol><li>대다수 사용자가 이미 iOS 17+ 분포에 들어와 있다고 판단했다. 정확한 수치는 공개 어렵지만, &ldquo;iOS 17 미만은 별도 호환 빌드를 운영하는 게 차라리 깨끗하다"는 결론이 나오는 수준이었다.</li><li>더 중요한 건 <strong>듀얼 DAO 분기를 피하는 것</strong>이었다. iOS 16을 그대로 끌고 가면 거의 모든 도메인 DAO에 &ldquo;iOS 17이면 SwiftData, 아니면 Realm&rdquo; 분기가 박힌다. 이 분기는 한 번 박히면 사라지지 않는다. 진짜다.</li></ol><p>이 결정 없이 Realm/SwiftData 듀얼 운영을 깔면 마이그레이션 자체가 어려워진다. <strong>iOS 17 최소 지원은 SwiftData 도입의 전제 조건이지 결과가 아니다.</strong></p><hr><h2 id=결정-3--일괄-vs-점진-마이그레이션>결정 3 — 일괄 vs 점진 마이그레이션</h2><p><strong>우리 결정</strong>: 일괄 마이그레이션.</p><p>이유 두 가지.</p><ul><li><strong>도메인 간 데이터 의존성이 깊다.</strong> 예를 들면 <code>Container</code> → <code>Summary</code> → <code>Attachment</code> 처럼 한 도메인 안에서도 참조가 줄줄이 엮인다. 일부만 SwiftData로 옮기면 cross-DB join이 안 된다. join을 우회하려면 메모리에서 수동 매칭하는 코드가 들어가는데, 그게 한 번 들어가면 마이그레이션이 끝나도 안 빠진다.</li><li><strong>듀얼 운영 시 publisher/observer 패턴이 양쪽에 모두 있어야 한다.</strong> Realm의 <code>Results</code> 자동 알림과 SwiftData의 변경 감지를 동시에 굴려야 하면 도메인마다 알림 코드가 두 벌. 끔찍.</li></ul><p>대신 <strong>PR 단위로는 도메인별 점진 머지</strong>다. 코드 단위로는 점진, 런타임은 일괄. 한 도메인이 새 DAO 패턴(enum + static)으로 완전히 전환되면 다음 도메인을 시작한다.</p><p>도메인 전환 순서 로드맵은 이렇게 굴렸다.</p><pre class=mermaid>flowchart LR
     A[SearchHistory<br>완료]:::done --> B[Setting<br>완료]:::done
     B --> C[Container / Folder<br>완료]:::done
     C --> D[Item / Summary<br>진행 중]:::inProgress
@@ -52,11 +51,36 @@
         App->>UD: 플래그 = true
         App-->>User: 일반 화면 진입
     end
-</pre><p>이 화면 끼우고 난 뒤로 &ldquo;데이터가 사라졌다"는 회귀 문의가 거의 사라졌다. 화면 자체는 단순한데, 이 한 장이 방식 B를 성립시키는 핵심이다.</p><hr><h2 id=계정-전환-시-데이터-유지>계정 전환 시 데이터 유지</h2><p>같은 작업에서 한 가지 더 처리했다. 다중 계정 지원 앱이라면 마이그레이션 시 추가로 챙길 게 있다.</p><p>사용자가 <strong>계정 A → 계정 B</strong>로 전환할 때 잘못 처리하면 두 가지 사고가 난다.</p><ul><li>계정 B 전환 시 또 동기화 화면이 뜬다 (사용자 입장에선 &ldquo;왜 또 받아오지?&rdquo;)</li><li>더 나쁘게는 계정 A 데이터가 계정 B 화면에 섞여 보인다 (개인정보 사고). 진짜 위험한 쪽</li></ul><p>구조 자체가 바뀌어서 그렇다.</p><ul><li>기존 Realm 구조: <strong>계정별 Realm 파일 분리</strong></li><li>SwiftData 구조: <strong>단일 ModelContainer + <code>accountID</code> 컬럼으로 row 격리</strong></li></ul><p>처리 방법은 세 가지.</p><ul><li>마이그레이션 플래그를 <strong>계정 단위가 아닌 디바이스 단위</strong>로 관리한다. 한 번 마이그레이션이 끝나면 다시 안 일어난다</li><li><code>ModelContainer</code>는 단일 인스턴스를 유지하고, account scope는 <strong>query predicate 단계에서 격리</strong>한다</li><li>계정 전환 시 row 삭제 없이 <strong>active account만 토글</strong>한다</li></ul><p>predicate 단계 격리는 이런 모양이다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Query</span><span class=p>(</span><span class=bp>filter</span><span class=p>:</span> <span class=p>#</span><span class=n>Predicate</span><span class=p>&lt;</span><span class=n>Item</span><span class=p>&gt;</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
+</pre><p>이 화면 끼우고 난 뒤로 &ldquo;데이터가 사라졌다"는 회귀 문의가 거의 사라졌다. 화면 자체는 단순한데, 이 한 장이 방식 B를 성립시키는 핵심이다.</p><hr><h2 id=계정-전환-시-데이터-유지>계정 전환 시 데이터 유지</h2><p>같은 작업에서 한 가지 더 처리했다. 다중 계정 지원 앱이라면 마이그레이션 시 추가로 챙길 게 있다.</p><p>사용자가 <strong>계정 A → 계정 B</strong>로 전환할 때 잘못 처리하면 두 가지 사고가 난다.</p><ul><li>계정 B 전환 시 또 동기화 화면이 뜬다 (사용자 입장에선 &ldquo;왜 또 받아오지?&rdquo;)</li><li>더 나쁘게는 계정 A 데이터가 계정 B 화면에 섞여 보인다 (개인정보 사고). 진짜 위험한 쪽</li></ul><p>구조 자체가 바뀌어서 그렇다.</p><ul><li>기존 Realm 구조: <strong>계정별 Realm 파일 분리</strong></li><li>SwiftData 구조: <strong>단일 ModelContainer + <code>accountID</code> 컬럼으로 row 격리</strong></li></ul><p>처리 방법은 세 가지.</p><ul><li>마이그레이션 플래그를 <strong>계정 단위가 아닌 디바이스 단위</strong>로 관리한다. 한 번 마이그레이션이 끝나면 다시 안 일어난다</li><li><code>ModelContainer</code>는 단일 인스턴스를 유지하고, account scope는 <strong>query predicate 단계에서 격리</strong>한다</li><li>계정 전환 시 row 삭제 없이 <strong>active account만 토글</strong>한다</li></ul><p>predicate 단계 격리는 이런 모양이다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Query</span><span class=p>(</span><span class=bp>filter</span><span class=p>:</span> <span class=p>#</span><span class=n>Predicate</span><span class=p>&lt;</span><span class=n>Item</span><span class=p>&gt;</span> <span class=p>{</span> <span class=n>item</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>item</span><span class=p>.</span><span class=n>accountID</span> <span class=p>==</span> <span class=n>currentAccountID</span>
 </span></span><span class=line><span class=cl><span class=p>})</span>
 </span></span><span class=line><span class=cl><span class=kd>private</span> <span class=kd>var</span> <span class=nv>items</span><span class=p>:</span> <span class=p>[</span><span class=n>Item</span><span class=p>]</span>
-</span></span></code></pre></div><p><code>@Query</code> 매크로 안에 <code>accountID == currentAccountID</code> 조건만 박아두면 계정 전환은 <code>currentAccountID</code> 토글 한 번으로 끝난다. row를 지우거나 다시 부르지 않는다. <code>FetchDescriptor</code>를 직접 만드는 경우에도 <code>#Predicate&lt;Item></code> 안에 같은 조건을 넣으면 동일.</p><p>DAO 레이어에서 이 패턴을 어떻게 강제하는지(잊고 안 넣으면 사고 남)는 <a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a> 편에서 따로 다룬다.</p><hr><h2 id=부수-결정--modelcontainer-bootstrap-설정>부수 결정 — ModelContainer Bootstrap 설정</h2><p>일괄 마이그레이션 적용 시점에 <code>ModelContainer</code> 설정을 한 번 더 점검했다. 두 가지가 기본값이 아니라 함정이 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>schema</span> <span class=p>=</span> <span class=n>Schema</span><span class=p>(</span><span class=n>AppSchemaV1</span><span class=p>.</span><span class=n>models</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>@Query</code> 매크로 안에 <code>accountID == currentAccountID</code> 조건만 박아두면 계정 전환은 <code>currentAccountID</code> 토글 한 번으로 끝난다. row를 지우거나 다시 부르지 않는다. <code>FetchDescriptor</code>를 직접 만드는 경우에도 <code>#Predicate&lt;Item></code> 안에 같은 조건을 넣으면 동일.</p><p>DAO 레이어에서 이 패턴을 어떻게 강제하는지(잊고 안 넣으면 사고 남)는 <a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a> 편에서 따로 다룬다.</p><hr><h2 id=부수-결정--modelcontainer-bootstrap-설정>부수 결정 — ModelContainer Bootstrap 설정</h2><p>일괄 마이그레이션 적용 시점에 <code>ModelContainer</code> 설정을 한 번 더 점검했다. 두 가지가 기본값이 아니라 함정이 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>schema</span> <span class=p>=</span> <span class=n>Schema</span><span class=p>(</span><span class=n>AppSchemaV1</span><span class=p>.</span><span class=n>models</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>configuration</span> <span class=p>=</span> <span class=n>ModelConfiguration</span><span class=p>(</span>
 </span></span><span class=line><span class=cl>    <span class=n>schema</span><span class=p>:</span> <span class=n>schema</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>    <span class=n>isStoredInMemoryOnly</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
@@ -77,190 +101,14 @@
 </span></span><span class=line><span class=cl>    <span class=p>[.</span><span class=n>protectionKey</span><span class=p>:</span> <span class=n>FileProtectionType</span><span class=p>.</span><span class=n>complete</span><span class=p>],</span>
 </span></span><span class=line><span class=cl>    <span class=n>ofItemAtPath</span><span class=p>:</span> <span class=n>url</span><span class=p>?.</span><span class=n>path</span> <span class=p>??</span> <span class=s>&#34;&#34;</span>
 </span></span><span class=line><span class=cl><span class=p>)</span>
-</span></span></code></pre></div><ul><li><strong>CloudKit 비활성화</strong> — 우리는 로컬 전용이다. CloudKit을 안 쓰면 <code>.none</code>을 <strong>명시적으로</strong> 박아야 한다. 기본값에 끌려가면 의도치 않은 동기화 동작이 끼어들 수 있다</li><li><strong><code>NSFileProtectionComplete</code> 강제</strong> — SwiftData 기본 파일 보호 수준은 <code>.completeUntilFirstUserAuthentication</code>이다. 데이터 보호 요건이 빡빡하면 <code>.complete</code>로 올려야 한다</li></ul><p>둘 다 &ldquo;기본값으로 되어 있겠지&rdquo; 하고 넘어가기 쉬운데, 명시적으로 박는 게 안전하다. <del>안 그러면 나중에 운다</del></p><hr><h2 id=마이그레이션-후-발견한-함정들-다음-편들-예고>마이그레이션 후 발견한 함정들 (다음 편들 예고)</h2><p>전략 정하고 코드 굴리기 시작하니, 거기서부터 또 다른 함정들이 줄줄이 튀어나왔다. 시리즈 다음 편들에서 한 편씩 다룰 예정.</p><ol><li><strong>Primary Key 함정</strong> (<a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2</a>)<ul><li><code>.invalidInt</code> 스캐폴드가 기본값과 충돌해서 모든 row가 같은 PK로 만들어진다</li><li><code>String.hashValue</code>는 프로세스 재시작마다 랜덤이라 PK가 불안정하다</li><li><code>#Predicate</code> 안의 enum 비교가 silent fail 한다</li></ul></li><li><strong>DAO 패턴</strong> (<a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3</a>) — class 인스턴스 vs enum + static. SwiftData에서 어느 쪽이 안전한가</li><li><strong>Combine 통합</strong> (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4</a>) — Realm <code>Results</code>의 자동 알림 패턴을 SwiftData에서 어떻게 재현했나</li><li><strong>Async/Await race</strong> (<a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5</a>) — sync 매니저의 fire-and-forget 함정</li><li><strong>View 다중 mount</strong> (<a href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/>Part 6</a>) — 마이그레이션 후 발견한 화면 두 번 깜빡임 디버깅</li></ol><hr><h2 id=마이그레이션-체크리스트>마이그레이션 체크리스트</h2><p>비슷한 마이그레이션 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> iOS 17+ 최소 지원으로 올릴 수 있는가</li><li><input disabled type=checkbox> 듀얼 운영 vs 일괄 — 데이터 의존성 그래프를 그려봤는가</li><li><input disabled type=checkbox> 사용자 데이터 보존 정책 결정 (마이그레이션 vs sync 복원)</li><li><input disabled type=checkbox> 로컬 전용 데이터(임시저장, 일부 설정) 별도 보존 흐름이 있는가</li><li><input disabled type=checkbox> 마이그레이션 진행 중 UX 화면을 디자인했는가</li><li><input disabled type=checkbox> 다중 계정 환경에서 마이그레이션 플래그의 범위(계정 단위 vs 디바이스 단위)</li><li><input disabled type=checkbox> <code>ModelContainer</code> 설정 점검 (CloudKit, 파일 보호)</li><li><input disabled type=checkbox> 도메인별 점진 머지 순서 로드맵</li><li><input disabled type=checkbox> Primary Key 안정성 (다음 편 참고)</li></ul><hr><h2 id=회고>회고</h2><p>이번 마이그레이션 굴리면서 다시 확인한 게 하나 있다. 큰 마이그레이션의 가장 큰 의사결정은 **&ldquo;코드를 어떻게 짤지"가 아니라 &ldquo;데이터 정책과 UX를 어떻게 정할지&rdquo;**다. 코드는 결정이 잡히면 따라온다. 결정이 안 잡힌 채로 코드를 쓰면, 그 코드가 결정을 대신 내려버리고 그게 가장 빠지기 어려운 종류의 부채가 된다. <del>경험담임</del></p><p>다음 편 → <a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정 3가지</a> 에서 보자.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li>Part 1 — 전략 (이 글)</li><li><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></li><li><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/>Part 6 — View 다중 mount 디버깅</a></li></ul></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><ul><li><strong>CloudKit 비활성화</strong> — 우리는 로컬 전용이다. CloudKit을 안 쓰면 <code>.none</code>을 <strong>명시적으로</strong> 박아야 한다. 기본값에 끌려가면 의도치 않은 동기화 동작이 끼어들 수 있다</li><li><strong><code>NSFileProtectionComplete</code> 강제</strong> — SwiftData 기본 파일 보호 수준은 <code>.completeUntilFirstUserAuthentication</code>이다. 데이터 보호 요건이 빡빡하면 <code>.complete</code>로 올려야 한다</li></ul><p>둘 다 &ldquo;기본값으로 되어 있겠지&rdquo; 하고 넘어가기 쉬운데, 명시적으로 박는 게 안전하다. <del>안 그러면 나중에 운다</del></p><hr><h2 id=마이그레이션-후-발견한-함정들-다음-편들-예고>마이그레이션 후 발견한 함정들 (다음 편들 예고)</h2><p>전략 정하고 코드 굴리기 시작하니, 거기서부터 또 다른 함정들이 줄줄이 튀어나왔다. 시리즈 다음 편들에서 한 편씩 다룰 예정.</p><ol><li><strong>Primary Key 함정</strong> (<a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2</a>)<ul><li><code>.invalidInt</code> 스캐폴드가 기본값과 충돌해서 모든 row가 같은 PK로 만들어진다</li><li><code>String.hashValue</code>는 프로세스 재시작마다 랜덤이라 PK가 불안정하다</li><li><code>#Predicate</code> 안의 enum 비교가 silent fail 한다</li></ul></li><li><strong>DAO 패턴</strong> (<a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3</a>) — class 인스턴스 vs enum + static. SwiftData에서 어느 쪽이 안전한가</li><li><strong>Combine 통합</strong> (<a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4</a>) — Realm <code>Results</code>의 자동 알림 패턴을 SwiftData에서 어떻게 재현했나</li><li><strong>Async/Await race</strong> (<a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5</a>) — sync 매니저의 fire-and-forget 함정</li><li><strong>View 다중 mount</strong> (<a href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/>Part 6</a>) — 마이그레이션 후 발견한 화면 두 번 깜빡임 디버깅</li></ol><hr><h2 id=마이그레이션-체크리스트>마이그레이션 체크리스트</h2><p>비슷한 마이그레이션 시작하기 전에 점검해 보면 좋을 항목들.</p><ul><li><input disabled type=checkbox> iOS 17+ 최소 지원으로 올릴 수 있는가</li><li><input disabled type=checkbox> 듀얼 운영 vs 일괄 — 데이터 의존성 그래프를 그려봤는가</li><li><input disabled type=checkbox> 사용자 데이터 보존 정책 결정 (마이그레이션 vs sync 복원)</li><li><input disabled type=checkbox> 로컬 전용 데이터(임시저장, 일부 설정) 별도 보존 흐름이 있는가</li><li><input disabled type=checkbox> 마이그레이션 진행 중 UX 화면을 디자인했는가</li><li><input disabled type=checkbox> 다중 계정 환경에서 마이그레이션 플래그의 범위(계정 단위 vs 디바이스 단위)</li><li><input disabled type=checkbox> <code>ModelContainer</code> 설정 점검 (CloudKit, 파일 보호)</li><li><input disabled type=checkbox> 도메인별 점진 머지 순서 로드맵</li><li><input disabled type=checkbox> Primary Key 안정성 (다음 편 참고)</li></ul><hr><h2 id=회고>회고</h2><p>이번 마이그레이션 굴리면서 다시 확인한 게 하나 있다. 큰 마이그레이션의 가장 큰 의사결정은 **&ldquo;코드를 어떻게 짤지"가 아니라 &ldquo;데이터 정책과 UX를 어떻게 정할지&rdquo;**다. 코드는 결정이 잡히면 따라온다. 결정이 안 잡힌 채로 코드를 쓰면, 그 코드가 결정을 대신 내려버리고 그게 가장 빠지기 어려운 종류의 부채가 된다. <del>경험담임</del></p><p>다음 편 → <a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정 3가지</a> 에서 보자.</p><hr><h2 id=시리즈-목차>시리즈 목차</h2><ul><li>Part 1 — 전략 (이 글)</li><li><a href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/>Part 2 — Primary Key 함정</a></li><li><a href=/p/realm-to-swiftdata-migration-part-3-dao-pattern/>Part 3 — DAO 패턴</a></li><li><a href=/p/realm-to-swiftdata-migration-part-4-combine-integration/>Part 4 — Combine 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/>Part 5 — Async/Await 통합</a></li><li><a href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/>Part 6 — View 다중 mount 디버깅</a></li></ul></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/><span>← PREVIOUS FILE</span>
+<strong>Swift 5.7에서 매일 쓰는 개선 7가지</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/realm-to-swiftdata-migration-part-2-primary-key-traps/><span>NEXT FILE →</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 2 — Primary Key 함정 3가지)</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#시작하며>시작하며</a></li><li><a href=#결정-1--왜-realm을-떠나는가>결정 1 — 왜 Realm을 떠나는가</a></li><li><a href=#결정-2--ios-17-최소-지원으로-올린다>결정 2 — iOS 17 최소 지원으로 올린다</a></li><li><a href=#결정-3--일괄-vs-점진-마이그레이션>결정 3 — 일괄 vs 점진 마이그레이션</a></li><li><a href=#결정-4--데이터-보존-vs-폐기>결정 4 — 데이터 보존 vs 폐기</a><ul><li><a href=#방식-a--데이터-마이그레이션-realm--swiftdata-복사>방식 A — 데이터 마이그레이션 (Realm → SwiftData 복사)</a></li><li><a href=#방식-b--폐기-후-sync로-복원-우리-선택>방식 B — 폐기 후 sync로 복원 (우리 선택)</a></li><li><a href=#로컬-전용-데이터는-어떻게-챙겼나>로컬 전용 데이터는 어떻게 챙겼나</a></li><li><a href=#핵심-트레이드오프>핵심 트레이드오프</a></li></ul></li><li><a href=#마이그레이션-진행-중-ux--동기화-화면>마이그레이션 진행 중 UX — 동기화 화면</a></li><li><a href=#계정-전환-시-데이터-유지>계정 전환 시 데이터 유지</a></li><li><a href=#부수-결정--modelcontainer-bootstrap-설정>부수 결정 — ModelContainer Bootstrap 설정</a></li><li><a href=#마이그레이션-후-발견한-함정들-다음-편들-예고>마이그레이션 후 발견한 함정들 (다음 편들 예고)</a></li><li><a href=#마이그레이션-체크리스트>마이그레이션 체크리스트</a></li><li><a href=#회고>회고</a></li><li><a href=#시리즈-목차>시리즈 목차</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script><script type=module>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script><script type=module>
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
   mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
 </script></body></html>

@@ -1,24 +1,38 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정 — 오깅중</title><meta name=description content="UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/mainactor-class-fetch-trap/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/mainactor-class-fetch-trap/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정"><meta property="article:published_time" content="2026-05-21T09:40:00+09:00"><meta property="article:modified_time" content="2026-05-21T09:40:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="MainActor"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="AsyncAwait"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정"><meta name=twitter:description content="UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정 — 오깅중</title><meta name=description content="UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/mainactor-class-fetch-trap/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/mainactor-class-fetch-trap/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정"><meta property="article:published_time" content="2026-05-21T09:40:00+09:00"><meta property="article:modified_time" content="2026-05-21T09:40:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Concurrency"><meta property="article:tag" content="MainActor"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="AsyncAwait"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정"><meta name=twitter:description content="UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 21, 2026</span>
-<span>·</span>
-<span>6분 읽기</span></div><h1 class=article__title>@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정</h1><p class=article__desc>UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법.</p></header><div class=article__body><p>Swift Concurrency로 코드를 옮기다 보면 <code>@MainActor</code>를 어디까지 붙여야 하는지 은근 애매하다.</p><p>이번에 만난 케이스도 딱 그랬다. 외부 이벤트를 받으면 서버에서 상세 데이터를 단건 fetch하고, 그 결과로 상세 화면 Coordinator를 만든 다음 navigation stack에 push하는 코드였다. Coordinator 빌드는 UIKit을 만지니까 메인 스레드가 맞고&mldr; 그래서 처음엔 클래스 전체에 <code>@MainActor</code>를 붙였다.</p><p>빌드는 됐다. 동작도 했다. 그런데 동료가 한마디 했다.</p><blockquote><p>그러면 fetch도 메인에서 도는 거 아니에요?</p></blockquote><p>맞다. 여기서 살짝 머리 맞은 느낌이었다.</p><h2 id=처음-코드는-이런-모양이었다>처음 코드는 이런 모양이었다</h2><p>대략 이런 store가 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>MainActor</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260521</span></nav><pre class=file-header>//  mainactor-class-fetch-trap.swift
+//  ogging.dev / Swift
+//  MAY 21, 2026 · 6 min read
+//  #swift, #concurrency, #mainactor, #uikit, #asyncawait, #debugging</pre><header class=article__header><h1 class=article__title>@MainActor를 클래스에 통째로 붙이면 생기는 fetch 함정</h1><p class=article__desc>UIKit 때문에 클래스 전체에 @MainActor를 붙였다가 async fetch까지 메인 액터에 묶인 사례. Swift Concurrency에서 UI 빌드와 데이터 fetch 격리를 나누는 방법.</p><div class=article__meta><span>MAY 21, 2026 · 6 MIN READ</span><div class=article__tags><span>#swift</span><span>#concurrency</span><span>#mainactor</span><span>#uikit</span></div></div></header><div class=article__body><p>Swift Concurrency로 코드를 옮기다 보면 <code>@MainActor</code>를 어디까지 붙여야 하는지 은근 애매하다.</p><p>이번에 만난 케이스도 딱 그랬다. 외부 이벤트를 받으면 서버에서 상세 데이터를 단건 fetch하고, 그 결과로 상세 화면 Coordinator를 만든 다음 navigation stack에 push하는 코드였다. Coordinator 빌드는 UIKit을 만지니까 메인 스레드가 맞고&mldr; 그래서 처음엔 클래스 전체에 <code>@MainActor</code>를 붙였다.</p><p>빌드는 됐다. 동작도 했다. 그런데 동료가 한마디 했다.</p><blockquote><p>그러면 fetch도 메인에서 도는 거 아니에요?</p></blockquote><p>맞다. 여기서 살짝 머리 맞은 느낌이었다.</p><h2 id=처음-코드는-이런-모양이었다>처음 코드는 이런 모양이었다</h2><p>대략 이런 store가 있었다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>MainActor</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>DetailRouteResolver</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>useCases</span><span class=p>:</span> <span class=n>DetailUseCases</span>
 </span></span><span class=line><span class=cl>
@@ -33,11 +47,40 @@
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>ResolvedDetail</span><span class=p>(...)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>그때 생각은 단순했다.</p><ul><li>상세 화면을 만들 때 UIKit을 만진다</li><li>UIKit은 메인 스레드에서 만져야 한다</li><li>그러면 <code>DetailRouteResolver</code>를 <code>@MainActor</code>로 격리하면 되겠네?</li></ul><p>처음 보면 그럴듯하다. 근데 다시 보면&mldr; 이 클래스 안에 <strong>UI 빌드만 있는 게 아니라 서버 fetch도 같이 있는</strong> 상태였다.</p><h2 id=mainactor-class는-생각보다-넓게-묶인다>@MainActor class는 생각보다 넓게 묶인다</h2><p><code>@MainActor</code>를 클래스에 붙이면 그 클래스의 인스턴스 메서드는 기본적으로 메인 액터에 묶인다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Task</span> <span class=p>{</span> <span class=p>@</span><span class=n>MainActor</span> <span class=k>in</span>
+</span></span></code></pre></td></tr></table></div></div><p>그때 생각은 단순했다.</p><ul><li>상세 화면을 만들 때 UIKit을 만진다</li><li>UIKit은 메인 스레드에서 만져야 한다</li><li>그러면 <code>DetailRouteResolver</code>를 <code>@MainActor</code>로 격리하면 되겠네?</li></ul><p>처음 보면 그럴듯하다. 근데 다시 보면&mldr; 이 클래스 안에 <strong>UI 빌드만 있는 게 아니라 서버 fetch도 같이 있는</strong> 상태였다.</p><h2 id=mainactor-class는-생각보다-넓게-묶인다>@MainActor class는 생각보다 넓게 묶인다</h2><p><code>@MainActor</code>를 클래스에 붙이면 그 클래스의 인스턴스 메서드는 기본적으로 메인 액터에 묶인다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>Task</span> <span class=p>{</span> <span class=p>@</span><span class=n>MainActor</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=n>await</span> <span class=n>detailStore</span><span class=p>.</span><span class=n>resolveDetail</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>route</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이렇게 호출하면 <code>resolveDetail</code> 본문은 메인 액터에서 돈다. 여기까지는 예상한 대로였다. 그런데 내가 놓친 부분은, 본문 안의 <code>await</code>가 자동으로 백그라운드 실행을 보장해주는 건 아니라는 거였다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>useCases</span><span class=p>.</span><span class=n>loadDetail</span><span class=p>.</span><span class=n>execute</span><span class=p>(...)</span>
-</span></span></code></pre></div><p><code>await</code>는 &ldquo;여기서 suspend될 수 있다"는 지점이지, &ldquo;무조건 다른 스레드로 보내준다"는 뜻은 아니었다. 호출하는 함수가 같은 actor에 격리되어 있거나, 내부에서 동기 작업을 오래 잡고 있거나, RxSwift의 cold observable을 얇게 <code>await</code>로 감싼 구조라면 생각보다 쉽게 메인 스레드를 잡고 있을 수 있다.</p><p>즉, 클래스 전체에 <code>@MainActor</code>를 붙인 순간 대충 이런 그림이 된다.</p><ul><li>UIKit 빌드 코드: 메인에서 실행됨. 여기까진 의도한 동작</li><li>데이터 fetch 진입 코드: 이것도 메인 액터에서 시작됨</li><li>fetch 내부가 완전히 비동기로 잘 빠지지 않으면&mldr; 메인 스레드가 막힐 수 있음</li></ul><p>UI 때문에 붙인 어노테이션이 네트워크/DB 경로까지 같이 끌고 간 셈이었다.</p><h2 id=fetch랑-ui-빌드는-따로-봐야-했다>fetch랑 UI 빌드는 따로 봐야 했다</h2><p>그래서 고친 방향은 단순했다. 클래스 전체 격리를 빼고, UI를 실제로 만드는 부분만 <code>@MainActor</code>로 좁혔다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>DetailRouteResolver</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>이렇게 호출하면 <code>resolveDetail</code> 본문은 메인 액터에서 돈다. 여기까지는 예상한 대로였다. 그런데 내가 놓친 부분은, 본문 안의 <code>await</code>가 자동으로 백그라운드 실행을 보장해주는 건 아니라는 거였다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>useCases</span><span class=p>.</span><span class=n>loadDetail</span><span class=p>.</span><span class=n>execute</span><span class=p>(...)</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>await</code>는 &ldquo;여기서 suspend될 수 있다"는 지점이지, &ldquo;무조건 다른 스레드로 보내준다"는 뜻은 아니었다. 호출하는 함수가 같은 actor에 격리되어 있거나, 내부에서 동기 작업을 오래 잡고 있거나, RxSwift의 cold observable을 얇게 <code>await</code>로 감싼 구조라면 생각보다 쉽게 메인 스레드를 잡고 있을 수 있다.</p><p>즉, 클래스 전체에 <code>@MainActor</code>를 붙인 순간 대충 이런 그림이 된다.</p><ul><li>UIKit 빌드 코드: 메인에서 실행됨. 여기까진 의도한 동작</li><li>데이터 fetch 진입 코드: 이것도 메인 액터에서 시작됨</li><li>fetch 내부가 완전히 비동기로 잘 빠지지 않으면&mldr; 메인 스레드가 막힐 수 있음</li></ul><p>UI 때문에 붙인 어노테이션이 네트워크/DB 경로까지 같이 끌고 간 셈이었다.</p><h2 id=fetch랑-ui-빌드는-따로-봐야-했다>fetch랑 UI 빌드는 따로 봐야 했다</h2><p>그래서 고친 방향은 단순했다. 클래스 전체 격리를 빼고, UI를 실제로 만드는 부분만 <code>@MainActor</code>로 좁혔다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>DetailRouteResolver</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>let</span> <span class=nv>useCases</span><span class=p>:</span> <span class=n>DetailUseCases</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>resolveDetail</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>ResolvedDetail</span><span class=p>?</span> <span class=p>{</span>
@@ -62,7 +105,21 @@
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>ResolvedDetail</span><span class=p>(</span><span class=n>coordinator</span><span class=p>:</span> <span class=n>coordinator</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>다시 말하면 이런 느낌으로 나눴다.</p><ul><li><code>DetailRouteResolver</code> 자체는 non-isolated로 둔다</li><li>데이터 fetch는 <code>resolveDetail</code>에서 처리한다</li><li>UIKit을 만지는 <code>makeDetail</code>만 <code>@MainActor</code>로 묶는다</li></ul><p>이렇게 하니까 fetch와 UI 빌드의 경계가 훨씬 선명해졌다. fetch는 fetch대로 흘러가고, 화면 생성이 필요한 순간에만 메인 액터로 돌아온다.</p><h2 id=mainactorrun으로만-잘라도-됨>MainActor.run으로만 잘라도 됨</h2><p>메서드를 나누기 애매하면 <code>MainActor.run</code> 블록으로만 잘라도 괜찮다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>resolveDetail</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>ResolvedDetail</span><span class=p>?</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>다시 말하면 이런 느낌으로 나눴다.</p><ul><li><code>DetailRouteResolver</code> 자체는 non-isolated로 둔다</li><li>데이터 fetch는 <code>resolveDetail</code>에서 처리한다</li><li>UIKit을 만지는 <code>makeDetail</code>만 <code>@MainActor</code>로 묶는다</li></ul><p>이렇게 하니까 fetch와 UI 빌드의 경계가 훨씬 선명해졌다. fetch는 fetch대로 흘러가고, 화면 생성이 필요한 순간에만 메인 액터로 돌아온다.</p><h2 id=mainactorrun으로만-잘라도-됨>MainActor.run으로만 잘라도 됨</h2><p>메서드를 나누기 애매하면 <code>MainActor.run</code> 블록으로만 잘라도 괜찮다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>resolveDetail</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>ResolvedDetail</span><span class=p>?</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>useCases</span><span class=p>.</span><span class=n>loadDetail</span><span class=p>.</span><span class=n>execute</span><span class=p>(</span>
 </span></span><span class=line><span class=cl>        <span class=n>containerID</span><span class=p>:</span> <span class=n>route</span><span class=p>.</span><span class=n>containerID</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>        <span class=n>itemID</span><span class=p>:</span> <span class=n>route</span><span class=p>.</span><span class=n>itemID</span>
@@ -76,7 +133,16 @@
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>ResolvedDetail</span><span class=p>(</span><span class=n>coordinator</span><span class=p>:</span> <span class=n>coordinator</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>개인적으로는 <code>@MainActor private func makeDetail(...)</code> 쪽이 더 읽기 좋았다. &ldquo;아, 여기부터 UI 영역이구나"가 함수 시그니처에 남아서 나중에 다시 봐도 덜 헷갈렸다.</p><h2 id=actor로-만들면-더-낫나-싶었는데>actor로 만들면 더 낫나? 싶었는데</h2><p>처음엔 <code>actor DetailRouteResolver</code>도 생각했다. 그런데 이 케이스에서는 오히려 애매했다.</p><p><code>actor</code>로 만들면 store의 상태 보호는 쉬워진다. 근데 UIKit을 만드는 순간 어차피 <code>MainActor</code>로 다시 전환해야 했다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>actor</span> <span class=n>DetailRouteResolver</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>개인적으로는 <code>@MainActor private func makeDetail(...)</code> 쪽이 더 읽기 좋았다. &ldquo;아, 여기부터 UI 영역이구나"가 함수 시그니처에 남아서 나중에 다시 봐도 덜 헷갈렸다.</p><h2 id=actor로-만들면-더-낫나-싶었는데>actor로 만들면 더 낫나? 싶었는데</h2><p>처음엔 <code>actor DetailRouteResolver</code>도 생각했다. 그런데 이 케이스에서는 오히려 애매했다.</p><p><code>actor</code>로 만들면 store의 상태 보호는 쉬워진다. 근데 UIKit을 만드는 순간 어차피 <code>MainActor</code>로 다시 전환해야 했다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>actor</span> <span class=n>DetailRouteResolver</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>resolveDetail</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>ResolvedDetail</span><span class=p>?</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>useCases</span><span class=p>.</span><span class=n>loadDetail</span><span class=p>.</span><span class=n>execute</span><span class=p>(...)</span>
 </span></span><span class=line><span class=cl>
@@ -85,7 +151,22 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>상태를 강하게 보호해야 하는 store라면 actor가 맞을 수도 있다. 다만 이 케이스는 상태 관리보다 &ldquo;fetch 후 UI 빌드"가 핵심이었다. 괜히 actor를 만들면 actor 격리와 MainActor 격리가 섞여서 읽기만 더 어려워졌다.</p><p>이 정도의 작은 라우팅용 객체라면 <strong>클래스는 non-isolated, UI 메서드만 MainActor</strong>가 제일 덜 복잡했다.</p><h2 id=진짜-어디서-도는지는-찍어봤다>진짜 어디서 도는지는 찍어봤다</h2><p>이런 건 말로만 생각하면 또 헷갈린다. 의심되면 그냥 바로 찍어보는 게 빨랐다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>resolveDetail</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>ResolvedDetail</span><span class=p>?</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>상태를 강하게 보호해야 하는 store라면 actor가 맞을 수도 있다. 다만 이 케이스는 상태 관리보다 &ldquo;fetch 후 UI 빌드"가 핵심이었다. 괜히 actor를 만들면 actor 격리와 MainActor 격리가 섞여서 읽기만 더 어려워졌다.</p><p>이 정도의 작은 라우팅용 객체라면 <strong>클래스는 non-isolated, UI 메서드만 MainActor</strong>가 제일 덜 복잡했다.</p><h2 id=진짜-어디서-도는지는-찍어봤다>진짜 어디서 도는지는 찍어봤다</h2><p>이런 건 말로만 생각하면 또 헷갈린다. 의심되면 그냥 바로 찍어보는 게 빨랐다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>resolveDetail</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=n>async</span> <span class=p>-&gt;</span> <span class=n>ResolvedDetail</span><span class=p>?</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;before fetch:&#34;</span><span class=p>,</span> <span class=n>Thread</span><span class=p>.</span><span class=n>isMainThread</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>useCases</span><span class=p>.</span><span class=n>loadDetail</span><span class=p>.</span><span class=n>execute</span><span class=p>(...)</span>
@@ -100,187 +181,11 @@
 </span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;make detail:&#34;</span><span class=p>,</span> <span class=n>Thread</span><span class=p>.</span><span class=n>isMainThread</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>...</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>make detail</code>은 <code>true</code>가 맞다. 그런데 fetch 전후가 계속 <code>true</code>로 찍히고, 그 안에서 동기 작업이 무겁다면&mldr; 그때는 구조를 다시 봐야 했다. Instruments의 Time Profiler에서 main thread가 fetch 쪽 call stack에 오래 잡혀 있는지도 같이 보면 더 확실했다.</p><h2 id=정리>정리</h2><p>UIKit이 섞였다고 클래스 전체에 <code>@MainActor</code>를 붙이면 일단 편해 보인다. 그런데 그 클래스 안에 fetch, 파싱, DB 접근까지 같이 있으면 격리 범위가 생각보다 훅 넓어진다.</p><p>이번 케이스는 나는 이렇게 정리했다.</p><ul><li><code>@MainActor</code>는 UI를 실제로 만지는 경계에만 붙이는 게 낫다</li><li><code>await</code>는 백그라운드 실행 보장 키워드가 아니었다</li><li>데이터 fetch와 UI 빌드는 같은 함수에 있어도 따로 봐야 했다</li><li>클래스 전체 격리보다 메서드 단위 격리가 디버깅하기 쉬웠다</li></ul><p>Swift Concurrency에서 중요한 건 &ldquo;async니까 괜찮겠지"가 아니라, <strong>지금 이 코드가 어느 actor에 묶여 있지?</strong>를 계속 좁게 보는 쪽에 가까웠다.</p><p>관련 검색어: Swift @MainActor class, Swift Concurrency MainActor, async await main thread, UIKit MainActor, Swift actor isolation.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p><code>make detail</code>은 <code>true</code>가 맞다. 그런데 fetch 전후가 계속 <code>true</code>로 찍히고, 그 안에서 동기 작업이 무겁다면&mldr; 그때는 구조를 다시 봐야 했다. Instruments의 Time Profiler에서 main thread가 fetch 쪽 call stack에 오래 잡혀 있는지도 같이 보면 더 확실했다.</p><h2 id=정리>정리</h2><p>UIKit이 섞였다고 클래스 전체에 <code>@MainActor</code>를 붙이면 일단 편해 보인다. 그런데 그 클래스 안에 fetch, 파싱, DB 접근까지 같이 있으면 격리 범위가 생각보다 훅 넓어진다.</p><p>이번 케이스는 나는 이렇게 정리했다.</p><ul><li><code>@MainActor</code>는 UI를 실제로 만지는 경계에만 붙이는 게 낫다</li><li><code>await</code>는 백그라운드 실행 보장 키워드가 아니었다</li><li>데이터 fetch와 UI 빌드는 같은 함수에 있어도 따로 봐야 했다</li><li>클래스 전체 격리보다 메서드 단위 격리가 디버깅하기 쉬웠다</li></ul><p>Swift Concurrency에서 중요한 건 &ldquo;async니까 괜찮겠지"가 아니라, <strong>지금 이 코드가 어느 actor에 묶여 있지?</strong>를 계속 좁게 보는 쪽에 가까웠다.</p><p>관련 검색어: Swift @MainActor class, Swift Concurrency MainActor, async await main thread, UIKit MainActor, Swift actor isolation.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/gcd-still-needed-with-swift-concurrency/><span>← PREVIOUS FILE</span>
+<strong>Swift Concurrency 프로젝트에서 GCD가 여전히 답인 자리들</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/coordinator-push-routing-async/><span>NEXT FILE →</span>
+<strong>iOS Coordinator에서 푸시 진입을 단일 라우터로 정리한 기록</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#처음-코드는-이런-모양이었다>처음 코드는 이런 모양이었다</a></li><li><a href=#mainactor-class는-생각보다-넓게-묶인다>@MainActor class는 생각보다 넓게 묶인다</a></li><li><a href=#fetch랑-ui-빌드는-따로-봐야-했다>fetch랑 UI 빌드는 따로 봐야 했다</a></li><li><a href=#mainactorrun으로만-잘라도-됨>MainActor.run으로만 잘라도 됨</a></li><li><a href=#actor로-만들면-더-낫나-싶었는데>actor로 만들면 더 낫나? 싶었는데</a></li><li><a href=#진짜-어디서-도는지는-찍어봤다>진짜 어디서 도는지는 찍어봤다</a></li><li><a href=#정리>정리</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

@@ -1,223 +1,60 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥 — 오깅중</title><meta name=description content="푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/coordinator-ispush-flag-trap/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="isPush 플래그가 만드는 Coordinator 흐름 분기 지옥"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/coordinator-ispush-flag-trap/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례."><meta property="og:image" content="https://jun7680.github.io/p/coordinator-ispush-flag-trap/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="isPush 플래그가 만드는 Coordinator 흐름 분기 지옥"><meta property="article:published_time" content="2026-05-13T14:15:00+09:00"><meta property="article:modified_time" content="2026-05-13T14:15:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="Navigation"><meta property="article:tag" content="PushNotification"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="isPush 플래그가 만드는 Coordinator 흐름 분기 지옥"><meta name=twitter:description content="푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례."><meta name=twitter:image content="https://jun7680.github.io/p/coordinator-ispush-flag-trap/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥 — 오깅중</title><meta name=description content="푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/coordinator-ispush-flag-trap/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="isPush 플래그가 만드는 Coordinator 흐름 분기 지옥"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/coordinator-ispush-flag-trap/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례."><meta property="og:image" content="https://jun7680.github.io/p/coordinator-ispush-flag-trap/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="isPush 플래그가 만드는 Coordinator 흐름 분기 지옥"><meta property="article:published_time" content="2026-05-13T14:15:00+09:00"><meta property="article:modified_time" content="2026-05-13T14:15:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Coordinator"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="Navigation"><meta property="article:tag" content="PushNotification"><meta property="article:tag" content="Debugging"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="isPush 플래그가 만드는 Coordinator 흐름 분기 지옥"><meta name=twitter:description content="푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례."><meta name=twitter:image content="https://jun7680.github.io/p/coordinator-ispush-flag-trap/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 13, 2026</span>
-<span>·</span>
-<span>3분 읽기</span></div><h1 class=article__title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥</h1><p class=article__desc>푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례.</p></header><div class=article__body><p>어느 날 푸시 알림으로 특정 화면 들어가서 작업 완료하면 본문에 그대로 머무는 버그를 받았다. 일반 진입(리스트 → 상세 → 작업)에선 정상 동작, <strong>푸시 진입에서만</strong> 작업 후 리스트로 안 돌아옴. 한참 헤매다 보니 Coordinator 패턴에서 흔히 만들어지는 &ldquo;진입 경로별 분기 트랩"이었음. 정리해둔다.</p><h2 id=coordinator-체인>Coordinator 체인</h2><p>문제 화면의 Coordinator 트리는 대략 이런 모양.</p><pre tabindex=0><code>HomeCoordinator
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260513</span></nav><pre class=file-header>//  coordinator-ispush-flag-trap.swift
+//  ogging.dev / Swift
+//  MAY 13, 2026 · 3 min read
+//  #coordinator, #uikit, #navigation, #pushnotification, #debugging</pre><header class=article__header><h1 class=article__title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥</h1><p class=article__desc>푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례.</p><div class=article__meta><span>MAY 13, 2026 · 3 MIN READ</span><div class=article__tags><span>#coordinator</span><span>#uikit</span><span>#navigation</span><span>#pushnotification</span></div></div></header><div class=article__body><p>어느 날 푸시 알림으로 특정 화면 들어가서 작업 완료하면 본문에 그대로 머무는 버그를 받았다. 일반 진입(리스트 → 상세 → 작업)에선 정상 동작, <strong>푸시 진입에서만</strong> 작업 후 리스트로 안 돌아옴. 한참 헤매다 보니 Coordinator 패턴에서 흔히 만들어지는 &ldquo;진입 경로별 분기 트랩"이었음. 정리해둔다.</p><h2 id=coordinator-체인>Coordinator 체인</h2><p>문제 화면의 Coordinator 트리는 대략 이런 모양.</p><pre tabindex=0><code>HomeCoordinator
 └─ ItemTabCoordinator (isPush=true)
     └─ ItemListCoordinator (build 시 isPush 전달)
         └─ ItemDetailCoordinator
             └─ ConfirmCoordinator
-</code></pre><p>푸시 진입과 일반 진입에서 동일한 트리를 빌드하되, <strong>푸시일 때만 <code>isPush=true</code> 플래그가 위에서부터 cascade</strong>로 흘러 내려오는 구조.</p><h2 id=무엇이-일어났는가>무엇이 일어났는가</h2><p>작업 완료 후 종료 흐름은 푸시/일반 모두 동일하게 <code>Detail.shutdown(isSwipe: false)</code> → <code>List.shutdownItem(isSwipe: false)</code>로 진입한다. 그런데 <code>shutdownItem</code>에 이런 분기가 있었다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdownItem</span><span class=p>(</span><span class=n>isSwipe</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>)</span> <span class=p>{</span>
+</code></pre><p>푸시 진입과 일반 진입에서 동일한 트리를 빌드하되, <strong>푸시일 때만 <code>isPush=true</code> 플래그가 위에서부터 cascade</strong>로 흘러 내려오는 구조.</p><h2 id=무엇이-일어났는가>무엇이 일어났는가</h2><p>작업 완료 후 종료 흐름은 푸시/일반 모두 동일하게 <code>Detail.shutdown(isSwipe: false)</code> → <code>List.shutdownItem(isSwipe: false)</code>로 진입한다. 그런데 <code>shutdownItem</code>에 이런 분기가 있었다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdownItem</span><span class=p>(</span><span class=n>isSwipe</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>isPush</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>sceneFinishDelegate</span><span class=p>?.</span><span class=n>finish</span><span class=p>(</span><span class=n>to</span><span class=p>:</span> <span class=kc>self</span><span class=p>)</span>   <span class=c1>// ListCoord 자신을 finish</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>detachChild</span><span class=p>(</span><span class=n>type</span><span class=p>:</span> <span class=n>ItemDetailCoordinator</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>isPush=true</code> 분기는 ListCoord가 <strong>자기 자신을 부모(TabCoord)에게 finish 시킨다</strong>. TabCoord의 finish도 isPush 분기를 가지고 있어서 더 위로 cascade.</p><p>그 결과:</p><ul><li>Detail VC는 <strong>단 한 번도 detach/pop되지 않음</strong></li><li>List/TabCoord는 정리되지만 Detail VC는 nav 스택에 그대로 남음</li></ul><p>&ldquo;본문에 머무르는&rdquo; 증상이 정확히 이거였다. 위쪽 Coordinator는 다 정리됐는데 가장 안쪽 VC만 화면에 살아있는, 잘 보면 좀 무서운 상태 ㅋㅋ.</p><h2 id=원래-분기의-의도>원래 분기의 의도</h2><p>코드 짤 당시 의도는 짐작이 됨. &ldquo;푸시 진입이면 작업 끝나고 화면 자체를 닫고 홈으로&rdquo; 정책이었을 거다. 근데 실제 요구사항 다시 확인해보면 &ldquo;푸시든 아니든 작업 후 리스트로 복귀&rdquo;. <strong>분기 자체가 정책과 어긋난 상태</strong>.</p><p>그리고 분기 만들 당시엔 한 단계만 보면 됐을 수도 있음. 근데 시간 지나면서 부모 Coordinator에도 같은 isPush 분기가 추가됐고, 그 cascade가 &ldquo;내가 의도하지 않은 곳"까지 영향을 미친 거.</p><h2 id=해결>해결</h2><p>분기를 제거하고 dismiss 경로를 단일화.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdownItem</span><span class=p>(</span><span class=n>isSwipe</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>)</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>isPush=true</code> 분기는 ListCoord가 <strong>자기 자신을 부모(TabCoord)에게 finish 시킨다</strong>. TabCoord의 finish도 isPush 분기를 가지고 있어서 더 위로 cascade.</p><p>그 결과:</p><ul><li>Detail VC는 <strong>단 한 번도 detach/pop되지 않음</strong></li><li>List/TabCoord는 정리되지만 Detail VC는 nav 스택에 그대로 남음</li></ul><p>&ldquo;본문에 머무르는&rdquo; 증상이 정확히 이거였다. 위쪽 Coordinator는 다 정리됐는데 가장 안쪽 VC만 화면에 살아있는, 잘 보면 좀 무서운 상태 ㅋㅋ.</p><h2 id=원래-분기의-의도>원래 분기의 의도</h2><p>코드 짤 당시 의도는 짐작이 됨. &ldquo;푸시 진입이면 작업 끝나고 화면 자체를 닫고 홈으로&rdquo; 정책이었을 거다. 근데 실제 요구사항 다시 확인해보면 &ldquo;푸시든 아니든 작업 후 리스트로 복귀&rdquo;. <strong>분기 자체가 정책과 어긋난 상태</strong>.</p><p>그리고 분기 만들 당시엔 한 단계만 보면 됐을 수도 있음. 근데 시간 지나면서 부모 Coordinator에도 같은 isPush 분기가 추가됐고, 그 cascade가 &ldquo;내가 의도하지 않은 곳"까지 영향을 미친 거.</p><h2 id=해결>해결</h2><p>분기를 제거하고 dismiss 경로를 단일화.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>shutdownItem</span><span class=p>(</span><span class=n>isSwipe</span><span class=p>:</span> <span class=nb>Bool</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>isSwipe</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>detachChildCoordinator</span><span class=p>(</span><span class=n>type</span><span class=p>:</span> <span class=n>ItemDetailCoordinator</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>detachChild</span><span class=p>(</span><span class=n>type</span><span class=p>:</span> <span class=n>ItemDetailCoordinator</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>isPush</code> 분기 제거. 푸시/일반 모두 동일한 dismiss 경로로 통일. 결과적으로 작업 완료 후 항상 리스트로 복귀.</p><h2 id=같은-패턴이-자주-만들어지는-자리>같은 패턴이 자주 만들어지는 자리</h2><p>이 함정은 isPush뿐 아니라 진입 경로를 플래그로 추적할 때 어디서나 만들어짐.</p><ul><li><code>isDeepLink</code> — 딥링크 진입이면 다르게</li><li><code>isModal</code> — 모달이면 다르게</li><li><code>isFromOnboarding</code> — 온보딩에서 왔으면 다르게</li></ul><p>플래그 받는 순간 dismiss/완료 경로가 두 갈래로 갈리고, 시간 지나면 그 갈래 중 하나가 의도와 다르게 동작하는 모순 발생. 진입 경로 추적은 <strong>시작 시점에만</strong> 의미가 있는데, 종료 시점의 분기까지 같은 플래그로 표현하면서 문제가 생기는 거다.</p><h2 id=교훈>교훈</h2><p>&ldquo;푸시 진입은 일반 진입이랑 다르다"고 가정하고 isPush 플래그 받는 순간, dismiss 경로가 두 갈래로 갈라짐. 처음엔 둘 다 잘 돌아가지만, 누군가 위에서 cascade finish 호출하면 한쪽이 의도와 정반대로 동작함.</p><p>흐름 분기 추가하기 전에 한 번만 더 묻자.</p><ul><li><strong>이 분기가 진짜 두 가지 다른 동작을 요구하는 비즈니스 요구사항이냐?</strong></li><li>아니면 그냥 진입 경로만 다른 거냐?</li></ul><p>후자라면 분기 만들지 말고 동일한 흐름 유지하자. 진입은 분기, <strong>종료는 통일</strong> — 이거 하나만 지켜도 Coordinator 패턴이 한결 안전해짐.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p><code>isPush</code> 분기 제거. 푸시/일반 모두 동일한 dismiss 경로로 통일. 결과적으로 작업 완료 후 항상 리스트로 복귀.</p><h2 id=같은-패턴이-자주-만들어지는-자리>같은 패턴이 자주 만들어지는 자리</h2><p>이 함정은 isPush뿐 아니라 진입 경로를 플래그로 추적할 때 어디서나 만들어짐.</p><ul><li><code>isDeepLink</code> — 딥링크 진입이면 다르게</li><li><code>isModal</code> — 모달이면 다르게</li><li><code>isFromOnboarding</code> — 온보딩에서 왔으면 다르게</li></ul><p>플래그 받는 순간 dismiss/완료 경로가 두 갈래로 갈리고, 시간 지나면 그 갈래 중 하나가 의도와 다르게 동작하는 모순 발생. 진입 경로 추적은 <strong>시작 시점에만</strong> 의미가 있는데, 종료 시점의 분기까지 같은 플래그로 표현하면서 문제가 생기는 거다.</p><h2 id=교훈>교훈</h2><p>&ldquo;푸시 진입은 일반 진입이랑 다르다"고 가정하고 isPush 플래그 받는 순간, dismiss 경로가 두 갈래로 갈라짐. 처음엔 둘 다 잘 돌아가지만, 누군가 위에서 cascade finish 호출하면 한쪽이 의도와 정반대로 동작함.</p><p>흐름 분기 추가하기 전에 한 번만 더 묻자.</p><ul><li><strong>이 분기가 진짜 두 가지 다른 동작을 요구하는 비즈니스 요구사항이냐?</strong></li><li>아니면 그냥 진입 경로만 다른 거냐?</li></ul><p>후자라면 분기 만들지 말고 동일한 흐름 유지하자. 진입은 분기, <strong>종료는 통일</strong> — 이거 하나만 지켜도 Coordinator 패턴이 한결 안전해짐.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/uikit-swiftui-bridging/><span>← PREVIOUS FILE</span>
+<strong>UIKit ↔ SwiftUI 브릿징 — UIViewRepresentable vs UIHostingController 언제 뭘 쓸지</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/swift-mutating-without-self-mutation/><span>NEXT FILE →</span>
+<strong>Swift mutating인데 self를 안 바꾸는 함수 — 컴파일 통과하는 시그니처의 함정</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#coordinator-체인>Coordinator 체인</a></li><li><a href=#무엇이-일어났는가>무엇이 일어났는가</a></li><li><a href=#원래-분기의-의도>원래 분기의 의도</a></li><li><a href=#해결>해결</a></li><li><a href=#같은-패턴이-자주-만들어지는-자리>같은 패턴이 자주 만들어지는 자리</a></li><li><a href=#교훈>교훈</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

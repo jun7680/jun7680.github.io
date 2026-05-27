@@ -1,24 +1,32 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다 — 오깅중</title><meta name=description content="iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="iOS 17 이후 @StateObject는 거의 안 쓰게 됐다"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다."><meta property="og:image" content="https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="iOS 17 이후 @StateObject는 거의 안 쓰게 됐다"><meta property="article:published_time" content="2026-05-12T11:00:00+09:00"><meta property="article:modified_time" content="2026-05-12T11:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="Observable"><meta property="article:tag" content="State"><meta property="article:tag" content="iOS17"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="iOS 17 이후 @StateObject는 거의 안 쓰게 됐다"><meta name=twitter:description content="iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다."><meta name=twitter:image content="https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다 — 오깅중</title><meta name=description content="iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="iOS 17 이후 @StateObject는 거의 안 쓰게 됐다"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다."><meta property="og:image" content="https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="iOS 17 이후 @StateObject는 거의 안 쓰게 됐다"><meta property="article:published_time" content="2026-05-12T11:00:00+09:00"><meta property="article:modified_time" content="2026-05-12T11:00:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="Observable"><meta property="article:tag" content="State"><meta property="article:tag" content="iOS17"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="iOS 17 이후 @StateObject는 거의 안 쓰게 됐다"><meta name=twitter:description content="iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다."><meta name=twitter:image content="https://jun7680.github.io/p/state-stateobject-observedobject-observable-ios17/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>MAY 12, 2026</span>
-<span>·</span>
-<span>5분 읽기</span></div><h1 class=article__title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</h1><p class=article__desc>iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다.</p></header><div class=article__body><p>iOS 17 이전에는 SwiftUI 상태 관리할 때 <code>@StateObject</code>랑 <code>@ObservedObject</code> 중에 뭘 써야 하는지가 진짜 헷갈렸다. 둘 다 ViewModel 들고 다닐 때 쓰는데 동작이 미묘하게 달라서, 잘못 쓰면 자식 화면이 부모 리렌더할 때마다 상태 리셋된다. 17부터 <a href=https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro>Observation 매크로</a>(<code>@Observable</code>) 들어오면서 이 고민 자체가 그냥 없어짐.</p><p>코드로 보면 이렇게 짧아진다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 16 이전</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260512</span></nav><pre class=file-header>//  state-stateobject-observedobject-observable-ios17.swift
+//  ogging.dev / Swift
+//  MAY 12, 2026 · 5 min read
+//  #swiftui, #observable, #state, #ios17</pre><header class=article__header><h1 class=article__title>iOS 17 이후 @StateObject는 거의 안 쓰게 됐다</h1><p class=article__desc>iOS 17부터 @Observable 매크로 들어오면서 @StateObject/@ObservedObject 중에 뭘 쓸지 헷갈리던 게 거의 사라졌다.</p><div class=article__meta><span>MAY 12, 2026 · 5 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#observable</span><span>#state</span><span>#ios17</span></div></div></header><div class=article__body><p>iOS 17 이전에는 SwiftUI 상태 관리할 때 <code>@StateObject</code>랑 <code>@ObservedObject</code> 중에 뭘 써야 하는지가 진짜 헷갈렸다. 둘 다 ViewModel 들고 다닐 때 쓰는데 동작이 미묘하게 달라서, 잘못 쓰면 자식 화면이 부모 리렌더할 때마다 상태 리셋된다. 17부터 <a href=https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro>Observation 매크로</a>(<code>@Observable</code>) 들어오면서 이 고민 자체가 그냥 없어짐.</p><p>코드로 보면 이렇게 짧아진다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 16 이전</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>Counter</span><span class=p>:</span> <span class=n>ObservableObject</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Published</span> <span class=kd>var</span> <span class=nv>value</span> <span class=p>=</span> <span class=mi>0</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
@@ -27,7 +35,17 @@
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>StateObject</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>counter</span> <span class=p>=</span> <span class=n>Counter</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span> <span class=n>Text</span><span class=p>(</span><span class=s>&#34;</span><span class=si>\(</span><span class=n>counter</span><span class=p>.</span><span class=n>value</span><span class=si>)</span><span class=s>&#34;</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 17+</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 17+</span>
 </span></span><span class=line><span class=cl><span class=p>@</span><span class=n>Observable</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>Counter</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>value</span> <span class=p>=</span> <span class=mi>0</span>
@@ -37,7 +55,18 @@
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>counter</span> <span class=p>=</span> <span class=n>Counter</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span> <span class=n>Text</span><span class=p>(</span><span class=s>&#34;</span><span class=si>\(</span><span class=n>counter</span><span class=p>.</span><span class=n>value</span><span class=si>)</span><span class=s>&#34;</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>@Observable</code> 한 줄만 붙이면 <code>@Published</code> 다 떼도 되고, View 쪽도 그냥 <code>@State</code>로 바꾸면 끝. App 진입점도 <code>environmentObject(_:)</code> → <code>environment(_:)</code>로 옮기면 됨.</p><h2 id=셋-차이는-그래도-알아두자>셋 차이는 그래도 알아두자</h2><p>새 코드는 위처럼 쓰면 되는데, iOS 16 끌고 가는 프로젝트나 옛날 코드 손볼 일 있으면 차이는 알아둬야 함.</p><table><thead><tr><th></th><th>타입</th><th>누가 만드나</th><th>라이프사이클</th></tr></thead><tbody><tr><td><code>@State</code></td><td>값 타입 (또는 iOS 17+ <code>@Observable</code> 클래스)</td><td>View가 직접</td><td>View와 함께</td></tr><tr><td><code>@StateObject</code></td><td><code>ObservableObject</code> 채택 클래스</td><td>View가 직접</td><td>처음 init 때 한 번 생성, 부모 리렌더돼도 유지</td></tr><tr><td><code>@ObservedObject</code></td><td><code>ObservableObject</code> 채택 클래스</td><td>외부에서 주입</td><td>부모 리렌더되면 새 인스턴스 받을 수 있음</td></tr></tbody></table><p>가장 자주 헷갈리는 게 <code>@StateObject</code> 써야 할 자리에 <code>@ObservedObject</code> 쓰는 거.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 부모 리렌더 때마다 ChildViewModel 새로 만들어짐</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>@Observable</code> 한 줄만 붙이면 <code>@Published</code> 다 떼도 되고, View 쪽도 그냥 <code>@State</code>로 바꾸면 끝. App 진입점도 <code>environmentObject(_:)</code> → <code>environment(_:)</code>로 옮기면 됨.</p><h2 id=셋-차이는-그래도-알아두자>셋 차이는 그래도 알아두자</h2><p>새 코드는 위처럼 쓰면 되는데, iOS 16 끌고 가는 프로젝트나 옛날 코드 손볼 일 있으면 차이는 알아둬야 함.</p><table><thead><tr><th></th><th>타입</th><th>누가 만드나</th><th>라이프사이클</th></tr></thead><tbody><tr><td><code>@State</code></td><td>값 타입 (또는 iOS 17+ <code>@Observable</code> 클래스)</td><td>View가 직접</td><td>View와 함께</td></tr><tr><td><code>@StateObject</code></td><td><code>ObservableObject</code> 채택 클래스</td><td>View가 직접</td><td>처음 init 때 한 번 생성, 부모 리렌더돼도 유지</td></tr><tr><td><code>@ObservedObject</code></td><td><code>ObservableObject</code> 채택 클래스</td><td>외부에서 주입</td><td>부모 리렌더되면 새 인스턴스 받을 수 있음</td></tr></tbody></table><p>가장 자주 헷갈리는 게 <code>@StateObject</code> 써야 할 자리에 <code>@ObservedObject</code> 쓰는 거.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// ❌ 부모 리렌더 때마다 ChildViewModel 새로 만들어짐</span>
 </span></span><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ParentView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>ChildView</span><span class=p>(</span><span class=n>vm</span><span class=p>:</span> <span class=n>ChildViewModel</span><span class=p>())</span>
@@ -48,13 +77,36 @@
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>ObservedObject</span> <span class=kd>var</span> <span class=nv>vm</span><span class=p>:</span> <span class=n>ChildViewModel</span>
 </span></span><span class=line><span class=cl>    <span class=p>...</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>자식이 직접 만들고 자식이 들고 있어야 할 ViewModel이면 <code>@StateObject</code>. 외부에서 받아서 보기만 할 거면 <code>@ObservedObject</code>. 이게 안 맞으면 부모 리렌더할 때마다 자식 상태가 리셋되는데, 처음 보면 원인 찾기 진짜 빡셈.</p><h2 id=bindable은-어디-쓰나>@Bindable은 어디 쓰나</h2><p><code>@ObservedObject</code> 시절에는 <code>$vm.value</code>로 binding 바로 꺼냈는데, <code>@Observable</code> 클래스는 그게 안 됨. binding 필요한 자리에 <code>@Bindable</code>을 붙여주면 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>EditView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>자식이 직접 만들고 자식이 들고 있어야 할 ViewModel이면 <code>@StateObject</code>. 외부에서 받아서 보기만 할 거면 <code>@ObservedObject</code>. 이게 안 맞으면 부모 리렌더할 때마다 자식 상태가 리셋되는데, 처음 보면 원인 찾기 진짜 빡셈.</p><h2 id=bindable은-어디-쓰나>@Bindable은 어디 쓰나</h2><p><code>@ObservedObject</code> 시절에는 <code>$vm.value</code>로 binding 바로 꺼냈는데, <code>@Observable</code> 클래스는 그게 안 됨. binding 필요한 자리에 <code>@Bindable</code>을 붙여주면 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>EditView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Bindable</span> <span class=kd>var</span> <span class=nv>counter</span><span class=p>:</span> <span class=n>Counter</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>TextField</span><span class=p>(</span><span class=s>&#34;name&#34;</span><span class=p>,</span> <span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>counter</span><span class=p>.</span><span class=n>name</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>자식이 외부에서 받은 객체에 binding 만들어야 할 때만 <code>@Bindable</code>. 그냥 읽기만 할 거면 일반 프로퍼티로 받아도 SwiftUI가 알아서 변경 추적함. body가 실제로 읽은 프로퍼티만 추적해서 <a href=https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro>성능도 더 좋다고</a> 공식 문서에 적혀 있다.</p><h2 id=환경-주입도-표기가-바뀐다>환경 주입도 표기가 바뀐다</h2><p>ObservableObject 시절엔 <code>environmentObject(_:)</code>로 객체를 트리에 흘려보냈다. <code>@Observable</code>은 환경 키를 따로 만들지 않고 <strong>타입 그 자체를 키로</strong> 사용한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 16</span>
+</span></span></code></pre></td></tr></table></div></div><p>자식이 외부에서 받은 객체에 binding 만들어야 할 때만 <code>@Bindable</code>. 그냥 읽기만 할 거면 일반 프로퍼티로 받아도 SwiftUI가 알아서 변경 추적함. body가 실제로 읽은 프로퍼티만 추적해서 <a href=https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro>성능도 더 좋다고</a> 공식 문서에 적혀 있다.</p><h2 id=환경-주입도-표기가-바뀐다>환경 주입도 표기가 바뀐다</h2><p>ObservableObject 시절엔 <code>environmentObject(_:)</code>로 객체를 트리에 흘려보냈다. <code>@Observable</code>은 환경 키를 따로 만들지 않고 <strong>타입 그 자체를 키로</strong> 사용한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// iOS 16</span>
 </span></span><span class=line><span class=cl><span class=n>ParentView</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>environmentObject</span><span class=p>(</span><span class=n>authStore</span><span class=p>)</span>  <span class=c1>// AuthStore: ObservableObject</span>
 </span></span><span class=line><span class=cl>
@@ -71,7 +123,20 @@
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Environment</span><span class=p>(</span><span class=n>AuthStore</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=kd>var</span> <span class=nv>authStore</span>
 </span></span><span class=line><span class=cl>    <span class=p>...</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>자식 쪽도 <code>@EnvironmentObject</code> → <code>@Environment(_:)</code>로 바뀐다. 옛 코드를 들어낼 때 한 묶음으로 같이 바꿔야 함.</p><h2 id=점진-마이그레이션-패턴>점진 마이그레이션 패턴</h2><p>전체를 한 번에 바꿀 수 없는 프로젝트가 더 많다. iOS 16 유지하면서 17에서만 새 매크로를 활용하려면 둘 다 채택하는 식의 패턴을 잠깐 거치게 된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=cp>#if</span> <span class=cp>canImport</span><span class=p>(</span><span class=cp>Observation</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>자식 쪽도 <code>@EnvironmentObject</code> → <code>@Environment(_:)</code>로 바뀐다. 옛 코드를 들어낼 때 한 묶음으로 같이 바꿔야 함.</p><h2 id=점진-마이그레이션-패턴>점진 마이그레이션 패턴</h2><p>전체를 한 번에 바꿀 수 없는 프로젝트가 더 많다. iOS 16 유지하면서 17에서만 새 매크로를 활용하려면 둘 다 채택하는 식의 패턴을 잠깐 거치게 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=cp>#if</span> <span class=cp>canImport</span><span class=p>(</span><span class=cp>Observation</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=kd>import</span> <span class=nc>Observation</span>
 </span></span><span class=line><span class=cl><span class=cp>#endif</span>
 </span></span><span class=line><span class=cl>
@@ -84,7 +149,16 @@
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>CounterLegacy</span><span class=p>:</span> <span class=n>ObservableObject</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Published</span> <span class=kd>var</span> <span class=nv>value</span> <span class=p>=</span> <span class=mi>0</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>뷰는 분기.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>CounterView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>뷰는 분기.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>CounterView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=cp>#available</span><span class=p>(</span><span class=cp>iOS</span> <span class=mi>17</span><span class=p>,</span> <span class=o>*</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=n>CounterViewNew</span><span class=p>()</span>
@@ -93,7 +167,24 @@
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>타깃 최소 버전이 17로 올라가는 시점에 legacy 분기를 통째로 들어내면 됨. 한 곳을 통째로 다 갈아엎는 PR보다, 화면 단위로 천천히 갈아치우는 게 회귀 위험이 낮다.</p><h2 id=옮기면서-만난-함정-몇-가지>옮기면서 만난 함정 몇 가지</h2><ul><li><strong>클래스에 <code>==</code>/<code>Equatable</code>을 직접 구현해 두면 <code>@Observable</code>이 의존 추적을 못 하는 경우가 있다.</strong> <code>@Observable</code>은 KeyPath 기반으로 의존성을 잡는데, 커스텀 Equatable이 인스턴스 동일성을 망가뜨리면 뷰가 갱신을 놓침. 가능하면 <code>Equatable</code> 안 붙이거나, <code>id</code> 같은 명시적 비교에만 사용.</li><li><strong><code>@Published</code> 제거 잊기.</strong> ObservableObject에서 옮길 때 <code>@Published</code>만 떼면 되는데, <code>@Observable</code>은 모든 stored property를 자동 추적하므로 <code>@Published</code>가 남아 있으면 컴파일 오류 또는 경고.</li><li><strong><code>objectWillChange</code>로 수동 브로드캐스트하던 코드.</strong> <code>@Observable</code>에는 같은 API가 없다. 대부분의 케이스에서 어차피 필요 없는데, 강제 갱신이 필요한 자리는 별도 <code>@State</code> 토글 변수로 우회.</li><li><strong><code>@StateObject</code>로 강제로 유지하던 의존성 그래프.</strong> <code>@Observable</code>을 <code>@State</code>로 받으면 View 생성 시점에 한 번만 만들어진다는 라이프사이클은 유지된다. 다만 init 비용이 큰 객체라면 명시적으로 <code>static let shared</code> 같은 싱글톤으로 외부에서 주입하는 방향이 안전.</li></ul><h2 id=swiftdata도-같은-흐름>SwiftData도 같은 흐름</h2><p>iOS 17에서 SwiftData가 나오면서 <code>@Model</code> 클래스가 자동으로 <code>@Observable</code>이 됐다. 즉 SwiftData 모델은 그냥 <code>@State</code> / <code>@Bindable</code>로 다루면 끝.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
+</span></span></code></pre></td></tr></table></div></div><p>타깃 최소 버전이 17로 올라가는 시점에 legacy 분기를 통째로 들어내면 됨. 한 곳을 통째로 다 갈아엎는 PR보다, 화면 단위로 천천히 갈아치우는 게 회귀 위험이 낮다.</p><h2 id=옮기면서-만난-함정-몇-가지>옮기면서 만난 함정 몇 가지</h2><ul><li><strong>클래스에 <code>==</code>/<code>Equatable</code>을 직접 구현해 두면 <code>@Observable</code>이 의존 추적을 못 하는 경우가 있다.</strong> <code>@Observable</code>은 KeyPath 기반으로 의존성을 잡는데, 커스텀 Equatable이 인스턴스 동일성을 망가뜨리면 뷰가 갱신을 놓침. 가능하면 <code>Equatable</code> 안 붙이거나, <code>id</code> 같은 명시적 비교에만 사용.</li><li><strong><code>@Published</code> 제거 잊기.</strong> ObservableObject에서 옮길 때 <code>@Published</code>만 떼면 되는데, <code>@Observable</code>은 모든 stored property를 자동 추적하므로 <code>@Published</code>가 남아 있으면 컴파일 오류 또는 경고.</li><li><strong><code>objectWillChange</code>로 수동 브로드캐스트하던 코드.</strong> <code>@Observable</code>에는 같은 API가 없다. 대부분의 케이스에서 어차피 필요 없는데, 강제 갱신이 필요한 자리는 별도 <code>@State</code> 토글 변수로 우회.</li><li><strong><code>@StateObject</code>로 강제로 유지하던 의존성 그래프.</strong> <code>@Observable</code>을 <code>@State</code>로 받으면 View 생성 시점에 한 번만 만들어진다는 라이프사이클은 유지된다. 다만 init 비용이 큰 객체라면 명시적으로 <code>static let shared</code> 같은 싱글톤으로 외부에서 주입하는 방향이 안전.</li></ul><h2 id=swiftdata도-같은-흐름>SwiftData도 같은 흐름</h2><p>iOS 17에서 SwiftData가 나오면서 <code>@Model</code> 클래스가 자동으로 <code>@Observable</code>이 됐다. 즉 SwiftData 모델은 그냥 <code>@State</code> / <code>@Bindable</code>로 다루면 끝.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Model</span>
 </span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>Todo</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>title</span><span class=p>:</span> <span class=nb>String</span>
 </span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>done</span><span class=p>:</span> <span class=nb>Bool</span>
@@ -110,187 +201,11 @@
 </span></span><span class=line><span class=cl>        <span class=n>Toggle</span><span class=p>(</span><span class=s>&#34;done&#34;</span><span class=p>,</span> <span class=n>isOn</span><span class=p>:</span> <span class=err>$</span><span class=n>todo</span><span class=p>.</span><span class=n>done</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>ObservableObject + Combine + Repository 패턴으로 한참 우회하던 옛 흐름과 비교하면 분량이 절반 이하로 줄어든다.</p><h2 id=정리>정리</h2><ul><li>iOS 17+ 새 코드는 <code>@Observable</code> + <code>@State</code> + 필요한 자리에 <code>@Bindable</code>. 끝.</li><li>환경 주입은 <code>environment(_:)</code> + <code>@Environment(Type.self)</code>로 통일.</li><li>iOS 16 유지 프로젝트는 화면 단위 점진 마이그레이션이 안전.</li><li>SwiftData 모델은 자동 <code>@Observable</code>이라 별도 표기가 거의 필요 없음.</li></ul><p>새 코드 짤 때 <code>@StateObject</code>/<code>@ObservedObject</code> 표기를 마주치면 일단 <code>@Observable</code>로 옮길 수 있나부터 확인하는 게 출발선이 됐다.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>ObservableObject + Combine + Repository 패턴으로 한참 우회하던 옛 흐름과 비교하면 분량이 절반 이하로 줄어든다.</p><h2 id=정리>정리</h2><ul><li>iOS 17+ 새 코드는 <code>@Observable</code> + <code>@State</code> + 필요한 자리에 <code>@Bindable</code>. 끝.</li><li>환경 주입은 <code>environment(_:)</code> + <code>@Environment(Type.self)</code>로 통일.</li><li>iOS 16 유지 프로젝트는 화면 단위 점진 마이그레이션이 안전.</li><li>SwiftData 모델은 자동 <code>@Observable</code>이라 별도 표기가 거의 필요 없음.</li></ul><p>새 코드 짤 때 <code>@StateObject</code>/<code>@ObservedObject</code> 표기를 마주치면 일단 <code>@Observable</code>로 옮길 수 있나부터 확인하는 게 출발선이 됐다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/realm-to-swiftdata-migration-part-5-async-await-integration/><span>← PREVIOUS FILE</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 5 — Async/Await 통합)</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><span>NEXT FILE →</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#셋-차이는-그래도-알아두자>셋 차이는 그래도 알아두자</a></li><li><a href=#bindable은-어디-쓰나>@Bindable은 어디 쓰나</a></li><li><a href=#환경-주입도-표기가-바뀐다>환경 주입도 표기가 바뀐다</a></li><li><a href=#점진-마이그레이션-패턴>점진 마이그레이션 패턴</a></li><li><a href=#옮기면서-만난-함정-몇-가지>옮기면서 만난 함정 몇 가지</a></li><li><a href=#swiftdata도-같은-흐름>SwiftData도 같은 흐름</a></li><li><a href=#정리>정리</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

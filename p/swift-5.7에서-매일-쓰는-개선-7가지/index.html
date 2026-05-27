@@ -1,24 +1,32 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Swift 5.7에서 매일 쓰는 개선 7가지 — 오깅중</title><meta name=description content="Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Swift 5.7에서 매일 쓰는 개선 7가지"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지."><meta property="og:image" content="https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="Swift 5.7에서 매일 쓰는 개선 7가지"><meta property="article:published_time" content="2022-06-15T00:00:00Z"><meta property="article:modified_time" content="2022-06-15T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Swift 5.7"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Swift 5.7에서 매일 쓰는 개선 7가지"><meta name=twitter:description content="Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지."><meta name=twitter:image content="https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
-<span class=wordmark__cursor aria-hidden=true></span>
-<span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Swift 5.7에서 매일 쓰는 개선 7가지 — 오깅중</title><meta name=description content="Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="Swift 5.7에서 매일 쓰는 개선 7가지"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지."><meta property="og:image" content="https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/thumbnail.png"><meta property="og:image:width" content="500"><meta property="og:image:height" content="500"><meta property="og:image:alt" content="Swift 5.7에서 매일 쓰는 개선 7가지"><meta property="article:published_time" content="2022-06-15T00:00:00Z"><meta property="article:modified_time" content="2022-06-15T00:00:00Z"><meta property="article:author" content="오깅중"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Swift 5.7"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Swift 5.7에서 매일 쓰는 개선 7가지"><meta name=twitter:description content="Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지."><meta name=twitter:image content="https://jun7680.github.io/p/swift-5.7%EC%97%90%EC%84%9C-%EB%A7%A4%EC%9D%BC-%EC%93%B0%EB%8A%94-%EA%B0%9C%EC%84%A0-7%EA%B0%80%EC%A7%80/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
 <a href=/tags/>Tags</a>
-<a href=/categories/>Categories</a>
 <a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<span class=search-btn__label>검색</span>
+<span class=search-btn__label>Search posts</span>
 <kbd>⌘K</kbd>
 </button>
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><div class=site-tagline role=doc-subtitle><span class=site-tagline__bracket>[</span>
-<span class=site-tagline__text>AI보다 빨리 디버깅하기</span>
-<span class=site-tagline__bracket>]</span></div><main class=page><div><article class="article reveal-in"><header class=article__header><div class=article__meta><span class=meta-cat>Swift</span>
-<span>·</span>
-<span>JUN 15, 2022</span>
-<span>·</span>
-<span>4분 읽기</span></div><h1 class=article__title>Swift 5.7에서 매일 쓰는 개선 7가지</h1><p class=article__desc>Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지.</p></header><div class=article__body><p>WWDC 2022에서 Swift 5.7이 같이 풀렸다. 보통은 이런 마이너 버전에 큰 변화가 없는데, 5.7은 일상 코드에 영향을 주는 변경이 꽤 많아서 한 번 정리해 둔다. 다 적으면 너무 길어지니까 매일 쓰게 되는 7가지만 추렸다.</p><h2 id=1-if-let--guard-let-단축-표기>1. if let / guard let 단축 표기</h2><p>가장 환영받는 변경. 옵셔널 언래핑할 때 같은 이름을 두 번 쓰던 패턴이 사라졌다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_220615</span></nav><pre class=file-header>//  .swift
+//  ogging.dev / Swift
+//  JUN 15, 2022 · 4 min read
+//  #swift, #swift 5.7</pre><header class=article__header><h1 class=article__title>Swift 5.7에서 매일 쓰는 개선 7가지</h1><p class=article__desc>Swift 5.7에 들어온 변경 중 실무에서 매일 쓰게 되는 것들 위주 정리. if let 단축, any/some, 정규식 리터럴, distributed actor, 클로저 추론, 새 String 처리, Generics where 구문까지.</p><div class=article__meta><span>JUN 15, 2022 · 4 MIN READ</span><div class=article__tags><span>#swift</span><span>#swift 5.7</span></div></div></header><div class=article__body><p>WWDC 2022에서 Swift 5.7이 같이 풀렸다. 보통은 이런 마이너 버전에 큰 변화가 없는데, 5.7은 일상 코드에 영향을 주는 변경이 꽤 많아서 한 번 정리해 둔다. 다 적으면 너무 길어지니까 매일 쓰게 되는 7가지만 추렸다.</p><h2 id=1-if-let--guard-let-단축-표기>1. if let / guard let 단축 표기</h2><p>가장 환영받는 변경. 옵셔널 언래핑할 때 같은 이름을 두 번 쓰던 패턴이 사라졌다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
 </span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>user</span> <span class=p>=</span> <span class=n>user</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>show</span><span class=p>(</span><span class=n>user</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
@@ -27,7 +35,18 @@
 </span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>user</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>show</span><span class=p>(</span><span class=n>user</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><code>guard let</code>, <code>while let</code>도 동일하게 적용. 변수 이름이 길어질수록 효과가 크다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>var</span> <span class=nv>wwdcPresentationContent</span><span class=p>:</span> <span class=nb>String</span><span class=p>?</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>guard let</code>, <code>while let</code>도 동일하게 적용. 변수 이름이 길어질수록 효과가 크다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>var</span> <span class=nv>wwdcPresentationContent</span><span class=p>:</span> <span class=nb>String</span><span class=p>?</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 이전</span>
 </span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>content</span> <span class=p>=</span> <span class=n>wwdcPresentationContent</span> <span class=p>{</span>
@@ -38,21 +57,44 @@
 </span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>wwdcPresentationContent</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=n>wwdcPresentationContent</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이름을 그대로 살리고 싶을 때 가장 깔끔.</p><h2 id=2-any와-some--existential-vs-opaque의-명시화>2. any와 some — Existential vs Opaque의 명시화</h2><p>5.7부터 프로토콜을 타입처럼 쓸 때 <code>any</code> 키워드 명시가 권장된다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
+</span></span></code></pre></td></tr></table></div></div><p>이름을 그대로 살리고 싶을 때 가장 깔끔.</p><h2 id=2-any와-some--existential-vs-opaque의-명시화>2. any와 some — Existential vs Opaque의 명시화</h2><p>5.7부터 프로토콜을 타입처럼 쓸 때 <code>any</code> 키워드 명시가 권장된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
 </span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nv>transport</span><span class=p>:</span> <span class=n>Transport</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 5.7</span>
 </span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nv>transport</span><span class=p>:</span> <span class=n>any</span> <span class=n>Transport</span>
-</span></span></code></pre></div><p><code>any Transport</code>는 <strong>existential</strong>(어떤 타입이든 들어갈 수 있는 박스). 반면 <code>some Transport</code>는 <strong>opaque</strong>(컴파일 타임에 단일 타입으로 확정되지만 호출자에겐 감춤).</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>makeRoute</span><span class=p>()</span> <span class=p>-&gt;</span> <span class=n>some</span> <span class=n>Route</span> <span class=p>{</span> <span class=n>CarRoute</span><span class=p>()</span> <span class=p>}</span>   <span class=c1>// 호출자엔 some Route, 실제는 CarRoute</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>any Transport</code>는 <strong>existential</strong>(어떤 타입이든 들어갈 수 있는 박스). 반면 <code>some Transport</code>는 <strong>opaque</strong>(컴파일 타임에 단일 타입으로 확정되지만 호출자에겐 감춤).</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>makeRoute</span><span class=p>()</span> <span class=p>-&gt;</span> <span class=n>some</span> <span class=n>Route</span> <span class=p>{</span> <span class=n>CarRoute</span><span class=p>()</span> <span class=p>}</span>   <span class=c1>// 호출자엔 some Route, 실제는 CarRoute</span>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>anyRoute</span><span class=p>()</span> <span class=p>-&gt;</span> <span class=n>any</span> <span class=n>Route</span> <span class=p>{</span> <span class=n>CarRoute</span><span class=p>()</span> <span class=p>}</span>     <span class=c1>// 어떤 Route든 들어가는 박스</span>
-</span></span></code></pre></div><p>성능 측면에서 <code>some</code>이 보통 더 효율적이다. existential은 dynamic dispatch + boxing 오버헤드가 있음. 5.7 이후로는 둘을 의도적으로 구분해서 쓰는 게 표준이 됐다.</p><h2 id=3-regex-literal--정규식이-1급-시민>3. Regex Literal — 정규식이 1급 시민</h2><p>기존엔 <code>NSRegularExpression</code>으로 문자열에서 패턴 매칭을 했는데, 5.7부터 정규식 리터럴과 빌더 DSL이 들어왔다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>log</span> <span class=p>=</span> <span class=s>&#34;2026-05-13 10:30:00 ERROR Something failed&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>성능 측면에서 <code>some</code>이 보통 더 효율적이다. existential은 dynamic dispatch + boxing 오버헤드가 있음. 5.7 이후로는 둘을 의도적으로 구분해서 쓰는 게 표준이 됐다.</p><h2 id=3-regex-literal--정규식이-1급-시민>3. Regex Literal — 정규식이 1급 시민</h2><p>기존엔 <code>NSRegularExpression</code>으로 문자열에서 패턴 매칭을 했는데, 5.7부터 정규식 리터럴과 빌더 DSL이 들어왔다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>log</span> <span class=p>=</span> <span class=s>&#34;2026-05-13 10:30:00 ERROR Something failed&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=k>if</span> <span class=kd>let</span> <span class=nv>match</span> <span class=p>=</span> <span class=n>log</span><span class=p>.</span><span class=n>firstMatch</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=o>/</span><span class=p>(</span><span class=err>\</span><span class=n>d</span><span class=p>{</span><span class=mi>4</span><span class=p>})</span><span class=o>-</span><span class=p>(</span><span class=err>\</span><span class=n>d</span><span class=p>{</span><span class=mi>2</span><span class=p>})</span><span class=o>-</span><span class=p>(</span><span class=err>\</span><span class=n>d</span><span class=p>{</span><span class=mi>2</span><span class=p>})</span><span class=o>/</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;year:&#34;</span><span class=p>,</span> <span class=n>match</span><span class=p>.</span><span class=mi>1</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;month:&#34;</span><span class=p>,</span> <span class=n>match</span><span class=p>.</span><span class=mi>2</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=bp>print</span><span class=p>(</span><span class=s>&#34;day:&#34;</span><span class=p>,</span> <span class=n>match</span><span class=p>.</span><span class=mi>3</span><span class=p>)</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>캡처 그룹이 <code>match.1</code>, <code>match.2</code>처럼 <strong>타입 안전한 튜플 인덱스</strong>로 노출된다. 빌더 DSL을 쓰면 정규식 패턴 자체도 Swift 코드로 표현 가능.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>RegexBuilder</span>
+</span></span></code></pre></td></tr></table></div></div><p>캡처 그룹이 <code>match.1</code>, <code>match.2</code>처럼 <strong>타입 안전한 튜플 인덱스</strong>로 노출된다. 빌더 DSL을 쓰면 정규식 패턴 자체도 Swift 코드로 표현 가능.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>RegexBuilder</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>datePattern</span> <span class=p>=</span> <span class=n>Regex</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>Capture</span> <span class=p>{</span> <span class=nb>Repeat</span><span class=p>(.</span><span class=n>digit</span><span class=p>,</span> <span class=bp>count</span><span class=p>:</span> <span class=mi>4</span><span class=p>)</span> <span class=p>}</span>
@@ -61,204 +103,45 @@
 </span></span><span class=line><span class=cl>    <span class=s>&#34;-&#34;</span>
 </span></span><span class=line><span class=cl>    <span class=n>Capture</span> <span class=p>{</span> <span class=nb>Repeat</span><span class=p>(.</span><span class=n>digit</span><span class=p>,</span> <span class=bp>count</span><span class=p>:</span> <span class=mi>2</span><span class=p>)</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>문법이 어렵지 않은 정규식이라면 리터럴, 복잡한 패턴이면 빌더 — 라는 식으로 갈리는 듯하다.</p><h2 id=4-generics의-some--any가-파라미터에서도-자연스러워짐>4. Generics의 some / any가 파라미터에서도 자연스러워짐</h2><p>이전엔 함수 시그니처에 제네릭을 쓸 때 <code>&lt;T: Animal></code> 식의 거추장스러운 표기였는데, 5.7은 <code>some</code>을 파라미터 위치에서도 그대로 쓸 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
+</span></span></code></pre></td></tr></table></div></div><p>문법이 어렵지 않은 정규식이라면 리터럴, 복잡한 패턴이면 빌더 — 라는 식으로 갈리는 듯하다.</p><h2 id=4-generics의-some--any가-파라미터에서도-자연스러워짐>4. Generics의 some / any가 파라미터에서도 자연스러워짐</h2><p>이전엔 함수 시그니처에 제네릭을 쓸 때 <code>&lt;T: Animal></code> 식의 거추장스러운 표기였는데, 5.7은 <code>some</code>을 파라미터 위치에서도 그대로 쓸 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=c1>// 이전</span>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>feed</span><span class=p>&lt;</span><span class=n>A</span><span class=p>:</span> <span class=n>Animal</span><span class=p>&gt;(</span><span class=kc>_</span> <span class=n>animal</span><span class=p>:</span> <span class=n>A</span><span class=p>)</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 5.7</span>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>feed</span><span class=p>(</span><span class=kc>_</span> <span class=n>animal</span><span class=p>:</span> <span class=n>some</span> <span class=n>Animal</span><span class=p>)</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
-</span></span></code></pre></div><p>표기가 짧아지고 의도가 분명해진다. 단순 파라미터 한 개짜리 제네릭은 거의 다 <code>some</code>으로 바꿀 수 있다.</p><h2 id=5-distributed-actor>5. Distributed Actor</h2><p><code>actor</code>를 분산 시스템 경계 너머로 확장한 개념. 다른 프로세스/머신에 있는 actor에도 같은 호출 문법으로 메시지를 보낼 수 있다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>Distributed</span>
+</span></span></code></pre></td></tr></table></div></div><p>표기가 짧아지고 의도가 분명해진다. 단순 파라미터 한 개짜리 제네릭은 거의 다 <code>some</code>으로 바꿀 수 있다.</p><h2 id=5-distributed-actor>5. Distributed Actor</h2><p><code>actor</code>를 분산 시스템 경계 너머로 확장한 개념. 다른 프로세스/머신에 있는 actor에도 같은 호출 문법으로 메시지를 보낼 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>import</span> <span class=nc>Distributed</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=n>distributed</span> <span class=n>actor</span> <span class=n>ChatRoom</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>distributed</span> <span class=kd>func</span> <span class=nf>send</span><span class=p>(</span><span class=kc>_</span> <span class=n>message</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=n>async</span> <span class=kr>throws</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>서버사이드 Swift나 Apple Watch ↔ iPhone 같은 멀티 디바이스 시나리오에서 의미가 크다. iOS 일반 앱에서 당장 쓸 일은 많지 않지만, &ldquo;있다"는 것 정도는 알아두면 좋음.</p><h2 id=6-multi-statement-closure-타입-추론-강화>6. Multi-statement closure 타입 추론 강화</h2><p>이전엔 클로저 본문이 두 줄 이상이면 반환 타입을 명시해야 하는 경우가 잦았다. 5.7은 본문이 복잡해도 추론이 잘 되도록 컴파일러가 개선됐다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>labels</span> <span class=p>=</span> <span class=n>numbers</span><span class=p>.</span><span class=bp>map</span> <span class=p>{</span> <span class=n>number</span> <span class=k>in</span>
+</span></span></code></pre></td></tr></table></div></div><p>서버사이드 Swift나 Apple Watch ↔ iPhone 같은 멀티 디바이스 시나리오에서 의미가 크다. iOS 일반 앱에서 당장 쓸 일은 많지 않지만, &ldquo;있다"는 것 정도는 알아두면 좋음.</p><h2 id=6-multi-statement-closure-타입-추론-강화>6. Multi-statement closure 타입 추론 강화</h2><p>이전엔 클로저 본문이 두 줄 이상이면 반환 타입을 명시해야 하는 경우가 잦았다. 5.7은 본문이 복잡해도 추론이 잘 되도록 컴파일러가 개선됐다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>labels</span> <span class=p>=</span> <span class=n>numbers</span><span class=p>.</span><span class=bp>map</span> <span class=p>{</span> <span class=n>number</span> <span class=k>in</span>
 </span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>formatted</span> <span class=p>=</span> <span class=nb>String</span><span class=p>(</span><span class=n>format</span><span class=p>:</span> <span class=s>&#34;%03d&#34;</span><span class=p>,</span> <span class=n>number</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s>&#34;Number is </span><span class=si>\(</span><span class=n>formatted</span><span class=si>)</span><span class=s>&#34;</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>옛 컴파일러는 위 코드에서 <code>-> String</code>을 명시해야 추론이 됐는데, 5.7은 알아서 잡는다. Combine 체이닝처럼 클로저가 깊게 들어가는 코드에서 체감이 큼.</p><h2 id=7-generics-where-구문--어디서나-사용-가능>7. Generics where 구문 — 어디서나 사용 가능</h2><p><code>where</code>로 제약을 거는 위치 제한이 풀렸다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>Array</span> <span class=p>{</span>
+</span></span></code></pre></td></tr></table></div></div><p>옛 컴파일러는 위 코드에서 <code>-> String</code>을 명시해야 추론이 됐는데, 5.7은 알아서 잡는다. Combine 체이닝처럼 클로저가 깊게 들어가는 코드에서 체감이 큼.</p><h2 id=7-generics-where-구문--어디서나-사용-가능>7. Generics where 구문 — 어디서나 사용 가능</h2><p><code>where</code>로 제약을 거는 위치 제한이 풀렸다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>Array</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>averageDistance</span><span class=p>()</span> <span class=p>-&gt;</span> <span class=nb>Double</span> <span class=k>where</span> <span class=n>Element</span> <span class=p>==</span> <span class=nb>Double</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p>이전엔 protocol·extension 선언부에서만 가능했던 <code>where</code>가 메서드/프로퍼티 레벨에서도 자유롭게. 라이브러리 만들 때 활용도가 높다.</p><h2 id=정리>정리</h2><ul><li><code>if let</code>/<code>guard let</code> 단축, <code>some</code> 파라미터, 클로저 추론은 <strong>일상 코드 줄 수 자체를 줄여줌</strong>.</li><li><code>any</code>/<code>some</code> 명시는 <strong>성능 의도를 코드에 박는 효과</strong> — 한 번 익혀두면 옛 코드에서 거슬리는 게 보이기 시작.</li><li>Regex 리터럴은 <strong>NSRegularExpression 제거의 시작</strong>. 새 코드는 다 새 API로 가도 무방.</li></ul><p>세부 변경 전체 목록은 <a href=https://www.hackingwithswift.com/articles/249/whats-new-in-swift-5-7>What&rsquo;s new in Swift 5.7 (Hacking with Swift)</a>에 잘 정리돼 있다.</p><p>5.7 이후로도 5.9의 매크로, 6.0의 strict concurrency 같은 굵직한 변경이 이어졌지만, 5.7에서 잡힌 표기·추론 개선이 그 이후의 변경을 자연스럽게 받아들이게 만든다는 점에서 중요한 마디 같음.</p></div></article></div><aside class=sidebar><div class=card id=about><div class=card__head><span class=card__title>ABOUT</span>
-<span class=card__aux>v2.0</span></div><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p><div class=about__links><a class=pill-link href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a>
-<a class=pill-link href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a>
-<a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
-<span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
-<span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>164</span>
-<span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/actor/>#actor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ai/>#ai<span class=tag__count>1</span></a>
-<a class=tag href=/tags/animation/>#animation<span class=tag__count>3</span></a>
-<a class=tag href=/tags/apidesign/>#apidesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/apple-intelligence/>#apple intelligence<span class=tag__count>1</span></a>
-<a class=tag href=/tags/architecture/>#architecture<span class=tag__count>4</span></a>
-<a class=tag href=/tags/asyncawait/>#asyncawait<span class=tag__count>5</span></a>
-<a class=tag href=/tags/attribute/>#attribute<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bindable/>#bindable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/binding/>#binding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/bridging/>#bridging<span class=tag__count>1</span></a>
-<a class=tag href=/tags/builderpattern/>#builderpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/cellregistration/>#cellregistration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/claude-desktop/>#claude desktop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/closedrange/>#closedrange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/codereview/>#codereview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/combine/>#combine<span class=tag__count>4</span></a>
-<a class=tag href=/tags/componentdesign/>#componentdesign<span class=tag__count>1</span></a>
-<a class=tag href=/tags/concurrency/>#concurrency<span class=tag__count>10</span></a>
-<a class=tag href=/tags/config/>#config<span class=tag__count>1</span></a>
-<a class=tag href=/tags/coordinator/>#coordinator<span class=tag__count>9</span></a>
-<a class=tag href=/tags/cp949/>#cp949<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crash/>#crash<span class=tag__count>1</span></a>
-<a class=tag href=/tags/crashlytics/>#crashlytics<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dao/>#dao<span class=tag__count>1</span></a>
-<a class=tag href=/tags/date/>#date<span class=tag__count>1</span></a>
-<a class=tag href=/tags/debugging/>#debugging<span class=tag__count>11</span></a>
-<a class=tag href=/tags/deduplication/>#deduplication<span class=tag__count>1</span></a>
-<a class=tag href=/tags/deeplink/>#deeplink<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designpattern/>#designpattern<span class=tag__count>1</span></a>
-<a class=tag href=/tags/designsystem/>#designsystem<span class=tag__count>2</span></a>
-<a class=tag href=/tags/diffabledatasource/>#diffabledatasource<span class=tag__count>1</span></a>
-<a class=tag href=/tags/dispatchqueue/>#dispatchqueue<span class=tag__count>2</span></a>
-<a class=tag href=/tags/enum/>#enum<span class=tag__count>1</span></a>
-<a class=tag href=/tags/environmentvalues/>#environmentvalues<span class=tag__count>1</span></a>
-<a class=tag href=/tags/exc_breakpoint/>#exc_breakpoint<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastlane/>#fastlane<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fastmcp/>#fastmcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/fcm/>#fcm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
-<a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
-<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
-<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
-<a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
-<a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
-<a class=tag href=/tags/github-actions/>#github actions<span class=tag__count>1</span></a>
-<a class=tag href=/tags/hashable/>#hashable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ignoressafearea/>#ignoressafearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/inheritance/>#inheritance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios/>#ios<span class=tag__count>11</span></a>
-<a class=tag href=/tags/ios-17/>#ios 17<span class=tag__count>2</span></a>
-<a class=tag href=/tags/ios-26/>#ios 26<span class=tag__count>3</span></a>
-<a class=tag href=/tags/ios-simulator/>#ios simulator<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
-<a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
-<a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
-<a class=tag href=/tags/lazyvstack/>#lazyvstack<span class=tag__count>1</span></a>
-<a class=tag href=/tags/liquid-glass/>#liquid glass<span class=tag__count>1</span></a>
-<a class=tag href=/tags/list/>#list<span class=tag__count>2</span></a>
-<a class=tag href=/tags/llm/>#llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mainactor/>#mainactor<span class=tag__count>1</span></a>
-<a class=tag href=/tags/matchedgeometryeffect/>#matchedgeometryeffect<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mcp/>#mcp<span class=tag__count>1</span></a>
-<a class=tag href=/tags/memory/>#memory<span class=tag__count>1</span></a>
-<a class=tag href=/tags/migration/>#migration<span class=tag__count>12</span></a>
-<a class=tag href=/tags/modal/>#modal<span class=tag__count>2</span></a>
-<a class=tag href=/tags/modelcontainer/>#modelcontainer<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mutating/>#mutating<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvi/>#mvi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/mvvmc/>#mvvmc<span class=tag__count>1</span></a>
-<a class=tag href=/tags/nanteslabel/>#nanteslabel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/navigation/>#navigation<span class=tag__count>2</span></a>
-<a class=tag href=/tags/navigationstack/>#navigationstack<span class=tag__count>2</span></a>
-<a class=tag href=/tags/notificationcenter/>#notificationcenter<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observable/>#observable<span class=tag__count>3</span></a>
-<a class=tag href=/tags/observableobject/>#observableobject<span class=tag__count>1</span></a>
-<a class=tag href=/tags/observation/>#observation<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onappear/>#onappear<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onchange/>#onchange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ongeometrychange/>#ongeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/onscrollgeometrychange/>#onscrollgeometrychange<span class=tag__count>1</span></a>
-<a class=tag href=/tags/oop/>#oop<span class=tag__count>1</span></a>
-<a class=tag href=/tags/optional/>#optional<span class=tag__count>1</span></a>
-<a class=tag href=/tags/overlay/>#overlay<span class=tag__count>1</span></a>
-<a class=tag href=/tags/padding/>#padding<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pagination/>#pagination<span class=tag__count>1</span></a>
-<a class=tag href=/tags/performance/>#performance<span class=tag__count>1</span></a>
-<a class=tag href=/tags/powershell/>#powershell<span class=tag__count>1</span></a>
-<a class=tag href=/tags/predicate/>#predicate<span class=tag__count>2</span></a>
-<a class=tag href=/tags/preferencekey/>#preferencekey<span class=tag__count>1</span></a>
-<a class=tag href=/tags/present/>#present<span class=tag__count>1</span></a>
-<a class=tag href=/tags/preview/>#preview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/primarykey/>#primarykey<span class=tag__count>2</span></a>
-<a class=tag href=/tags/processinfo/>#processinfo<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocol/>#protocol<span class=tag__count>1</span></a>
-<a class=tag href=/tags/protocolhierarchy/>#protocolhierarchy<span class=tag__count>1</span></a>
-<a class=tag href=/tags/publisher/>#publisher<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pullrequest/>#pullrequest<span class=tag__count>1</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification<span class=tag__count>6</span></a>
-<a class=tag href=/tags/pypi/>#pypi<span class=tag__count>1</span></a>
-<a class=tag href=/tags/qa-%EC%9E%90%EB%8F%99%ED%99%94/>#qa 자동화<span class=tag__count>1</span></a>
-<a class=tag href=/tags/racecondition/>#racecondition<span class=tag__count>3</span></a>
-<a class=tag href=/tags/realm/>#realm<span class=tag__count>7</span></a>
-<a class=tag href=/tags/refactoring/>#refactoring<span class=tag__count>1</span></a>
-<a class=tag href=/tags/remoteconfig/>#remoteconfig<span class=tag__count>1</span></a>
-<a class=tag href=/tags/rxswift/>#rxswift<span class=tag__count>2</span></a>
-<a class=tag href=/tags/safearea/>#safearea<span class=tag__count>1</span></a>
-<a class=tag href=/tags/safeareainset/>#safeareainset<span class=tag__count>1</span></a>
-<a class=tag href=/tags/scrollview/>#scrollview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sendable/>#sendable<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sentinel/>#sentinel<span class=tag__count>1</span></a>
-<a class=tag href=/tags/sheet/>#sheet<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl/>#simctl<span class=tag__count>1</span></a>
-<a class=tag href=/tags/simctl_child/>#simctl_child<span class=tag__count>1</span></a>
-<a class=tag href=/tags/state/>#state<span class=tag__count>3</span></a>
-<a class=tag href=/tags/struct/>#struct<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift/>#swift<span class=tag__count>17</span></a>
-<a class=tag href=/tags/swift-5.7/>#swift 5.7<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-6/>#swift 6<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
-<a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
-<a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
-<a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
-<a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uibutton.configuration/>#uibutton.configuration<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uicollectionview/>#uicollectionview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uihostingcontroller/>#uihostingcontroller<span class=tag__count>3</span></a>
-<a class=tag href=/tags/uikit/>#uikit<span class=tag__count>16</span></a>
-<a class=tag href=/tags/uistackview/>#uistackview<span class=tag__count>2</span></a>
-<a class=tag href=/tags/uiviewcontroller/>#uiviewcontroller<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uiviewrepresentable/>#uiviewrepresentable<span class=tag__count>2</span></a>
-<a class=tag href=/tags/unique/>#unique<span class=tag__count>1</span></a>
-<a class=tag href=/tags/urlsession/>#urlsession<span class=tag__count>1</span></a>
-<a class=tag href=/tags/uv/>#uv<span class=tag__count>1</span></a>
-<a class=tag href=/tags/viewlifecycle/>#viewlifecycle<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webkit/>#webkit<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webpage/>#webpage<span class=tag__count>1</span></a>
-<a class=tag href=/tags/webview/>#webview<span class=tag__count>1</span></a>
-<a class=tag href=/tags/windows/>#windows<span class=tag__count>1</span></a>
-<a class=tag href=/tags/workflow/>#workflow<span class=tag__count>1</span></a>
-<a class=tag href=/tags/wwdc25/>#wwdc25<span class=tag__count>2</span></a>
-<a class=tag href=/tags/xcode/>#xcode<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcode-16/>#xcode 16<span class=tag__count>1</span></a>
-<a class=tag href=/tags/xcrun/>#xcrun<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EB%B2%84%EA%B9%85/>#디버깅<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%94%94%EC%9E%90%EC%9D%B8/>#디자인<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98/>#마이그레이션<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4/>#오픈소스<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
-<a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
-<span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
-  │  오깅중 / og_   │
-  │  ████████░░ 80% │
-  │  status: typing │
-  └─────────────────┘</pre><p style=font-size:13px;color:var(--ink-2);margin:0;max-width:40ch>iOS, Swift, 그리고 가끔 다른 것들.<br>"Don't worry if it doesn't work right."</p></div><div class=footer-block><h4>NAVIGATE</h4><ul><li><a href=/>Home</a></li><li><a href=/archives/>Archives</a></li><li><a href=/tags/>Tags</a></li><li><a href=/categories/>Categories</a></li><li><a href=/about/>About</a></li></ul></div><div class=footer-block><h4>ELSEWHERE</h4><ul><li><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub ↗</a></li><li><a href=https://instagram.com/ockkkk91 target=_blank rel=noopener>Instagram ↗</a></li><li><a href=mailto:dlswns9119@gmail.com>Email ↗</a></li><li><a href=https://jun7680.github.io/index.xml>RSS ↗</a></li></ul></div></div><div class=footer-baseline><span>© 2020–2026 오깅중</span>
-<span class=footer-legal><a href=/about/>About</a>
-<a href=/privacy/>Privacy</a>
-</span><span>BUILT WITH ☕ / HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</span></span></code></pre></td></tr></table></div></div><p>이전엔 protocol·extension 선언부에서만 가능했던 <code>where</code>가 메서드/프로퍼티 레벨에서도 자유롭게. 라이브러리 만들 때 활용도가 높다.</p><h2 id=정리>정리</h2><ul><li><code>if let</code>/<code>guard let</code> 단축, <code>some</code> 파라미터, 클로저 추론은 <strong>일상 코드 줄 수 자체를 줄여줌</strong>.</li><li><code>any</code>/<code>some</code> 명시는 <strong>성능 의도를 코드에 박는 효과</strong> — 한 번 익혀두면 옛 코드에서 거슬리는 게 보이기 시작.</li><li>Regex 리터럴은 <strong>NSRegularExpression 제거의 시작</strong>. 새 코드는 다 새 API로 가도 무방.</li></ul><p>세부 변경 전체 목록은 <a href=https://www.hackingwithswift.com/articles/249/whats-new-in-swift-5-7>What&rsquo;s new in Swift 5.7 (Hacking with Swift)</a>에 잘 정리돼 있다.</p><p>5.7 이후로도 5.9의 매크로, 6.0의 strict concurrency 같은 굵직한 변경이 이어졌지만, 5.7에서 잡힌 표기·추론 개선이 그 이후의 변경을 자연스럽게 받아들이게 만든다는 점에서 중요한 마디 같음.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/uistackview-ishidden%EC%9D%B4-%EB%88%84%EC%A0%81%EB%90%98%EB%8A%94-%EB%8F%99%EC%9E%91%EA%B3%BC-%EC%95%88%EC%A0%84%ED%95%9C-%ED%86%A0%EA%B8%80-%ED%8C%A8%ED%84%B4/><span>← PREVIOUS FILE</span>
+<strong>UIStackView isHidden이 누적되는 동작과 안전한 토글 패턴</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/realm-to-swiftdata-migration-part-1-strategy/><span>NEXT FILE →</span>
+<strong>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 1 — 전략편)</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#1-if-let--guard-let-단축-표기>1. if let / guard let 단축 표기</a></li><li><a href=#2-any와-some--existential-vs-opaque의-명시화>2. any와 some — Existential vs Opaque의 명시화</a></li><li><a href=#3-regex-literal--정규식이-1급-시민>3. Regex Literal — 정규식이 1급 시민</a></li><li><a href=#4-generics의-some--any가-파라미터에서도-자연스러워짐>4. Generics의 some / any가 파라미터에서도 자연스러워짐</a></li><li><a href=#5-distributed-actor>5. Distributed Actor</a></li><li><a href=#6-multi-statement-closure-타입-추론-강화>6. Multi-statement closure 타입 추론 강화</a></li><li><a href=#7-generics-where-구문--어디서나-사용-가능>7. Generics where 구문 — 어디서나 사용 가능</a></li><li><a href=#정리>정리</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 <input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
-<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.0de1073d81f52f232b17b6285b4dffcf789610fedff36f97b3850601b587711d.js integrity="sha256-DeEHPYH1LyMrF7YoW03/z3iWEP7f82+Xs4UGAbWHcR0=" defer></script></body></html>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>
