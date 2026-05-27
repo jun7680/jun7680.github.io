@@ -1,4 +1,4 @@
-<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>AsyncAwait — 오깅중</title><meta name=description content="iOS, Swift, 그리고 가끔 다른 것들. 개발 일지와 새로 배운 것들."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/tags/asyncawait/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="website"><meta property="og:title" content="AsyncAwait"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/tags/asyncawait/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS, Swift, 그리고 가끔 다른 것들. 개발 일지와 새로 배운 것들."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="AsyncAwait"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="AsyncAwait"><meta name=twitter:description content="iOS, Swift, 그리고 가끔 다른 것들. 개발 일지와 새로 배운 것들."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Asyncawait — 오깅중</title><meta name=description content="iOS, Swift, 그리고 가끔 다른 것들. 개발 일지와 새로 배운 것들."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/tags/asyncawait/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="website"><meta property="og:title" content="Asyncawait"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/tags/asyncawait/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="iOS, Swift, 그리고 가끔 다른 것들. 개발 일지와 새로 배운 것들."><meta property="og:image" content="https://jun7680.github.io/og-default.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Asyncawait"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Asyncawait"><meta name=twitter:description content="iOS, Swift, 그리고 가끔 다른 것들. 개발 일지와 새로 배운 것들."><meta name=twitter:image content="https://jun7680.github.io/og-default.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href=https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"><link rel=stylesheet href=/css/main.min.b9c7ef12249e26864c8e4efc1d16ac3308d2987cadd0c8a794b244e1bec42331.css integrity="sha256-ucfvEiSeJoZMjk78HRasMwjSmHyt0MinlLJE4b7EIzE="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
 <span class=wordmark__cursor aria-hidden=true></span>
 <span class=wordmark__mono>/ ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
 <a href=/archives/>Archives</a>
@@ -28,7 +28,7 @@
 <a class=pill-link href=mailto:dlswns9119@gmail.com>Email ↗</a></div></div><div class=card><div class=card__head><span class=card__title>NOW</span>
 <span class=now-aux><span class=live-dot></span> LIVE</span></div><div class=now-list><div><span class=now-label>reading_</span> "Modern Concurrency in Swift"</div><div><span class=now-label>building_</span> SwiftUI side project</div><div><span class=now-label>listening_</span> lo-fi beats / focus</div></div></div><div class=card><div class=card__head><span class=card__title>VISITORS</span></div><div class=gc-total><span class=gc-total__label>누적 방문자</span>
 <span class=gc-total__value id=gc-total>—</span></div><script>(function(){var e="https://ogging.goatcounter.com/counter/TOTAL.json";fetch(e,{credentials:"omit"}).then(function(e){return e.ok?e.json():null}).then(function(e){var t=document.getElementById("gc-total");if(!t)return;t.textContent=e&&e.count?e.count:"0"}).catch(function(){var e=document.getElementById("gc-total");e&&(e.textContent="—")})})()</script></div><details class="card card--collapsible" id=tags><summary class="card__head card__head--toggle"><span class=card__title>TAGS</span>
-<span class=card__aux>162</span>
+<span class=card__aux>164</span>
 <span class=card__chevron aria-hidden=true>▾</span></summary><div class=tags><a class=tag href=/tags/@entry/>#@entry<span class=tag__count>1</span></a>
 <a class=tag href=/tags/@generable/>#@generable<span class=tag__count>1</span></a>
 <a class=tag href=/tags/@observable/>#@observable<span class=tag__count>1</span></a>
@@ -74,6 +74,8 @@
 <a class=tag href=/tags/firebase/>#firebase<span class=tag__count>2</span></a>
 <a class=tag href=/tags/focusstate/>#focusstate<span class=tag__count>1</span></a>
 <a class=tag href=/tags/foreach/>#foreach<span class=tag__count>1</span></a>
+<a class=tag href=/tags/form/>#form<span class=tag__count>1</span></a>
+<a class=tag href=/tags/formatstyle/>#formatstyle<span class=tag__count>1</span></a>
 <a class=tag href=/tags/foundation-models/>#foundation models<span class=tag__count>1</span></a>
 <a class=tag href=/tags/gcd/>#gcd<span class=tag__count>3</span></a>
 <a class=tag href=/tags/geometryreader/>#geometryreader<span class=tag__count>1</span></a>
@@ -88,7 +90,7 @@
 <a class=tag href=/tags/ios13/>#ios13<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios14/>#ios14<span class=tag__count>1</span></a>
 <a class=tag href=/tags/ios15/>#ios15<span class=tag__count>1</span></a>
-<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>14</span></a>
+<a class=tag href=/tags/ios17/>#ios17<span class=tag__count>15</span></a>
 <a class=tag href=/tags/kakao-moment-mcp/>#kakao-moment-mcp<span class=tag__count>1</span></a>
 <a class=tag href=/tags/keyboard/>#keyboard<span class=tag__count>1</span></a>
 <a class=tag href=/tags/layout/>#layout<span class=tag__count>1</span></a>
@@ -158,9 +160,9 @@
 <a class=tag href=/tags/swift-macro/>#swift macro<span class=tag__count>1</span></a>
 <a class=tag href=/tags/swift6/>#swift6<span class=tag__count>2</span></a>
 <a class=tag href=/tags/swiftdata/>#swiftdata<span class=tag__count>13</span></a>
-<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>24</span></a>
+<a class=tag href=/tags/swiftui/>#swiftui<span class=tag__count>25</span></a>
 <a class=tag href=/tags/task/>#task<span class=tag__count>2</span></a>
-<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>1</span></a>
+<a class=tag href=/tags/textfield/>#textfield<span class=tag__count>2</span></a>
 <a class=tag href=/tags/transition/>#transition<span class=tag__count>2</span></a>
 <a class=tag href=/tags/typedthrows/>#typedthrows<span class=tag__count>1</span></a>
 <a class=tag href=/tags/uibutton/>#uibutton<span class=tag__count>1</span></a>
@@ -191,8 +193,8 @@
 <a class=tag href=/tags/%EC%98%A8%EB%94%94%EB%B0%94%EC%9D%B4%EC%8A%A4-llm/>#온디바이스 llm<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%98%91%EC%97%85/>#협업<span class=tag__count>1</span></a>
 <a class=tag href=/tags/%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/>#환경변수<span class=tag__count>1</span></a></div></details><div class=card id=archive><div class=card__head><span class=card__title>ARCHIVES</span>
-<span class=card__aux>65 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>59</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<span class=card__aux>66 posts</span></div><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__bar><div style=width:100%></div></span><span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
 <span class=archive-row__bar><div style=width:10%></div></span><span class=archive-row__count>06</span></div></div></aside></main><footer class=site-footer><div class=site-footer__inner><div class=footer-block><pre class=footer-ascii>  ┌─────────────────┐
   │  오깅중 / og_   │
   │  ████████░░ 80% │
