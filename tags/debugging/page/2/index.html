@@ -10,30 +10,32 @@
 <button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
 <span class=nav-toggle__bar></span>
 <span class=nav-toggle__bar></span>
-<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><section class=listing><div class=listing__head><h1>DEBUGGING</h1><span>11</span></div><div class=home-grid><div class=posts><a class="post-row cat--swift" href=/p/swift-string-hashvalue-pk-trap/><div class=post-row__eyebrow><span class=post-row__index>P_001</span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><section class=listing><div class=listing__head><h1>DEBUGGING</h1><span>12</span></div><div class=home-grid><div class=posts><a class="post-row cat--swift" href=/p/swiftdata-invalidint-unique-silent-loss/><div class=post-row__eyebrow><span class=post-row__index>P_001</span>
 <span>·</span>
-<span class=post-row__category>SWIFT</span></div><div class=post-row__copy><h3 class=post-row__title>Swift String.hashValue로 DB PK를 만들면 안 되는 이유</h3><p class=post-row__excerpt>Swift의 String.hashValue는 per-process random seed라서 앱 재시작마다 값이 바뀐다. DB PK로 박으면 lookup이 영구 실패한다. 결정적 hash로 가야 하는 이유와 마이그레이션 처리.</p></div><div class=post-row__foot><span>MAY 13, 2026 · 3 MIN</span><div class=post-row__tags><span>#swiftdata</span><span>#hashable</span><span>#primarykey</span></div></div></a><a class="post-row cat--swift" href=/p/coordinator-ispush-flag-trap/><div class=post-row__eyebrow><span class=post-row__index>P_002</span>
+<span class=post-row__category>SWIFT</span></div><div class=post-row__copy><h3 class=post-row__title>@Model 스캐폴드 id + .unique 제약 = 조용한 데이터 손실</h3><p class=post-row__excerpt>SwiftData에서 sentinel default id(.invalidInt = -1)와 @Attribute(.unique)와 try?가 만나면 100건이 1건으로 줄어든다. 에러 없이. 다층 방어로 막는 법.</p></div><div class=post-row__foot><span>MAY 13, 2026 · 3 MIN</span><div class=post-row__tags><span>#swiftdata</span><span>#attribute</span><span>#unique</span></div></div></a><a class="post-row cat--swift" href=/p/swift-string-hashvalue-pk-trap/><div class=post-row__eyebrow><span class=post-row__index>P_002</span>
 <span>·</span>
-<span class=post-row__category>SWIFT</span></div><div class=post-row__copy><h3 class=post-row__title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥</h3><p class=post-row__excerpt>푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례.</p></div><div class=post-row__foot><span>MAY 13, 2026 · 3 MIN</span><div class=post-row__tags><span>#coordinator</span><span>#uikit</span><span>#navigation</span></div></div></a><a class="post-row cat--swift" href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><div class=post-row__eyebrow><span class=post-row__index>P_003</span>
+<span class=post-row__category>SWIFT</span></div><div class=post-row__copy><h3 class=post-row__title>Swift String.hashValue로 DB PK를 만들면 안 되는 이유</h3><p class=post-row__excerpt>Swift의 String.hashValue는 per-process random seed라서 앱 재시작마다 값이 바뀐다. DB PK로 박으면 lookup이 영구 실패한다. 결정적 hash로 가야 하는 이유와 마이그레이션 처리.</p></div><div class=post-row__foot><span>MAY 13, 2026 · 3 MIN</span><div class=post-row__tags><span>#swiftdata</span><span>#hashable</span><span>#primarykey</span></div></div></a><a class="post-row cat--swift" href=/p/coordinator-ispush-flag-trap/><div class=post-row__eyebrow><span class=post-row__index>P_003</span>
+<span>·</span>
+<span class=post-row__category>SWIFT</span></div><div class=post-row__copy><h3 class=post-row__title>isPush 플래그가 만드는 Coordinator 흐름 분기 지옥</h3><p class=post-row__excerpt>푸시 진입과 일반 진입을 isPush 플래그로 가르는 순간, dismiss 경로가 두 갈래로 갈리고 cascade finish가 의도와 정반대로 동작한다. 분기 자체가 정책과 어긋난 사례.</p></div><div class=post-row__foot><span>MAY 13, 2026 · 3 MIN</span><div class=post-row__tags><span>#coordinator</span><span>#uikit</span><span>#navigation</span></div></div></a><a class="post-row cat--swift" href=/p/realm-to-swiftdata-migration-part-6-view-multi-mount-debugging/><div class=post-row__eyebrow><span class=post-row__index>P_004</span>
 <span>·</span>
 <span class=post-row__category>SWIFT</span></div><div class=post-row__copy><h3 class=post-row__title>Realm에서 SwiftData로: 42개 모델을 옮기는 전략과 함정 (Part 6 — View 다중 mount 디버깅)</h3><p class=post-row__excerpt>마이그레이션 후 리스트 화면 진입 시 스켈레톤이 두 번 깜빡이는 회귀를 가설 5개로 못 잡고, ObjectIdentifier 진단 로그 한 줄로 Store가 3번 init되는 걸 5분 만에 잡았다. Publisher 다중 trigger + invalid sentinel 합작이었고, isValid 가드 + attach 책임 단일화 + attachedFolderID latch 3중으로 막은 흐름. 시리즈 6편을 닫으며 측정이 추측을 이긴다는 thesis 정리.</p></div><div class=post-row__foot><span>MAY 12, 2026 · 14 MIN</span><div class=post-row__tags><span>#swiftdata</span><span>#realm</span><span>#ios17</span></div></div></a></div><aside class=sidebar><section class=side-section id=about><h2 class=side-section__title>ABOUT</h2><h3 class=about__name>오깅중</h3><p class=about__role>iOS Developer · Swift</p><pre class=about-ascii>┌─────────────────┐
 │ <b>오깅중 / og_</b>   │
 │ <i>████████░░</i> 80% │
 │ status: typing  │
 └─────────────────┘</pre><p class=about__bio>"Don't worry if it doesn't work right. If everything did, you'd be out of a job."
-— iOS와 Swift에 대한 기록.</p></section><section class=side-section id=tags><h2 class=side-section__title>TAGS · 164</h2><div class=side-tags><a class=tag href=/tags/swiftui/>#swiftui <span>25</span></a>
-<a class=tag href=/tags/swift/>#swift <span>17</span></a>
+— iOS와 Swift에 대한 기록.</p></section><section class=side-section id=tags><h2 class=side-section__title>TAGS · 166</h2><div class=side-tags><a class=tag href=/tags/swiftui/>#swiftui <span>25</span></a>
+<a class=tag href=/tags/swift/>#swift <span>18</span></a>
+<a class=tag href=/tags/ios17/>#ios17 <span>16</span></a>
 <a class=tag href=/tags/uikit/>#uikit <span>16</span></a>
-<a class=tag href=/tags/ios17/>#ios17 <span>15</span></a>
-<a class=tag href=/tags/swiftdata/>#swiftdata <span>13</span></a>
+<a class=tag href=/tags/swiftdata/>#swiftdata <span>14</span></a>
+<a class=tag href=/tags/debugging/>#debugging <span>12</span></a>
 <a class=tag href=/tags/migration/>#migration <span>12</span></a>
-<a class=tag href=/tags/debugging/>#debugging <span>11</span></a>
 <a class=tag href=/tags/ios/>#ios <span>11</span></a>
 <a class=tag href=/tags/concurrency/>#concurrency <span>10</span></a>
 <a class=tag href=/tags/coordinator/>#coordinator <span>9</span></a>
 <a class=tag href=/tags/realm/>#realm <span>7</span></a>
-<a class=tag href=/tags/pushnotification/>#pushnotification <span>6</span></a></div></section><section class=side-section id=archive><h2 class=side-section__title>ARCHIVES · 66 POSTS</h2><div class=archive-row><span class=archive-row__year>2026</span>
-<span class=archive-row__count>60</span></div><div class=archive-row><span class=archive-row__year>2022</span>
+<a class=tag href=/tags/pushnotification/>#pushnotification <span>6</span></a></div></section><section class=side-section id=archive><h2 class=side-section__title>ARCHIVES · 67 POSTS</h2><div class=archive-row><span class=archive-row__year>2026</span>
+<span class=archive-row__count>61</span></div><div class=archive-row><span class=archive-row__year>2022</span>
 <span class=archive-row__count>06</span></div></section><section class=side-section><h2 class=side-section__title>ELSEWHERE</h2><div class=elsewhere><a href=https://github.com/jun7680 target=_blank rel=noopener>GitHub <span>↗</span></a>
 <a href=mailto:dlswns9119@gmail.com>Email <span>↗</span></a>
 <a href=https://jun7680.github.io/index.xml>RSS <span>↗</span></a></div></section></aside></div><nav class=pagination aria-label=페이지네이션><a href=/tags/debugging/>← PREV</a>
