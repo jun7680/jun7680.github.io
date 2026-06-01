@@ -1,0 +1,247 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>NavigationStack path가 커질 때 Route enum으로 버티기 — 오깅중</title><meta name=description content="SwiftUI NavigationStack에서 여러 모델 타입을 path에 직접 넣다가 화면 전환이 흩어진 경험과 Route enum으로 목적지를 모으는 기준을 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/navigationstack-route-enum-path/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="NavigationStack path가 커질 때 Route enum으로 버티기"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/navigationstack-route-enum-path/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI NavigationStack에서 여러 모델 타입을 path에 직접 넣다가 화면 전환이 흩어진 경험과 Route enum으로 목적지를 모으는 기준을 정리한다."><meta property="og:image" content="https://jun7680.github.io/p/navigationstack-route-enum-path/thumbnail.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="NavigationStack path가 커질 때 Route enum으로 버티기"><meta property="article:published_time" content="2026-06-02T07:40:00+09:00"><meta property="article:modified_time" content="2026-06-02T07:40:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="NavigationStack"><meta property="article:tag" content="Navigation"><meta property="article:tag" content="Router"><meta property="article:tag" content="iOS16"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="NavigationStack path가 커질 때 Route enum으로 버티기"><meta name=twitter:description content="SwiftUI NavigationStack에서 여러 모델 타입을 path에 직접 넣다가 화면 전환이 흩어진 경험과 Route enum으로 목적지를 모으는 기준을 정리한다."><meta name=twitter:image content="https://jun7680.github.io/p/navigationstack-route-enum-path/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<span class=search-btn__label>Search posts</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swiftui"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFTUI</span>
+<span>/</span>
+<span>P_260602</span></nav><pre class=file-header>//  navigationstack-route-enum-path.swift
+//  ogging.dev / SwiftUI
+//  JUN 02, 2026 · 6 min read
+//  #swiftui, #navigationstack, #navigation, #router, #ios16</pre><header class=article__header><h1 class=article__title>NavigationStack path가 커질 때 Route enum으로 버티기</h1><p class=article__desc>SwiftUI NavigationStack에서 여러 모델 타입을 path에 직접 넣다가 화면 전환이 흩어진 경험과 Route enum으로 목적지를 모으는 기준을 정리한다.</p><div class=article__meta><span>JUN 02, 2026 · 6 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#navigationstack</span><span>#navigation</span><span>#router</span></div></div></header><div class=article__body><p><code>NavigationStack</code>은 처음 붙이면 꽤 편하다. 리스트에서 값을 누르고, <code>navigationDestination</code>만 선언하면 상세 화면으로 넘어간다. 작은 화면에서는 이 정도로 충분하다.</p><p>문제는 화면이 늘어난 뒤다. 상품 상세, 리뷰 작성, 설정, 웹뷰, 알림 딥링크가 같은 stack을 타기 시작하면 <code>path</code>에 무엇을 넣을지 애매해진다. 어떤 곳은 <code>Product.ID</code>, 어떤 곳은 <code>Product</code>, 어떤 곳은 문자열 URL을 넣고, destination 선언도 여러 파일에 흩어진다.</p><p>나는 이 시점부터 <code>Route</code> enum을 둔다. 핵심은 거창한 라우터를 만드는 게 아니라, <strong>화면 이동의 입력값을 한 타입으로 모으는 것</strong>이다.</p><h2 id=모델을-그대로-path에-넣으면-빨리-시작할-수-있다>모델을 그대로 path에 넣으면 빨리 시작할 수 있다</h2><p>가장 단순한 코드는 이렇다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProductListView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>products</span><span class=p>:</span> <span class=p>[</span><span class=n>Product</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>NavigationStack</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>List</span><span class=p>(</span><span class=n>products</span><span class=p>)</span> <span class=p>{</span> <span class=n>product</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=n>NavigationLink</span><span class=p>(</span><span class=n>value</span><span class=p>:</span> <span class=n>product</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=n>ProductRow</span><span class=p>(</span><span class=n>product</span><span class=p>:</span> <span class=n>product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>Product</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>product</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=n>ProductDetailView</span><span class=p>(</span><span class=n>product</span><span class=p>:</span> <span class=n>product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Apple 문서의 <a href=https://developer.apple.com/documentation/swiftui/view/navigationdestination%28for%3Adestination%3A%29><code>navigationDestination(for:destination:)</code></a>는 특정 데이터 타입에 맞는 destination을 선언한다. 이 방식은 화면 하나짜리 흐름에서는 읽기 쉽다.</p><p>그런데 앱이 커지면 모델 타입 자체가 navigation contract가 된다. <code>Product</code>가 <code>Hashable</code>이어야 하고, 상세 화면에 필요한 값이 바뀔 때 navigation 값도 같이 흔들린다. 원격 알림에서 <code>productID</code>만 받은 경우에는 다시 <code>Product</code>를 만들어 넣을 수도 없다.</p><h2 id=화면-이동-값은-모델보다-작게-잡는다>화면 이동 값은 모델보다 작게 잡는다</h2><p>상세 화면에 필요한 최소 입력은 보통 전체 모델이 아니라 식별자다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppRoute</span><span class=p>:</span> <span class=nb>Hashable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>productDetail</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=n>Product</span><span class=p>.</span><span class=n>ID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>reviewEditor</span><span class=p>(</span><span class=n>productID</span><span class=p>:</span> <span class=n>Product</span><span class=p>.</span><span class=n>ID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>settings</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>webPage</span><span class=p>(</span><span class=n>title</span><span class=p>:</span> <span class=nb>String</span><span class=p>,</span> <span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이렇게 두면 <code>NavigationPath</code>나 <code>[AppRoute]</code>에 한 종류의 값만 들어간다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>RootView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>path</span><span class=p>:</span> <span class=p>[</span><span class=n>AppRoute</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>NavigationStack</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>path</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>ProductListView</span> <span class=p>{</span> <span class=n>product</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(.</span><span class=n>productDetail</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=n>product</span><span class=p>.</span><span class=n>id</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>route</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                <span class=n>destination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>route</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>ViewBuilder</span>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>destination</span><span class=p>(</span><span class=k>for</span> <span class=n>route</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>switch</span> <span class=n>route</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>productDetail</span><span class=p>(</span><span class=kd>let</span> <span class=nv>id</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>ProductDetailView</span><span class=p>(</span><span class=n>productID</span><span class=p>:</span> <span class=n>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>reviewEditor</span><span class=p>(</span><span class=kd>let</span> <span class=nv>productID</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>ReviewEditorView</span><span class=p>(</span><span class=n>productID</span><span class=p>:</span> <span class=n>productID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>settings</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>SettingsView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>case</span> <span class=p>.</span><span class=n>webPage</span><span class=p>(</span><span class=kd>let</span> <span class=nv>title</span><span class=p>,</span> <span class=kd>let</span> <span class=nv>url</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>WebPageView</span><span class=p>(</span><span class=n>title</span><span class=p>:</span> <span class=n>title</span><span class=p>,</span> <span class=n>url</span><span class=p>:</span> <span class=n>url</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>여기서 <code>ProductDetailView</code>는 <code>productID</code>를 받고 필요한 데이터를 직접 로드한다. 리스트가 들고 있던 <code>Product</code> 인스턴스를 상세 화면까지 끌고 가지 않는다. 데이터 freshness도 이쪽이 낫다.</p><h2 id=route-enum은-화면-이름표가-아니라-입력-계약이다>Route enum은 화면 이름표가 아니라 입력 계약이다</h2><p><code>Route</code>를 만들 때 자주 하는 실수는 화면 이름만 넣는 것이다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppRoute</span><span class=p>:</span> <span class=nb>Hashable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>productDetail</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이러면 상세 화면에 필요한 값은 전역 store나 별도 state에서 찾아야 한다. 결국 navigation과 상태가 다시 분리되어 추적하기 어렵다.</p><p>반대로 모델 전체를 넣는 것도 애매하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>enum</span> <span class=nc>AppRoute</span><span class=p>:</span> <span class=nb>Hashable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=n>productDetail</span><span class=p>(</span><span class=n>Product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이 방식은 빠르게 만들 수 있지만 path 복원, 딥링크, push 알림 처리에서 불편해진다. 라우트에는 화면을 열기 위한 최소 값만 넣는 편이 오래 간다.</p><p>내 기준은 이렇다.</p><table><thead><tr><th>라우트 값</th><th>적합도</th></tr></thead><tbody><tr><td>화면 이름만</td><td>대부분 부족함</td></tr><tr><td>모델 전체</td><td>작은 예제에서는 편함, 앱이 커지면 무거움</td></tr><tr><td>모델 ID + 화면 옵션</td><td>가장 무난함</td></tr><tr><td>View 자체</td><td>피하는 편이 좋음</td></tr></tbody></table><h2 id=push와-deep-link도-같은-route로-보낸다>push와 deep link도 같은 Route로 보낸다</h2><p><code>Route</code> enum을 쓰면 외부 진입도 같은 코드로 모을 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>func</span> <span class=nf>handlePush</span><span class=p>(</span><span class=kc>_</span> <span class=n>payload</span><span class=p>:</span> <span class=n>PushPayload</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=kd>let</span> <span class=nv>productID</span> <span class=p>=</span> <span class=n>payload</span><span class=p>.</span><span class=n>productID</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(.</span><span class=n>productDetail</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=n>productID</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>handleURL</span><span class=p>(</span><span class=kc>_</span> <span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>guard</span> <span class=kd>let</span> <span class=nv>route</span> <span class=p>=</span> <span class=n>AppRoute</span><span class=p>(</span><span class=n>url</span><span class=p>:</span> <span class=n>url</span><span class=p>)</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>.</span><span class=n>append</span><span class=p>(</span><span class=n>route</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>URL parsing은 extension으로 빼도 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>extension</span> <span class=nc>AppRoute</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>?(</span><span class=n>url</span><span class=p>:</span> <span class=n>URL</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>components</span> <span class=p>=</span> <span class=n>url</span><span class=p>.</span><span class=n>pathComponents</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>components</span><span class=p>.</span><span class=bp>count</span> <span class=p>==</span> <span class=mi>3</span><span class=p>,</span> <span class=n>components</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=p>==</span> <span class=s>&#34;products&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kc>self</span> <span class=p>=</span> <span class=p>.</span><span class=n>productDetail</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=n>components</span><span class=p>[</span><span class=mi>2</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>여기서 중요한 건 push, deep link, 내부 버튼이 전부 같은 <code>.productDetail(id:)</code>로 들어온다는 점이다. 어느 경로로 들어왔는지에 따라 상세 화면 생성 방식이 달라지지 않는다.</p><h2 id=destination은-루트-근처에-모은다>destination은 루트 근처에 모은다</h2><p><code>navigationDestination</code>을 여러 하위 View에 흩뿌리면 나중에 같은 타입에 대한 destination이 어디서 적용되는지 헷갈린다. 특히 <code>String</code>, <code>UUID</code> 같은 범용 타입을 destination 값으로 쓰면 더 위험하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=nb>String</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>value</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=n>Text</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이 코드는 간단하지만 <code>String</code>을 navigation 값으로 쓰는 모든 흐름에 영향을 줄 수 있다. 그래서 앱 단위 navigation에서는 범용 타입보다 도메인 라우트 타입을 선호한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>navigationDestination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>AppRoute</span><span class=p>.</span><span class=kc>self</span><span class=p>)</span> <span class=p>{</span> <span class=n>route</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=n>destination</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=n>route</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>하위 View는 화면을 직접 push하지 않고 action을 올린다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProductListView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>onSelect</span><span class=p>:</span> <span class=p>(</span><span class=n>Product</span><span class=p>)</span> <span class=p>-&gt;</span> <span class=nb>Void</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>List</span><span class=p>(</span><span class=n>products</span><span class=p>)</span> <span class=p>{</span> <span class=n>product</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>onSelect</span><span class=p>(</span><span class=n>product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=n>label</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ProductRow</span><span class=p>(</span><span class=n>product</span><span class=p>:</span> <span class=n>product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이러면 리스트는 navigation 구조를 몰라도 된다. 재사용도 편하고 preview도 단순해진다.</p><h2 id=path를-전역으로-만들지는-않는다>path를 전역으로 만들지는 않는다</h2><p><code>Route</code> enum을 만들었다고 곧바로 전역 Router 객체를 만들 필요는 없다. 탭마다 navigation stack이 다르면 path도 탭마다 따로 있는 게 자연스럽다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>MainTabView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>homePath</span><span class=p>:</span> <span class=p>[</span><span class=n>AppRoute</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>settingsPath</span><span class=p>:</span> <span class=p>[</span><span class=n>AppRoute</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>TabView</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>HomeRoot</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>homePath</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=p>.</span><span class=n>tabItem</span> <span class=p>{</span> <span class=n>Label</span><span class=p>(</span><span class=s>&#34;홈&#34;</span><span class=p>,</span> <span class=n>systemImage</span><span class=p>:</span> <span class=s>&#34;house&#34;</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>SettingsRoot</span><span class=p>(</span><span class=n>path</span><span class=p>:</span> <span class=err>$</span><span class=n>settingsPath</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=p>.</span><span class=n>tabItem</span> <span class=p>{</span> <span class=n>Label</span><span class=p>(</span><span class=s>&#34;설정&#34;</span><span class=p>,</span> <span class=n>systemImage</span><span class=p>:</span> <span class=s>&#34;gear&#34;</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>외부 진입만 중앙에서 받아 어느 탭의 path에 넣을지 결정하면 된다. 모든 화면 이동을 하나의 singleton router에 몰아넣으면 처음엔 편하지만, 탭별 복원과 테스트가 더 어려워진다.</p><h2 id=내가-잡은-기준>내가 잡은 기준</h2><p><code>NavigationStack</code>이 커질 때는 이렇게 정리한다.</p><ol><li>작은 화면 하나면 모델을 직접 <code>NavigationLink(value:)</code>에 넣어도 된다.</li><li>외부 진입, 여러 destination, path 조작이 생기면 <code>Route</code> enum으로 모은다.</li><li>라우트에는 화면을 열기 위한 최소 입력만 넣는다.</li><li><code>String</code>, <code>UUID</code> 같은 범용 타입 destination은 앱 루트에서 피한다.</li><li>destination 선언은 stack 루트 근처에 둔다.</li><li>탭마다 stack이 다르면 path도 분리한다.</li></ol><p><code>NavigationStack</code>은 화면 전환을 데이터로 표현하게 해준다. 그래서 그 데이터의 타입을 대충 잡으면 나중에 전환 규칙도 대충 흩어진다. <code>Route</code> enum은 추상화라기보다, 화면 이동 값에 이름과 경계를 붙이는 일에 가깝다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/swiftui-state-initial-value-binding-trap/><span>← PREVIOUS FILE</span>
+<strong>SwiftUI @State 초기값이 바인딩을 따라 바뀌지 않을 때</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/urlsession-cancellation-error-handling/><span>NEXT FILE →</span>
+<strong>URLSession 취소를 실패 알림으로 보여주지 않기</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#모델을-그대로-path에-넣으면-빨리-시작할-수-있다>모델을 그대로 path에 넣으면 빨리 시작할 수 있다</a></li><li><a href=#화면-이동-값은-모델보다-작게-잡는다>화면 이동 값은 모델보다 작게 잡는다</a></li><li><a href=#route-enum은-화면-이름표가-아니라-입력-계약이다>Route enum은 화면 이름표가 아니라 입력 계약이다</a></li><li><a href=#push와-deep-link도-같은-route로-보낸다>push와 deep link도 같은 Route로 보낸다</a></li><li><a href=#destination은-루트-근처에-모은다>destination은 루트 근처에 모은다</a></li><li><a href=#path를-전역으로-만들지는-않는다>path를 전역으로 만들지는 않는다</a></li><li><a href=#내가-잡은-기준>내가 잡은 기준</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>

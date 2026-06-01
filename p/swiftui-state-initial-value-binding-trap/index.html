@@ -1,0 +1,195 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI @State 초기값이 바인딩을 따라 바뀌지 않을 때 — 오깅중</title><meta name=description content="SwiftUI View init에서 @State를 Binding 값으로 초기화했다가 부모 값 변경을 놓친 경험과 draft state, onChange, id 재생성 기준을 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-state-initial-value-binding-trap/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI @State 초기값이 바인딩을 따라 바뀌지 않을 때"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-state-initial-value-binding-trap/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI View init에서 @State를 Binding 값으로 초기화했다가 부모 값 변경을 놓친 경험과 draft state, onChange, id 재생성 기준을 정리한다."><meta property="og:image" content="https://jun7680.github.io/p/swiftui-state-initial-value-binding-trap/thumbnail.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SwiftUI @State 초기값이 바인딩을 따라 바뀌지 않을 때"><meta property="article:published_time" content="2026-06-02T07:20:00+09:00"><meta property="article:modified_time" content="2026-06-02T07:20:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="State"><meta property="article:tag" content="Binding"><meta property="article:tag" content="ViewLifecycle"><meta property="article:tag" content="iOS17"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI @State 초기값이 바인딩을 따라 바뀌지 않을 때"><meta name=twitter:description content="SwiftUI View init에서 @State를 Binding 값으로 초기화했다가 부모 값 변경을 놓친 경험과 draft state, onChange, id 재생성 기준을 정리한다."><meta name=twitter:image content="https://jun7680.github.io/p/swiftui-state-initial-value-binding-trap/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<span class=search-btn__label>Search posts</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swiftui"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFTUI</span>
+<span>/</span>
+<span>P_260602</span></nav><pre class=file-header>//  swiftui-state-initial-value-binding-trap.swift
+//  ogging.dev / SwiftUI
+//  JUN 02, 2026 · 6 min read
+//  #swiftui, #state, #binding, #viewlifecycle, #ios17</pre><header class=article__header><h1 class=article__title>SwiftUI @State 초기값이 바인딩을 따라 바뀌지 않을 때</h1><p class=article__desc>SwiftUI View init에서 @State를 Binding 값으로 초기화했다가 부모 값 변경을 놓친 경험과 draft state, onChange, id 재생성 기준을 정리한다.</p><div class=article__meta><span>JUN 02, 2026 · 6 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#state</span><span>#binding</span><span>#viewlifecycle</span></div></div></header><div class=article__body><p>SwiftUI에서 편집 화면을 만들다 보면 부모가 넘겨준 모델을 <code>@State</code>에 복사해서 쓰고 싶을 때가 있다. 예를 들어 상세 화면에서 이름을 수정하다가 저장 버튼을 누를 때만 실제 모델에 반영하는 구조다.</p><p>처음에는 <code>init</code>에서 바인딩 값을 읽어 <code>@State</code> 초기값으로 넣으면 끝난 줄 알았다. 그런데 부모가 다른 아이템을 넘겨도 편집 화면의 값이 그대로 남아 있거나, 리스트에서 행을 바꿨는데 이전 draft가 보이는 일이 생겼다.</p><p>정리하고 보니 문제는 단순했다. <strong><code>@State</code>의 초기값은 View가 처음 살아날 때 쓰이는 값이지, 부모 값이 바뀔 때마다 다시 동기화되는 값이 아니다.</strong></p><h2 id=처음에-작성한-코드>처음에 작성한 코드</h2><p>편집 화면은 보통 이런 식으로 시작한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProfileEditor</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Binding</span> <span class=kd>var</span> <span class=nv>profile</span><span class=p>:</span> <span class=n>Profile</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>name</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(</span><span class=n>profile</span><span class=p>:</span> <span class=n>Binding</span><span class=p>&lt;</span><span class=n>Profile</span><span class=p>&gt;)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>_profile</span> <span class=p>=</span> <span class=n>profile</span>
+</span></span><span class=line><span class=cl>        <span class=n>_name</span> <span class=p>=</span> <span class=n>State</span><span class=p>(</span><span class=n>initialValue</span><span class=p>:</span> <span class=n>profile</span><span class=p>.</span><span class=n>wrappedValue</span><span class=p>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Form</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>TextField</span><span class=p>(</span><span class=s>&#34;이름&#34;</span><span class=p>,</span> <span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;저장&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>profile</span><span class=p>.</span><span class=n>name</span> <span class=p>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>코드만 보면 자연스럽다. <code>profile.name</code>을 바로 수정하지 않고, 사용자가 입력 중인 <code>name</code>을 따로 둔 뒤 저장할 때만 반영한다. 취소 버튼이 있는 화면에서는 이 구조가 필요하다.</p><p>문제는 같은 <code>ProfileEditor</code> 자리에 다른 <code>profile</code>이 들어오는 경우다. SwiftUI는 <code>body</code>를 다시 계산하지만, 기존 View identity가 유지되면 <code>@State</code> 저장소도 유지된다. 그래서 <code>init</code> 코드가 다시 보인다고 해서 state가 항상 새로 시작한다고 생각하면 안 된다.</p><p>Apple 문서의 <a href=https://developer.apple.com/documentation/swiftui/state><code>State</code></a>는 SwiftUI가 값을 관리하고, view가 다시 그려져도 값을 유지한다고 설명한다. 이 유지가 장점이지만, 부모 값을 복사한 draft에서는 함정이 된다.</p><h2 id=state는-입력-draft로-쓰는-값이다><code>@State</code>는 입력 draft로 쓰는 값이다</h2><p>나는 이 상황을 이렇게 나눠서 본다.</p><table><thead><tr><th>값</th><th>역할</th></tr></thead><tbody><tr><td><code>@Binding var profile</code></td><td>부모가 소유한 원본 값</td></tr><tr><td><code>@State var name</code></td><td>현재 화면에서 편집 중인 임시 값</td></tr><tr><td><code>save()</code></td><td>draft를 원본에 반영하는 경계</td></tr></tbody></table><p>즉 <code>name</code>은 <code>profile.name</code>의 실시간 mirror가 아니다. 사용자가 편집 중인 독립 draft다. 원본이 바뀔 때 draft도 무조건 바꿔야 하는지, 아니면 사용자의 미저장 입력을 보호해야 하는지 먼저 정해야 한다.</p><p>예를 들어 화면 밖에서 서버 갱신이 들어왔다고 해서 사용자가 입력 중인 텍스트를 갑자기 덮어쓰면 더 위험할 수 있다. 반대로 리스트에서 다른 프로필을 선택한 경우라면 draft를 새 프로필 값으로 바꾸는 게 맞다.</p><h2 id=선택-대상이-바뀌면-명시적으로-동기화한다>선택 대상이 바뀌면 명시적으로 동기화한다</h2><p>선택된 모델의 <code>id</code>가 바뀔 때 draft를 다시 채워야 한다면 <code>onChange</code>를 명시적으로 둔다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProfileEditor</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Binding</span> <span class=kd>var</span> <span class=nv>profile</span><span class=p>:</span> <span class=n>Profile</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>name</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>bio</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(</span><span class=n>profile</span><span class=p>:</span> <span class=n>Binding</span><span class=p>&lt;</span><span class=n>Profile</span><span class=p>&gt;)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>_profile</span> <span class=p>=</span> <span class=n>profile</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>value</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>wrappedValue</span>
+</span></span><span class=line><span class=cl>        <span class=n>_name</span> <span class=p>=</span> <span class=n>State</span><span class=p>(</span><span class=n>initialValue</span><span class=p>:</span> <span class=n>value</span><span class=p>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>_bio</span> <span class=p>=</span> <span class=n>State</span><span class=p>(</span><span class=n>initialValue</span><span class=p>:</span> <span class=n>value</span><span class=p>.</span><span class=n>bio</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Form</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>TextField</span><span class=p>(</span><span class=s>&#34;이름&#34;</span><span class=p>,</span> <span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>TextEditor</span><span class=p>(</span><span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>bio</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>Button</span><span class=p>(</span><span class=s>&#34;저장&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>save</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>profile</span><span class=p>.</span><span class=n>id</span><span class=p>)</span> <span class=p>{</span> <span class=kc>_</span><span class=p>,</span> <span class=kc>_</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>resetDraft</span><span class=p>(</span><span class=n>from</span><span class=p>:</span> <span class=n>profile</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>resetDraft</span><span class=p>(</span><span class=n>from</span> <span class=n>profile</span><span class=p>:</span> <span class=n>Profile</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>name</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>        <span class=n>bio</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>bio</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>save</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>profile</span><span class=p>.</span><span class=n>name</span> <span class=p>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>        <span class=n>profile</span><span class=p>.</span><span class=n>bio</span> <span class=p>=</span> <span class=n>bio</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>여기서는 <code>profile.id</code> 변경만 동기화 기준으로 삼았다. 같은 프로필의 서버 값이 갱신될 때마다 draft를 덮어쓰지는 않겠다는 뜻이다. 이 기준을 코드로 드러내면 나중에 &ldquo;왜 값이 안 따라오지?&ldquo;보다 &ldquo;어떤 변경을 따라가야 하지?&ldquo;로 문제를 볼 수 있다.</p><h2 id=id로-view를-새로-만들-수도-있다><code>.id()</code>로 View를 새로 만들 수도 있다</h2><p>부모 쪽에서 선택 대상이 바뀔 때 편집 화면 전체를 새로 시작하게 만들 수도 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>ProfileEditor</span><span class=p>(</span><span class=n>profile</span><span class=p>:</span> <span class=err>$</span><span class=n>selectedProfile</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>id</span><span class=p>(</span><span class=n>selectedProfile</span><span class=p>.</span><span class=n>id</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>이렇게 하면 <code>selectedProfile.id</code>가 바뀔 때 View identity가 바뀌고, 하위의 <code>@State</code>도 새로 초기화된다. 편집 화면 안에 여러 draft state, focus state, validation state가 같이 묶여 있다면 이 방식이 더 깔끔할 때가 있다.</p><p>다만 <code>.id()</code>는 꽤 강한 도구다. 화면 내부 상태를 전부 버린다. 스크롤 위치, focus, 애니메이션 상태까지 새로 시작할 수 있으니 &ldquo;선택 대상 변경 시 편집 세션을 완전히 리셋한다"는 의도가 맞을 때만 쓴다.</p><h2 id=바인딩을-그대로-넘기는-게-나은-경우>바인딩을 그대로 넘기는 게 나은 경우</h2><p>취소가 필요 없고 입력 즉시 원본에 반영해도 된다면 draft state를 만들 필요가 없다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProfileNameField</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>Binding</span> <span class=kd>var</span> <span class=nv>name</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>TextField</span><span class=p>(</span><span class=s>&#34;이름&#34;</span><span class=p>,</span> <span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이런 컴포넌트에서 괜히 <code>@State private var draftName</code>을 만들면 오히려 동기화 문제가 생긴다. 컴포넌트가 단순한 입력 필드인지, 저장/취소 경계가 있는 편집 세션인지가 기준이다.</p><p>나는 이렇게 나눈다.</p><ul><li>입력 즉시 반영: <code>@Binding</code>을 직접 사용</li><li>저장 버튼이 있음: <code>@State</code> draft를 만들고 저장 시 반영</li><li>선택 대상 변경 시 draft 리셋: <code>onChange(of: id)</code> 또는 <code>.id(id)</code></li><li>외부 갱신과 사용자 입력이 충돌 가능: 자동 덮어쓰기 금지, 충돌 UI 고려</li></ul><h2 id=viewmodel로-옮겨도-같은-문제는-남는다>ViewModel로 옮겨도 같은 문제는 남는다</h2><p><code>ObservableObject</code>나 <code>@Observable</code> view model로 옮기면 코드가 정리될 수는 있다. 하지만 원본 값을 draft로 복사하는 순간, 같은 질문은 남는다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>Observable</span>
+</span></span><span class=line><span class=cl><span class=kr>final</span> <span class=kd>class</span> <span class=nc>ProfileEditorModel</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>name</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>bio</span><span class=p>:</span> <span class=nb>String</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>var</span> <span class=nv>sourceID</span><span class=p>:</span> <span class=n>Profile</span><span class=p>.</span><span class=n>ID</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>init</span><span class=p>(</span><span class=n>profile</span><span class=p>:</span> <span class=n>Profile</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>sourceID</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>id</span>
+</span></span><span class=line><span class=cl>        <span class=n>name</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>        <span class=n>bio</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>bio</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=nf>resetIfNeeded</span><span class=p>(</span><span class=n>profile</span><span class=p>:</span> <span class=n>Profile</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=n>sourceID</span> <span class=o>!=</span> <span class=n>profile</span><span class=p>.</span><span class=n>id</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>sourceID</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>id</span>
+</span></span><span class=line><span class=cl>        <span class=n>name</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>        <span class=n>bio</span> <span class=p>=</span> <span class=n>profile</span><span class=p>.</span><span class=n>bio</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>저장소가 <code>@State</code>든 view model이든 핵심은 같다. draft를 언제 만들고, 언제 버리고, 언제 원본에 반영할지 기준이 있어야 한다.</p><h2 id=내가-잡은-기준>내가 잡은 기준</h2><p>지금은 <code>@State</code>를 부모 값으로 초기화할 때마다 아래를 먼저 확인한다.</p><ol><li>이 값은 원본의 mirror인가, 편집 중인 draft인가?</li><li>사용자가 입력 중일 때 외부 변경이 들어오면 덮어써도 되는가?</li><li>어떤 key가 바뀌면 draft를 리셋해야 하는가?</li><li>리셋 범위가 필드 몇 개인가, 화면 전체인가?</li><li>취소 버튼이 없다면 애초에 <code>@Binding</code> 직접 수정이 더 단순하지 않은가?</li></ol><p><code>@State(initialValue:)</code> 자체가 나쁜 건 아니다. 다만 이 코드는 &ldquo;처음 한 번 draft를 만든다"는 의미에 가깝다. 부모 값 변경을 계속 따라가는 동기화 코드로 읽기 시작하면 바로 꼬인다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/swiftui-searchable-state-management/><span>← PREVIOUS FILE</span>
+<strong>SwiftUI searchable 붙이고 검색 상태가 지저분해졌을 때</strong>
+</a><a class="article-nav__card article-nav__card--next" href=/p/navigationstack-route-enum-path/><span>NEXT FILE →</span>
+<strong>NavigationStack path가 커질 때 Route enum으로 버티기</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#처음에-작성한-코드>처음에 작성한 코드</a></li><li><a href=#state는-입력-draft로-쓰는-값이다><code>@State</code>는 입력 draft로 쓰는 값이다</a></li><li><a href=#선택-대상이-바뀌면-명시적으로-동기화한다>선택 대상이 바뀌면 명시적으로 동기화한다</a></li><li><a href=#id로-view를-새로-만들-수도-있다><code>.id()</code>로 View를 새로 만들 수도 있다</a></li><li><a href=#바인딩을-그대로-넘기는-게-나은-경우>바인딩을 그대로 넘기는 게 나은 경우</a></li><li><a href=#viewmodel로-옮겨도-같은-문제는-남는다>ViewModel로 옮겨도 같은 문제는 남는다</a></li><li><a href=#내가-잡은-기준>내가 잡은 기준</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>
