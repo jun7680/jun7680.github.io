@@ -1,0 +1,187 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>UICollectionViewCompositionalLayout 가로 스크롤 섹션에서 삐끗한 것들 — 오깅중</title><meta name=description content="UICollectionViewCompositionalLayout에서 orthogonalScrollingBehavior로 가로 스크롤 섹션을 만들 때 paging, group width, estimated size, section inset에서 자주 헷갈린 지점을 정리한다."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/uicollectionview-compositional-layout-orthogonal-scrolling/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="UICollectionViewCompositionalLayout 가로 스크롤 섹션에서 삐끗한 것들"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/uicollectionview-compositional-layout-orthogonal-scrolling/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="UICollectionViewCompositionalLayout에서 orthogonalScrollingBehavior로 가로 스크롤 섹션을 만들 때 paging, group width, estimated size, section inset에서 자주 헷갈린 지점을 정리한다."><meta property="og:image" content="https://jun7680.github.io/p/uicollectionview-compositional-layout-orthogonal-scrolling/thumbnail.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="UICollectionViewCompositionalLayout 가로 스크롤 섹션에서 삐끗한 것들"><meta property="article:published_time" content="2026-06-01T10:50:00+09:00"><meta property="article:modified_time" content="2026-06-01T10:50:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="UIKit"><meta property="article:tag" content="UICollectionView"><meta property="article:tag" content="CompositionalLayout"><meta property="article:tag" content="iOS13"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="UICollectionViewCompositionalLayout 가로 스크롤 섹션에서 삐끗한 것들"><meta name=twitter:description content="UICollectionViewCompositionalLayout에서 orthogonalScrollingBehavior로 가로 스크롤 섹션을 만들 때 paging, group width, estimated size, section inset에서 자주 헷갈린 지점을 정리한다."><meta name=twitter:image content="https://jun7680.github.io/p/uicollectionview-compositional-layout-orthogonal-scrolling/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<span class=search-btn__label>Search posts</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swift"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFT</span>
+<span>/</span>
+<span>P_260601</span></nav><pre class=file-header>//  uicollectionview-compositional-layout-orthogonal-scrolling.swift
+//  ogging.dev / Swift
+//  JUN 01, 2026 · 7 min read
+//  #uikit, #uicollectionview, #compositionallayout, #ios13</pre><header class=article__header><h1 class=article__title>UICollectionViewCompositionalLayout 가로 스크롤 섹션에서 삐끗한 것들</h1><p class=article__desc>UICollectionViewCompositionalLayout에서 orthogonalScrollingBehavior로 가로 스크롤 섹션을 만들 때 paging, group width, estimated size, section inset에서 자주 헷갈린 지점을 정리한다.</p><div class=article__meta><span>JUN 01, 2026 · 7 MIN READ</span><div class=article__tags><span>#uikit</span><span>#uicollectionview</span><span>#compositionallayout</span><span>#ios13</span></div></div></header><div class=article__body><p><code>UICollectionViewCompositionalLayout</code>은 처음 보면 꽤 그럴듯하다. 섹션마다 다른 레이아웃을 만들 수 있고, 한 화면 안에 세로 리스트와 가로 캐러셀을 같이 넣는 것도 <code>orthogonalScrollingBehavior</code> 한 줄이면 된다.</p><p>그런데 실제로 만지면 &ldquo;왜 한 장씩 안 넘어가지?&rdquo;, &ldquo;왜 셀이 화면 밖으로 애매하게 잘리지?&rdquo;, &ldquo;왜 header가 같이 밀리지?&rdquo; 같은 작은 삐끗함이 계속 나온다. <a href=/p/uikit-diffable-datasource-memo/>DiffableDataSource</a>를 붙일 때는 데이터 쪽이 문제였고, CompositionalLayout에서는 대부분 <strong>group 크기와 section 스크롤 정책을 헷갈린 것</strong>이 문제였다.</p><p>환경은 iOS 13+ 기준. API 이름은 길지만 구조는 <code>item -> group -> section -> layout</code> 네 단계만 보면 된다.</p><h2 id=가장-작은-기본형>가장 작은 기본형</h2><p>가로 카드 섹션을 만든다고 하면 보통 이런 모양에서 시작한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>func</span> <span class=nf>makeCardSection</span><span class=p>()</span> <span class=p>-&gt;</span> <span class=n>NSCollectionLayoutSection</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>itemSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=mf>1.0</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>        <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalHeight</span><span class=p>(</span><span class=mf>1.0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>item</span> <span class=p>=</span> <span class=n>NSCollectionLayoutItem</span><span class=p>(</span><span class=n>layoutSize</span><span class=p>:</span> <span class=n>itemSize</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>groupSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=mf>0.82</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>        <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>absolute</span><span class=p>(</span><span class=mi>180</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>group</span> <span class=p>=</span> <span class=n>NSCollectionLayoutGroup</span><span class=p>.</span><span class=n>horizontal</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>layoutSize</span><span class=p>:</span> <span class=n>groupSize</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>subitems</span><span class=p>:</span> <span class=p>[</span><span class=n>item</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>section</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSection</span><span class=p>(</span><span class=n>group</span><span class=p>:</span> <span class=n>group</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>section</span><span class=p>.</span><span class=n>orthogonalScrollingBehavior</span> <span class=p>=</span> <span class=p>.</span><span class=n>groupPagingCentered</span>
+</span></span><span class=line><span class=cl>    <span class=n>section</span><span class=p>.</span><span class=n>contentInsets</span> <span class=p>=</span> <span class=n>NSDirectionalEdgeInsets</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>top</span><span class=p>:</span> <span class=mi>12</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>leading</span><span class=p>:</span> <span class=mi>20</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>bottom</span><span class=p>:</span> <span class=mi>24</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>trailing</span><span class=p>:</span> <span class=mi>20</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>section</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>여기서 핵심은 cell 하나가 아니라 <strong>group 하나가 paging 단위</strong>라는 점이다. item은 group 안에 들어가는 조각이고, section은 group들을 어떻게 나열하고 어떻게 스크롤할지 정한다.</p><p>Apple 문서에서도 <a href=https://developer.apple.com/documentation/uikit/uicollectionlayoutsectionorthogonalscrollingbehavior><code>UICollectionLayoutSectionOrthogonalScrollingBehavior</code></a>는 section이 메인 스크롤 축과 직교하는 방향으로 어떻게 움직이는지 정하는 값으로 설명한다. 즉 세로 collection view 안에서 특정 section만 가로로 스크롤하게 만드는 설정이다.</p><h2 id=paging과-grouppaging은-다르다><code>.paging</code>과 <code>.groupPaging</code>은 다르다</h2><p>처음 제일 많이 헷갈린 건 이거였다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>section</span><span class=p>.</span><span class=n>orthogonalScrollingBehavior</span> <span class=p>=</span> <span class=p>.</span><span class=n>paging</span>
+</span></span></code></pre></td></tr></table></div></div><p>이름만 보면 카드 하나씩 넘어갈 것 같은데, <code>.paging</code>은 기본 scroll view paging에 가깝게 <strong>collection view의 visible bounds 단위</strong>로 넘어간다. 카드 group width를 80%로 잡아도 한 카드씩 딱딱 맞는 느낌이 아닐 수 있다.</p><p>카드 하나, 또는 내가 정의한 group 하나를 기준으로 넘기고 싶으면 보통 이쪽이 더 의도에 맞았다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>section</span><span class=p>.</span><span class=n>orthogonalScrollingBehavior</span> <span class=p>=</span> <span class=p>.</span><span class=n>groupPaging</span>
+</span></span></code></pre></td></tr></table></div></div><p>가운데 정렬된 카드 캐러셀처럼 보이게 하려면:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>section</span><span class=p>.</span><span class=n>orthogonalScrollingBehavior</span> <span class=p>=</span> <span class=p>.</span><span class=n>groupPagingCentered</span>
+</span></span></code></pre></td></tr></table></div></div><p>대충 이렇게 기억하면 덜 헷갈린다.</p><table><thead><tr><th>옵션</th><th>느낌</th></tr></thead><tbody><tr><td><code>.continuous</code></td><td>그냥 부드럽게 가로 스크롤</td></tr><tr><td><code>.continuousGroupLeadingBoundary</code></td><td>스크롤은 자유롭지만 group 앞쪽에 걸림</td></tr><tr><td><code>.paging</code></td><td>화면 bounds 기준 paging</td></tr><tr><td><code>.groupPaging</code></td><td>group 단위 paging</td></tr><tr><td><code>.groupPagingCentered</code></td><td>group 단위 paging + 가운데 정렬</td></tr></tbody></table><p>가로 캐러셀 UI는 <code>.groupPaging</code>이나 <code>.groupPagingCentered</code>에서 시작하는 게 안전했다. <code>.paging</code>은 group 크기와 화면 폭이 거의 같을 때만 기대한 느낌이 난다.</p><h2 id=group-width를-10으로-잡으면-캐러셀이-아니다>group width를 1.0으로 잡으면 캐러셀이 아니다</h2><p>다음 실수는 group width를 너무 크게 잡는 것.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>groupSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=mf>1.0</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>absolute</span><span class=p>(</span><span class=mi>180</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>이러면 한 group이 collection view 폭을 전부 먹는다. 가로 스크롤은 되는데 다음 카드가 살짝 보이는 캐러셀 느낌은 없다. 카드가 옆에 이어지는지 사용자가 바로 알아보기 어렵다.</p><p>나는 보통 카드 섹션이면 group width를 <code>0.78 ~ 0.9</code> 사이에서 시작한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>groupSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=mf>0.84</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>absolute</span><span class=p>(</span><span class=mi>180</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>그리고 group 사이 간격은 item inset보다 section의 spacing으로 주는 쪽이 읽기 편했다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>section</span><span class=p>.</span><span class=n>interGroupSpacing</span> <span class=p>=</span> <span class=mi>12</span>
+</span></span></code></pre></td></tr></table></div></div><p>item에 <code>contentInsets</code>를 주면 cell 내부 여백처럼 보이기도 하고, group size 계산과 섞여서 나중에 디버깅할 때 헷갈린다. 카드와 카드 사이 간격이면 <code>interGroupSpacing</code>, 섹션 바깥 여백이면 <code>section.contentInsets</code>로 나누는 게 낫다.</p><h2 id=estimated-height는-편하지만-흔들릴-수-있다>estimated height는 편하지만 흔들릴 수 있다</h2><p>동적 높이 셀이라서 바로 이렇게 쓰고 싶을 때가 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>groupSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=mf>0.84</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>estimated</span><span class=p>(</span><span class=mi>180</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>가능은 하다. <a href=https://developer.apple.com/documentation/uikit/uicollectionviewcompositionallayoutconfiguration><code>UICollectionViewCompositionalLayoutConfiguration</code></a> 예제에서도 header/footer 높이에 <code>.estimated(44)</code> 같은 값을 쓴다. 문제는 가로 orthogonal section에서 높이가 계속 다시 계산되면 스크롤 중에 레이아웃이 미세하게 튀는 느낌이 날 수 있다는 점이다.</p><p>카드 높이가 디자인상 고정이면 그냥 <code>.absolute</code>가 낫다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>absolute</span><span class=p>(</span><span class=mi>180</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>텍스트 길이에 따라 정말 달라져야 한다면 estimated를 쓰되, cell Auto Layout constraint가 위아래로 닫혀 있어야 한다. label bottom constraint가 빠졌거나 compression resistance가 애매하면 collection view가 추정 높이를 계속 다시 잡으면서 흔들린다.</p><h2 id=header는-section-안에-붙여야-한다>header는 section 안에 붙여야 한다</h2><p>섹션마다 제목을 붙일 때 layout 전체 configuration에 header를 넣는 방법도 있다. 하지만 그건 collection view 전체의 boundary supplementary item이다. 섹션별 제목이면 section에 붙이는 게 맞다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>headerSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=mf>1.0</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>estimated</span><span class=p>(</span><span class=mi>44</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nv>header</span> <span class=p>=</span> <span class=n>NSCollectionLayoutBoundarySupplementaryItem</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>layoutSize</span><span class=p>:</span> <span class=n>headerSize</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>elementKind</span><span class=p>:</span> <span class=n>UICollectionView</span><span class=p>.</span><span class=n>elementKindSectionHeader</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>alignment</span><span class=p>:</span> <span class=p>.</span><span class=n>top</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>section</span><span class=p>.</span><span class=n>boundarySupplementaryItems</span> <span class=p>=</span> <span class=p>[</span><span class=n>header</span><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>orthogonalScrollingBehavior</code>를 켜도 header까지 가로로 같이 스크롤되는 게 아니라, section의 boundary supplementary item으로 남는다. 카드들은 가로로 움직이고 header는 세로 흐름 안에서 섹션 제목처럼 보인다. 보통 우리가 원하는 홈 화면 섹션 구조가 이쪽이다.</p><p><code>UICollectionViewCompositionalLayoutConfiguration</code>의 <code>boundarySupplementaryItems</code>는 전체 layout의 header/footer가 필요할 때 쓰는 쪽으로 생각하면 덜 헷갈린다.</p><h2 id=섹션별-layout은-sectionprovider로-빼는-게-편하다>섹션별 layout은 sectionProvider로 빼는 게 편하다</h2><p>여러 섹션을 섞는 순간 layout 클로저가 길어진다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>layout</span> <span class=p>=</span> <span class=n>UICollectionViewCompositionalLayout</span> <span class=p>{</span> <span class=n>sectionIndex</span><span class=p>,</span> <span class=n>environment</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=k>switch</span> <span class=n>Section</span><span class=p>(</span><span class=n>rawValue</span><span class=p>:</span> <span class=n>sectionIndex</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=p>.</span><span class=n>hero</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>Self</span><span class=p>.</span><span class=n>makeHeroSection</span><span class=p>(</span><span class=n>environment</span><span class=p>:</span> <span class=n>environment</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=p>.</span><span class=n>recommend</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>Self</span><span class=p>.</span><span class=n>makeCardSection</span><span class=p>(</span><span class=n>environment</span><span class=p>:</span> <span class=n>environment</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=p>.</span><span class=n>list</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>Self</span><span class=p>.</span><span class=n>makeListSection</span><span class=p>(</span><span class=n>environment</span><span class=p>:</span> <span class=n>environment</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=kc>nil</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>여기서 <code>environment.container.effectiveContentSize.width</code>를 보면 iPhone/iPad 폭에 따라 group width를 다르게 줄 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>private</span> <span class=kd>static</span> <span class=kd>func</span> <span class=nf>makeCardSection</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>environment</span><span class=p>:</span> <span class=n>NSCollectionLayoutEnvironment</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=p>-&gt;</span> <span class=n>NSCollectionLayoutSection</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>containerWidth</span> <span class=p>=</span> <span class=n>environment</span><span class=p>.</span><span class=n>container</span><span class=p>.</span><span class=n>effectiveContentSize</span><span class=p>.</span><span class=n>width</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>groupFraction</span><span class=p>:</span> <span class=n>CGFloat</span> <span class=p>=</span> <span class=n>containerWidth</span> <span class=o>&gt;</span> <span class=mi>600</span> <span class=p>?</span> <span class=mf>0.42</span> <span class=p>:</span> <span class=mf>0.84</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nv>groupSize</span> <span class=p>=</span> <span class=n>NSCollectionLayoutSize</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>widthDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>fractionalWidth</span><span class=p>(</span><span class=n>groupFraction</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>        <span class=n>heightDimension</span><span class=p>:</span> <span class=p>.</span><span class=n>absolute</span><span class=p>(</span><span class=mi>180</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// item, group, section 구성...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>iPad에서 <code>0.84</code>를 그대로 쓰면 카드 하나가 너무 넓어져서 이상하다. CompositionalLayout은 sectionProvider에서 environment를 받을 수 있으니, size class 분기를 view controller 바깥에 흩뿌리지 않아도 된다.</p><h2 id=내가-잡은-기준>내가 잡은 기준</h2><p>지금은 가로 섹션을 만들 때 이 순서로 잡는다.</p><ol><li>세로 collection view 안에 가로 섹션이 필요한지 먼저 확인</li><li>카드 한 장이 paging 단위면 <code>.groupPagingCentered</code>부터 시작</li><li>group width는 <code>1.0</code> 말고 다음 카드가 살짝 보이는 값으로 시작</li><li>카드 사이 간격은 <code>section.interGroupSpacing</code></li><li>카드 높이가 고정이면 <code>.absolute</code>, 정말 필요할 때만 <code>.estimated</code></li><li>섹션 제목은 <code>section.boundarySupplementaryItems</code></li><li>iPad 대응은 <code>NSCollectionLayoutEnvironment</code>에서 container width 보고 조정</li></ol><p>DiffableDataSource가 데이터 변경을 정리해준다면, CompositionalLayout은 화면 구조를 section 단위로 정리해준다. 둘을 같이 쓰면 ViewController에서 <code>IndexPath</code> 계산과 레이아웃 분기 코드가 많이 빠진다.</p><p>다만 <code>orthogonalScrollingBehavior</code> 한 줄만 믿고 들어가면 paging 단위, group 크기, estimated height에서 바로 삐끗한다. CompositionalLayout은 &ldquo;cell 크기"를 정하는 API라기보다 <strong>section 안에서 group이 반복되는 규칙을 정하는 API</strong>라고 보는 편이 더 잘 맞았다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/swiftdata-unmanaged-model-ios17-crash/><span>← PREVIOUS FILE</span>
+<strong>iOS 17에서만 죽는 SwiftData 크래시 — unmanaged @Model의 함정</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#가장-작은-기본형>가장 작은 기본형</a></li><li><a href=#paging과-grouppaging은-다르다><code>.paging</code>과 <code>.groupPaging</code>은 다르다</a></li><li><a href=#group-width를-10으로-잡으면-캐러셀이-아니다>group width를 1.0으로 잡으면 캐러셀이 아니다</a></li><li><a href=#estimated-height는-편하지만-흔들릴-수-있다>estimated height는 편하지만 흔들릴 수 있다</a></li><li><a href=#header는-section-안에-붙여야-한다>header는 section 안에 붙여야 한다</a></li><li><a href=#섹션별-layout은-sectionprovider로-빼는-게-편하다>섹션별 layout은 sectionProvider로 빼는 게 편하다</a></li><li><a href=#내가-잡은-기준>내가 잡은 기준</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>
