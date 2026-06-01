@@ -1,0 +1,243 @@
+<!doctype html><html lang=ko data-theme=dark><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SwiftUI searchable 붙이고 검색 상태가 지저분해졌을 때 — 오깅중</title><meta name=description content="SwiftUI searchable에서 입력 중인 searchText, 실제 API query, 검색 결과 상태를 한 값에 묶었다가 꼬인 경험과 상태를 나눠 정리한 패턴."><meta name=author content="오깅중"><link rel=canonical href=https://jun7680.github.io/p/swiftui-searchable-state-management/><meta name=naver-site-verification content="d6a2cbad0afbab2751d616c4188a11743ef463bc"><meta name=google-adsense-account content="ca-pub-8273127451497178"><meta property="og:type" content="article"><meta property="og:title" content="SwiftUI searchable 붙이고 검색 상태가 지저분해졌을 때"><meta property="og:site_name" content="오깅중"><meta property="og:url" content="https://jun7680.github.io/p/swiftui-searchable-state-management/"><meta property="og:locale" content="ko_KR"><meta property="og:description" content="SwiftUI searchable에서 입력 중인 searchText, 실제 API query, 검색 결과 상태를 한 값에 묶었다가 꼬인 경험과 상태를 나눠 정리한 패턴."><meta property="og:image" content="https://jun7680.github.io/p/swiftui-searchable-state-management/thumbnail.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SwiftUI searchable 붙이고 검색 상태가 지저분해졌을 때"><meta property="article:published_time" content="2026-06-01T16:25:00+09:00"><meta property="article:modified_time" content="2026-06-01T16:25:00+09:00"><meta property="article:author" content="오깅중"><meta property="article:tag" content="SwiftUI"><meta property="article:tag" content="searchable"><meta property="article:tag" content="Search"><meta property="article:tag" content="NavigationStack"><meta property="article:tag" content="iOS15"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="SwiftUI searchable 붙이고 검색 상태가 지저분해졌을 때"><meta name=twitter:description content="SwiftUI searchable에서 입력 중인 searchText, 실제 API query, 검색 결과 상태를 한 값에 묶었다가 꼬인 경험과 상태를 나눠 정리한 패턴."><meta name=twitter:image content="https://jun7680.github.io/p/swiftui-searchable-state-management/thumbnail.png"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"><link rel=stylesheet href=/css/main.min.224d30dd8a61f0d511573d48141c6bb91e6f5579a840fac35ce184265b61bc3a.css integrity="sha256-Ik0w3Yph8NURVz1IFBxruR5vVXmoQPrDXOGEJlthvDo="><link rel=alternate type=application/rss+xml href=https://jun7680.github.io/index.xml title="오깅중 RSS"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8273127451497178" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-7FMQW3EVSB"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7FMQW3EVSB")</script><script data-goatcounter=https://ogging.goatcounter.com/count async src=//gc.zgo.at/count.js></script></head><body class=view-article><div class=scroll-progress><div id=progress-bar></div></div><header class=site-header><div class=site-header__inner><a href=https://jun7680.github.io/ class=wordmark aria-label="오깅중 홈"><span>오깅중</span>
+<span class=wordmark__divider>/</span>
+<span class=wordmark__mono>ogging.dev</span></a><nav class=site-nav id=site-nav><a href=/>Home</a>
+<a href=/archives/>Archives</a>
+<a href=/tags/>Tags</a>
+<a href=/about/>About</a></nav><div class=header-tools><button class=search-btn id=search-btn type=button aria-label="검색 열기">
+<span class=search-btn__label>Search posts</span>
+<kbd>⌘K</kbd>
+</button>
+<button class=nav-toggle id=nav-toggle type=button aria-label="메뉴 열기/닫기" aria-controls=site-nav aria-expanded=false>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span>
+<span class=nav-toggle__bar></span></button></div></div></header><main class=site-main><div class="article-layout cat--swiftui"><article class="article reveal-in"><nav class=breadcrumb aria-label=breadcrumb><a href=/>← HOME</a>
+<span>/</span>
+<span class=breadcrumb__cat>SWIFTUI</span>
+<span>/</span>
+<span>P_260601</span></nav><pre class=file-header>//  swiftui-searchable-state-management.swift
+//  ogging.dev / SwiftUI
+//  JUN 01, 2026 · 6 min read
+//  #swiftui, #searchable, #search, #navigationstack, #ios15</pre><header class=article__header><h1 class=article__title>SwiftUI searchable 붙이고 검색 상태가 지저분해졌을 때</h1><p class=article__desc>SwiftUI searchable에서 입력 중인 searchText, 실제 API query, 검색 결과 상태를 한 값에 묶었다가 꼬인 경험과 상태를 나눠 정리한 패턴.</p><div class=article__meta><span>JUN 01, 2026 · 6 MIN READ</span><div class=article__tags><span>#swiftui</span><span>#searchable</span><span>#search</span><span>#navigationstack</span></div></div></header><div class=article__body><p>SwiftUI에서 검색창 붙이는 건 쉽다. <code>NavigationStack</code>이나 <code>List</code>에 <code>.searchable(text:)</code> 한 줄 붙이면 검색 필드가 바로 생긴다.</p><p>문제는 그 다음이다. 검색어가 바뀔 때마다 API를 부르고, 검색 결과 없음 화면도 보여주고, 추천어도 띄우고, 화면을 나갔다 돌아왔을 때 이전 검색어를 유지할지 말지까지 들어오면 <code>@State var searchText</code> 하나가 갑자기 너무 많은 일을 하기 시작한다.</p><p>나는 처음에 <code>searchText</code> 하나로 입력값, API 요청값, 화면 상태를 전부 처리했다가 코드가 꽤 지저분해졌다. 정리하고 보니 핵심은 단순했다. <strong>사용자가 입력 중인 값과 실제 검색에 사용한 값은 분리하는 게 낫다.</strong></p><h2 id=처음에는-한-값으로-다-처리한다>처음에는 한 값으로 다 처리한다</h2><p>처음 떠오르는 코드는 보통 이렇다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProductSearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>searchText</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>results</span><span class=p>:</span> <span class=p>[</span><span class=n>Product</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>isLoading</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>List</span><span class=p>(</span><span class=n>results</span><span class=p>)</span> <span class=p>{</span> <span class=n>product</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>ProductRow</span><span class=p>(</span><span class=n>product</span><span class=p>:</span> <span class=n>product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>searchable</span><span class=p>(</span><span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>searchText</span><span class=p>,</span> <span class=n>prompt</span><span class=p>:</span> <span class=s>&#34;상품 검색&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>searchText</span><span class=p>)</span> <span class=p>{</span> <span class=kc>_</span><span class=p>,</span> <span class=n>newValue</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>            <span class=n>Task</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>isLoading</span> <span class=p>=</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl>                <span class=n>results</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>ProductAPI</span><span class=p>.</span><span class=n>search</span><span class=p>(</span><span class=n>keyword</span><span class=p>:</span> <span class=n>newValue</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=n>isLoading</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>짧긴 한데 문제가 많다.</p><ul><li>한 글자 입력할 때마다 요청이 나간다.</li><li><code>a</code>, <code>ap</code>, <code>app</code> 요청 순서가 뒤섞이면 오래 걸린 응답이 나중에 와서 최신 결과를 덮을 수 있다.</li><li>빈 문자열이 들어왔을 때 추천 목록을 보여줄지, 전체 목록을 보여줄지, 아무것도 안 보여줄지 기준이 애매하다.</li><li>검색창에 보이는 값과 서버에 보낸 값이 항상 같다고 가정한다.</li></ul><p>Apple 문서에서 <a href=https://developer.apple.com/documentation/swiftui/view/searchable%28text%3Aplacement%3Aprompt%3A%29><code>searchable(text:placement:prompt:)</code></a>는 검색 필드에 표시하고 편집할 텍스트 binding을 받는다. 즉 이 값은 우선 <strong>검색창의 입력 상태</strong>다. API 요청 상태까지 같은 값에 억지로 묶을 필요는 없다.</p><h2 id=입력값과-커밋된-검색어를-나눈다>입력값과 커밋된 검색어를 나눈다</h2><p>나는 검색 화면에서 보통 값을 세 개로 나눈다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>searchText</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>       <span class=c1>// 사용자가 지금 입력 중인 값</span>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>committedQuery</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>   <span class=c1>// 실제 검색에 사용한 값</span>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>results</span><span class=p>:</span> <span class=p>[</span><span class=n>Product</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>searchText</code>는 UI 입력값이고, <code>committedQuery</code>는 앱이 믿고 검색한 값이다. 공백 정리, 최소 글자 수, debounce 같은 정책은 둘 사이에서 처리한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>struct</span> <span class=nc>ProductSearchView</span><span class=p>:</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>searchText</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>committedQuery</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>results</span><span class=p>:</span> <span class=p>[</span><span class=n>Product</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>isLoading</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>errorMessage</span><span class=p>:</span> <span class=nb>String</span><span class=p>?</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nv>body</span><span class=p>:</span> <span class=n>some</span> <span class=n>View</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>List</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>isLoading</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ProgressView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=n>committedQuery</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>RecentSearchSection</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=n>results</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ContentUnavailableView</span><span class=p>.</span><span class=n>search</span><span class=p>(</span><span class=n>text</span><span class=p>:</span> <span class=n>committedQuery</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ForEach</span><span class=p>(</span><span class=n>results</span><span class=p>)</span> <span class=p>{</span> <span class=n>product</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>                    <span class=n>ProductRow</span><span class=p>(</span><span class=n>product</span><span class=p>:</span> <span class=n>product</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>searchable</span><span class=p>(</span><span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>searchText</span><span class=p>,</span> <span class=n>prompt</span><span class=p>:</span> <span class=s>&#34;상품 검색&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>.</span><span class=n>task</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=n>searchText</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>await</span> <span class=n>searchIfNeeded</span><span class=p>(</span><span class=n>searchText</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>func</span> <span class=nf>searchIfNeeded</span><span class=p>(</span><span class=kc>_</span> <span class=n>text</span><span class=p>:</span> <span class=nb>String</span><span class=p>)</span> <span class=n>async</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>let</span> <span class=nv>query</span> <span class=p>=</span> <span class=n>text</span><span class=p>.</span><span class=n>trimmingCharacters</span><span class=p>(</span><span class=k>in</span><span class=p>:</span> <span class=p>.</span><span class=n>whitespacesAndNewlines</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=n>query</span><span class=p>.</span><span class=bp>count</span> <span class=o>&gt;=</span> <span class=mi>2</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>committedQuery</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=n>results</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>Task</span><span class=p>.</span><span class=n>sleep</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=p>.</span><span class=n>milliseconds</span><span class=p>(</span><span class=mi>300</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=o>!</span><span class=n>Task</span><span class=p>.</span><span class=n>isCancelled</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>guard</span> <span class=n>query</span> <span class=o>!=</span> <span class=n>committedQuery</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>committedQuery</span> <span class=p>=</span> <span class=n>query</span>
+</span></span><span class=line><span class=cl>        <span class=n>isLoading</span> <span class=p>=</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl>        <span class=n>errorMessage</span> <span class=p>=</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>results</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>ProductAPI</span><span class=p>.</span><span class=n>search</span><span class=p>(</span><span class=n>keyword</span><span class=p>:</span> <span class=n>query</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>errorMessage</span> <span class=p>=</span> <span class=s>&#34;검색 결과를 불러오지 못했어요.&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=n>results</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>isLoading</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>이 패턴의 장점은 <code>searchText</code>를 직접 다듬지 않는다는 점이다. 사용자가 입력 중인 텍스트는 그대로 두고, 실제 검색어만 정리해서 쓴다. 한글 조합 중에 입력값을 건드려 커서가 튀는 일도 줄어든다.</p><h2 id=taskid를-쓰면-이전-검색이-자연스럽게-취소된다><code>.task(id:)</code>를 쓰면 이전 검색이 자연스럽게 취소된다</h2><p>검색어가 바뀔 때마다 직접 <code>Task</code>를 만들고 저장해두는 방식도 가능하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>searchTask</span><span class=p>:</span> <span class=n>Task</span><span class=p>&lt;</span><span class=nb>Void</span><span class=p>,</span> <span class=n>Never</span><span class=p>&gt;?</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>onChange</span><span class=p>(</span><span class=n>of</span><span class=p>:</span> <span class=n>searchText</span><span class=p>)</span> <span class=p>{</span> <span class=kc>_</span><span class=p>,</span> <span class=n>newValue</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>    <span class=n>searchTask</span><span class=p>?.</span><span class=n>cancel</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>searchTask</span> <span class=p>=</span> <span class=n>Task</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>?</span> <span class=n>await</span> <span class=n>Task</span><span class=p>.</span><span class=n>sleep</span><span class=p>(</span><span class=k>for</span><span class=p>:</span> <span class=p>.</span><span class=n>milliseconds</span><span class=p>(</span><span class=mi>300</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=n>await</span> <span class=n>search</span><span class=p>(</span><span class=n>newValue</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>근데 SwiftUI에서는 <code>.task(id:)</code>가 더 읽기 편했다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>task</span><span class=p>(</span><span class=n>id</span><span class=p>:</span> <span class=n>searchText</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>await</span> <span class=n>searchIfNeeded</span><span class=p>(</span><span class=n>searchText</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>id</code>가 바뀌면 이전 task는 취소되고 새 task가 시작된다. debounce용 <code>Task.sleep</code>도 취소가 먹기 때문에 따로 타이머 state를 들고 다닐 필요가 없다.</p><p>다만 <code>.task(id:)</code> 안에서 검색 결과를 state에 반영한다면, 취소 이후 응답이 화면을 덮지 않도록 <code>Task.isCancelled</code>를 확인하는 습관은 남겨두는 게 좋다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=kd>let</span> <span class=nv>response</span> <span class=p>=</span> <span class=k>try</span> <span class=n>await</span> <span class=n>ProductAPI</span><span class=p>.</span><span class=n>search</span><span class=p>(</span><span class=n>keyword</span><span class=p>:</span> <span class=n>query</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>guard</span> <span class=o>!</span><span class=n>Task</span><span class=p>.</span><span class=n>isCancelled</span> <span class=k>else</span> <span class=p>{</span> <span class=k>return</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>results</span> <span class=p>=</span> <span class=n>response</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=검색-결과-없음과-검색-전-화면은-다르다>검색 결과 없음과 검색 전 화면은 다르다</h2><p>검색 화면에서 자주 섞이는 상태가 있다.</p><table><thead><tr><th>상태</th><th>의미</th></tr></thead><tbody><tr><td><code>searchText.isEmpty</code></td><td>사용자가 검색창에 아무것도 입력하지 않음</td></tr><tr><td><code>committedQuery.isEmpty</code></td><td>앱이 아직 검색을 실행하지 않음</td></tr><tr><td><code>results.isEmpty</code></td><td>검색은 했지만 결과가 없음</td></tr></tbody></table><p>이 셋을 전부 <code>results.isEmpty</code> 하나로 보면 화면이 이상해진다. 아직 검색 전인데 &ldquo;검색 결과 없음"이 뜨거나, 한 글자만 입력했는데 이전 결과가 사라지거나, 빈 검색어에서 전체 목록 API를 때리는 식이다.</p><p>나는 보통 이렇게 나눈다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=k>if</span> <span class=n>committedQuery</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>RecentSearchSection</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=n>isLoading</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ProgressView</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=n>results</span><span class=p>.</span><span class=bp>isEmpty</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ContentUnavailableView</span><span class=p>.</span><span class=n>search</span><span class=p>(</span><span class=n>text</span><span class=p>:</span> <span class=n>committedQuery</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ResultList</span><span class=p>(</span><span class=n>results</span><span class=p>:</span> <span class=n>results</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>검색 전 화면은 최근 검색어나 추천어가 어울리고, 검색 결과 없음은 이미 실행한 query가 있어야 자연스럽다.</p><h2 id=추천어는-검색-결과와-다른-데이터다>추천어는 검색 결과와 다른 데이터다</h2><p><code>searchSuggestions</code>를 붙이면 추천어도 SwiftUI 쪽에서 자연스럽게 처리할 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>.</span><span class=n>searchable</span><span class=p>(</span><span class=n>text</span><span class=p>:</span> <span class=err>$</span><span class=n>searchText</span><span class=p>,</span> <span class=n>prompt</span><span class=p>:</span> <span class=s>&#34;상품 검색&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>searchSuggestions</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ForEach</span><span class=p>(</span><span class=n>suggestions</span><span class=p>)</span> <span class=p>{</span> <span class=n>suggestion</span> <span class=k>in</span>
+</span></span><span class=line><span class=cl>        <span class=n>Text</span><span class=p>(</span><span class=n>suggestion</span><span class=p>.</span><span class=n>title</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>.</span><span class=n>searchCompletion</span><span class=p>(</span><span class=n>suggestion</span><span class=p>.</span><span class=n>keyword</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Apple 문서의 <a href=https://developer.apple.com/documentation/swiftui/view/searchsuggestions%28_%3A%29><code>searchSuggestions</code></a> 예제처럼 <code>searchCompletion(_:)</code>을 붙이면 제안을 눌렀을 때 검색창 텍스트가 해당 값으로 채워진다.</p><p>여기서도 결과와 추천어를 같은 배열로 합치지 않는 게 좋았다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-swift data-lang=swift><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>suggestions</span><span class=p>:</span> <span class=p>[</span><span class=n>SearchSuggestion</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=p>@</span><span class=n>State</span> <span class=kd>private</span> <span class=kd>var</span> <span class=nv>results</span><span class=p>:</span> <span class=p>[</span><span class=n>Product</span><span class=p>]</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span></code></pre></td></tr></table></div></div><p>추천어는 입력 보조 데이터고, 결과는 검색 실행 결과다. 둘의 빈 상태 의미가 다르다. 추천어가 없다고 결과 없음 화면을 띄우면 이상하고, 결과가 없다고 추천어 API까지 실패한 것처럼 보이면 더 이상하다.</p><h2 id=내가-쓰는-기준>내가 쓰는 기준</h2><p>SwiftUI 검색 화면은 지금 이렇게 잡는다.</p><ol><li><code>.searchable</code>의 binding은 입력 상태로만 본다.</li><li>공백 trim, 최소 글자 수, debounce를 거친 값을 별도 query로 둔다.</li><li>API 요청은 <code>.task(id: searchText)</code>나 view model의 취소 가능한 search 메서드로 보낸다.</li><li>검색 전, 로딩, 결과 없음, 에러, 결과 있음 상태를 분리한다.</li><li>suggestions와 results는 다른 데이터로 둔다.</li></ol><p><code>searchable</code>은 검색창을 붙여주는 modifier이지, 검색 플로우 전체를 대신 설계해주는 API는 아니다. 검색창에 보이는 문자열 하나에 모든 의미를 얹기 시작하면 금방 꼬인다.</p><p>입력 중인 텍스트, 실제 실행한 query, 화면 상태를 나눠두면 코드는 조금 길어지지만 디버깅은 훨씬 쉬워진다. 검색 UI는 대부분 &ldquo;입력은 빠르게 바뀌고, 결과는 늦게 도착한다"는 비대칭에서 꼬이기 때문에 그 경계를 코드에도 남겨두는 편이 낫다.</p></div><nav class=article-nav aria-label="이전 및 다음 글"><a class=article-nav__card href=/p/uicollectionview-compositional-layout-orthogonal-scrolling/><span>← PREVIOUS FILE</span>
+<strong>UICollectionViewCompositionalLayout 가로 스크롤 섹션에서 삐끗한 것들</strong></a></nav></article><aside class=toc><p class=toc__title>ON THIS PAGE</p><nav id=TableOfContents><ul><li><a href=#처음에는-한-값으로-다-처리한다>처음에는 한 값으로 다 처리한다</a></li><li><a href=#입력값과-커밋된-검색어를-나눈다>입력값과 커밋된 검색어를 나눈다</a></li><li><a href=#taskid를-쓰면-이전-검색이-자연스럽게-취소된다><code>.task(id:)</code>를 쓰면 이전 검색이 자연스럽게 취소된다</a></li><li><a href=#검색-결과-없음과-검색-전-화면은-다르다>검색 결과 없음과 검색 전 화면은 다르다</a></li><li><a href=#추천어는-검색-결과와-다른-데이터다>추천어는 검색 결과와 다른 데이터다</a></li><li><a href=#내가-쓰는-기준>내가 쓰는 기준</a></li></ul></nav><div class=reading-card><span>READING PROGRESS</span>
+<strong id=reading-progress>0%</strong></div></aside></div></main><footer class=site-footer><div class=footer-baseline><span><i class=build-dot></i> BUILD SUCCEEDED · © 2020–2026 오깅중</span>
+<span>BUILT WITH ☕ · HOSTED ON GITHUB PAGES</span></div></footer><div class=palette-backdrop id=palette-backdrop hidden data-index-url=https://jun7680.github.io/index.json><div class=palette role=dialog aria-modal=true aria-label=검색><div class=palette__input><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id=palette-input type=text placeholder="포스트 검색…" autocomplete=off>
+<kbd>ESC</kbd></div><div class=palette__list id=palette-list></div><div class=palette__empty id=palette-empty hidden>검색 결과가 없습니다.</div></div></div><script src=/js/main.min.8ddb86c452b099df8fde67b03df718f615cb498b336af71ec7e0ef5d537998be.js integrity="sha256-jduGxFKwmd+P3mewPfcY9hXLSYszavcex+DvXVN5mL4=" defer></script></body></html>
